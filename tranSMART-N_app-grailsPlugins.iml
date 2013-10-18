@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="JAVA_MODULE" version="4">
   <component name="FacetManager">
-    <facet type="Spring" name="Spring">
-      <configuration>
-        <fileset id="Grails" name="Grails" removed="false" />
-      </configuration>
-    </facet>
     <facet type="web" name="GrailsWeb">
       <configuration>
         <webroots>
-          <root url="file://$MODULE_DIR$/web-app" relative="/" />
-          <root url="file://$MODULE_DIR$/grails-app/views" relative="/" />
+          <root url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/prototype-1.0/web-app" relative="/" />
+          <root url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/rdc-rmodules-0.3-SNAPSHOT/web-app" relative="/" />
+          <root url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/rdc-rmodules-0.3-SNAPSHOT/grails-app/views" relative="/" />
+          <root url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/build-info-1.1/grails-app/views" relative="/" />
         </webroots>
         <sourceRoots />
       </configuration>
@@ -23,23 +20,66 @@
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
-    <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/grails-app/jobs" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/grails-app/i18n" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/grails-app/controllers" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/grails-app/domain" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/grails-app/services" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/grails-app/taglib" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/test/unit" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/test/integration" isTestSource="true" />
+    <content url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/build-info-1.1">
+      <sourceFolder url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/build-info-1.1/grails-app/controllers" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/code-coverage-1.2.6" />
+    <content url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/db-reverse-engineer-0.5">
+      <sourceFolder url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/db-reverse-engineer-0.5/src/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/db-reverse-engineer-0.5/src/groovy" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/hibernate-2.2.4" />
+    <content url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/prototype-1.0">
+      <sourceFolder url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/prototype-1.0/src/groovy" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/quartz-1.0-RC2">
+      <sourceFolder url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/quartz-1.0-RC2/src/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/quartz-1.0-RC2/src/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/quartz-1.0-RC2/grails-app/services" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/rdc-rmodules-0.3-SNAPSHOT">
+      <sourceFolder url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/rdc-rmodules-0.3-SNAPSHOT/src/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/rdc-rmodules-0.3-SNAPSHOT/grails-app/utils" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/rdc-rmodules-0.3-SNAPSHOT/grails-app/i18n" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/rdc-rmodules-0.3-SNAPSHOT/grails-app/controllers" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/rdc-rmodules-0.3-SNAPSHOT/grails-app/services" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/release-2.2.1">
+      <sourceFolder url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/release-2.2.1/src/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/release-2.2.1/src/groovy" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/resources-1.2">
+      <sourceFolder url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/resources-1.2/src/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/resources-1.2/src/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/resources-1.2/grails-app/i18n" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/resources-1.2/grails-app/taglib" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/rest-client-builder-1.0.3">
+      <sourceFolder url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/rest-client-builder-1.0.3/src/groovy" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/spring-security-core-1.2.7.3">
+      <sourceFolder url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/spring-security-core-1.2.7.3/src/java" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/spring-security-core-1.2.7.3/src/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/spring-security-core-1.2.7.3/grails-app/i18n" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/spring-security-core-1.2.7.3/grails-app/services" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/spring-security-core-1.2.7.3/grails-app/taglib" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/tomcat-2.2.4" />
+    <content url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/transmart-core-1.0-SNAPSHOT">
+      <sourceFolder url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/transmart-core-1.0-SNAPSHOT/src/groovy" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/transmart-core-1.0-SNAPSHOT/grails-app/controllers" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/transmart-core-1.0-SNAPSHOT/grails-app/domain" isTestSource="false" />
+      <sourceFolder url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/transmart-core-1.0-SNAPSHOT/grails-app/services" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/webxml-1.4.1">
+      <sourceFolder url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/webxml-1.4.1/src/groovy" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="grails-2.2.4" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="grails-2.2.4" level="application" />
     <orderEntry type="module-library" exported="">
-      <library name="Grails User Library (tranSMART-N_app)">
+      <library name="Grails User Library (tranSMART-N_app-grailsPlugins)">
         <CLASSES>
-          <root url="file://$MODULE_DIR$/lib" />
           <root url="jar://$USER_HOME$/.grails/ivy-cache/org.hibernate/jtidy/jars/jtidy-r8-20060801.jar!/" />
           <root url="jar://$USER_HOME$/.grails/ivy-cache/org.hibernate/hibernate-tools/jars/hibernate-tools-3.6.0.CR1.jar!/" />
           <root url="jar://$USER_HOME$/.grails/ivy-cache/freemarker/freemarker/jars/freemarker-2.3.8.jar!/" />
@@ -95,13 +135,15 @@
           <root url="jar://$USER_HOME$/.grails/ivy-cache/org.eclipse.jdt.core.compiler/ecj/jars/ecj-3.7.2.jar!/" />
           <root url="jar://$USER_HOME$/.grails/ivy-cache/org.apache.tomcat.embed/tomcat-embed-logging-log4j/jars/tomcat-embed-logging-log4j-7.0.42.jar!/" />
           <root url="jar://$USER_HOME$/.grails/ivy-cache/org.apache.tomcat.embed/tomcat-embed-core/jars/tomcat-embed-core-7.0.42.jar!/" />
+          <root url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/rdc-rmodules-0.3-SNAPSHOT/lib" />
+          <root url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/build-info-1.1/lib" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
-        <jarDirectory url="file://$MODULE_DIR$/lib" recursive="false" />
+        <jarDirectory url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/build-info-1.1/lib" recursive="false" />
+        <jarDirectory url="file://$USER_HOME$/.grails/2.2.4/projects/transmart/plugins/rdc-rmodules-0.3-SNAPSHOT/lib" recursive="false" />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="tranSMART-N_app-grailsPlugins" />
   </component>
 </module>
 
