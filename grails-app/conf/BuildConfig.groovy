@@ -45,7 +45,7 @@ grails.project.dependency.resolution = {
         ])
     }
     dependencies {
-		runtime 'postgresql:postgresql:9.0-801.jdbc4'
+		//runtime 'postgresql:postgresql:9.0-801.jdbc4'
 		compile 'antlr:antlr:2.7.7'
         compile 'org.transmartproject:transmart-core-api:1.0-SNAPSHOT'
     }
