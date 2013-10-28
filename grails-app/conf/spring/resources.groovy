@@ -83,7 +83,7 @@ beans = {
 		sampleInfoService(SampleInfoService)
 	
 		// --
-	
+	    /*
 		log.debug("Postgres configured")
 		
 		dataCountService(PostgresDataCountService){bean ->
@@ -130,6 +130,54 @@ beans = {
 			asyncJobService = ref('asyncJobService')
 			dataExportService = ref('dataExportService')
 		}
+		*/
+    log.debug("Netezza configured")
+
+    dataCountService(NetezzaDataCountService){bean ->
+        dataSource = ref('dataSource')
+    }
+    geneExpressionDataService(NetezzaGeneExpressionDataService){bean ->
+        dataSource = ref('dataSource')
+        grailsApplication = ref('grailsApplication')
+        i2b2HelperService = ref('i2b2HelperService')
+        springSecurityService = ref('springSecurityService')
+        fileDownloadService = ref ('fileDownloadService')
+        utilService = ref('utilService')
+    }
+    snpDataService(NetezzaSnpDataService){bean ->
+        dataSource = ref('dataSource')
+        grailsApplication = ref('grailsApplication')
+        i2b2HelperService = ref('i2b2HelperService')
+        springSecurityService = ref('springSecurityService')
+        fileDownloadService = ref ('fileDownloadService')
+        utilService = ref('utilService')
+        snpService = ref('snpService')
+        plinkService = ref('plinkService')
+    }
+    clinicalDataService(NetezzaClinicalDataService){bean ->
+        dataSource = ref('dataSource')
+        i2b2HelperService = ref('i2b2HelperService')
+        springSecurityService = ref('springSecurityService')
+        utilService = ref('utilService')
+    }
+    i2b2HelperService(NetezzaI2b2HelperService){bean->
+        dataSource = ref('dataSource')
+        sessionFactory = ref('sessionFactory')
+        conceptService = ref('conceptService')
+        sampleInfoService = ref('conceptService')
+    }
+    exportService(NetezzaExportService){bean->
+        quartzScheduler = ref('quartzScheduler')
+        grailsApplication = ref('grailsApplication')
+        dataCountService = ref('dataCountService')
+        geneExpressionDataService = ref('geneExpressionDataService')
+        i2b2HelperService = ref('i2b2HelperService')
+        i2b2ExportHelperService = ref('i2b2ExportHelperService')
+        jobResultsService = ref('jobResultsService')
+        asyncJobService = ref('asyncJobService')
+        dataExportService = ref('dataExportService')
+    }
+
 	/*}*/
 }
 
