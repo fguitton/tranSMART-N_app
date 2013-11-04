@@ -19,9 +19,9 @@
   
 
 package com.recomdata.transmart.domain.i2b2
-import java.util.Date;
 
 class AsyncJob {
+    Long    id
 	String jobName
 	String jobStatus
 	String runTime
@@ -33,6 +33,8 @@ class AsyncJob {
 	
 	static mapping = {
 		table 'I2B2DEMODATA.ASYNC_JOB'
+        id generator:'sequence', params:[sequence:'sq_async_job']
+        id              column: "id" //,  generator: "identity"
 		version false
 		jobName column:'JOB_NAME'
 		jobStatus column:'JOB_STATUS'
