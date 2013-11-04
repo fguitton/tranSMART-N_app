@@ -16,13 +16,14 @@
  * 
  *
  ******************************************************************/
-  
+
+grails.plugin.location.'transmart-core'="../tranSMART-N_core-db"
+grails.plugin.location.'rdc-modules' = "../tranSMART-N_RModules"
 
 grails.project.class.dir = "target/classes"
 grails.project.test.class.dir = "target/test-classes"
 grails.project.test.reports.dir = "target/test-reports"
 
-//grails.plugin.location.'rdc-modules' = "../Rmodules"
 
 //grails.project.war.file = "target/${appName}-${appVersion}.war"
 grails.project.dependency.resolution = {
@@ -45,21 +46,20 @@ grails.project.dependency.resolution = {
         ])
     }
     dependencies {
-		//runtime 'postgresql:postgresql:9.0-801.jdbc4'
+//		runtime 'postgresql:postgresql:9.0-801.jdbc4'
+//        compile('org.transmartproject:transmart-core-api:1.0-SNAPSHOT')
 		compile 'antlr:antlr:2.7.7'
-        compile 'org.transmartproject:transmart-core-api:1.0-SNAPSHOT'
     }
 
     plugins {
         compile ":hibernate:$grailsVersion"
         compile ":quartz:1.0-RC2"
-        compile ":rdc-rmodules:0.3-SNAPSHOT"
+//        compile ":rdc-rmodules:0.3-SNAPSHOT"
         compile ":spring-security-core:1.2.7.3"
         compile ":resources:1.2"
         build ":tomcat:$grailsVersion"
         build ":build-info:1.1"
 		runtime ":prototype:1.0"
-        runtime ":transmart-core:1.0-SNAPSHOT"
 
         test ":code-coverage:1.2.6"
     }
