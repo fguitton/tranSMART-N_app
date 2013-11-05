@@ -485,7 +485,8 @@ class NetezzaI2b2HelperService {
      *  Gets the concept distributions for a concept in a subset
      */
     def  HashMap<String,Integer> getConceptDistributionDataForConcept(String concept_key, String result_instance_id) throws SQLException {
-        String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length()).replaceAll((/\\${''}/), "\\\\\\\\");
+//        String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length()).replaceAll((/\\${''}/), "\\\\\\\\");
+        String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length())
         HashMap<String,Integer> results = new LinkedHashMap<String, Integer>();
 
         // check to see if there is a mapping from this concept_key to a concept_key for the results
@@ -506,7 +507,7 @@ class NetezzaI2b2HelperService {
                 log.debug("** IN LOOP: fullname: "+fullname);
                 groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
                 String sqlt =
-                    "SELECT DISTINCT c_name, c_fullname FROM i2b2metadata.i2b2 WHERE C_FULLNAME LIKE ? AND c_hlevel = ? ORDER BY C_FULLNAME";
+                    "SELECT DISTINCT c_name, c_fullname FROM i2b2metadata.i2b2 WHERE C_FULLNAME LIKE ? ESCAPE '@' AND c_hlevel = ? ORDER BY C_FULLNAME";
                 log.trace(sqlt);
                 sql.eachRow(sqlt, [fullname+"%", i], {row ->
                     if (results.get(row[0]) == null) {
@@ -519,7 +520,7 @@ class NetezzaI2b2HelperService {
         } else {
             int i=getLevelFromKey(concept_key)+1;
             groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
-            String sqlt = "SELECT DISTINCT c_name, c_fullname FROM i2b2metadata.i2b2 WHERE C_FULLNAME LIKE ? AND c_hlevel = ? ORDER BY C_FULLNAME";
+            String sqlt = "SELECT DISTINCT c_name, c_fullname FROM i2b2metadata.i2b2 WHERE C_FULLNAME LIKE ? ESCAPE '@' AND c_hlevel = ? ORDER BY C_FULLNAME";
             log.trace(sqlt);
             sql.eachRow(sqlt, [fullname+"%", i], {row ->
                 results.put(row[0], getObservationCountForConceptForSubset("\\blah"+row[1], result_instance_id));
