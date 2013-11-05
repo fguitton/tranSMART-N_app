@@ -4564,13 +4564,14 @@ class NetezzaI2b2HelperService {
      */
     def  getChildPathsWithTokensFromParentKey(String concept_key) {
         String prefix=concept_key.substring(0, concept_key.indexOf("\\",2)); //get the prefix to put on to the fullname to make a key
-        String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length()).replaceAll((/\\${''}/), "\\\\\\\\");
+//        String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length()).replaceAll((/\\${''}/), "\\\\\\\\");
+        String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length())//.replaceAll((/\\${''}/), "\\\\\\\\");
 
         String xml;
         def ls=[:];
         int i=getLevelFromKey(concept_key)+1;
         groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-        String sqlt = "SELECT C_FULLNAME, SECURE_OBJ_TOKEN FROM i2b2metadata.i2b2_SECURE WHERE C_FULLNAME LIKE ? AND c_hlevel = ? ORDER BY C_FULLNAME";
+        String sqlt = "SELECT C_FULLNAME, SECURE_OBJ_TOKEN FROM i2b2metadata.i2b2_SECURE WHERE C_FULLNAME LIKE ? ESCAPE '@' AND c_hlevel = ? ORDER BY C_FULLNAME";
         sql.eachRow(sqlt, [fullname+"%", i], {row ->
             String conceptkey=prefix+row.c_fullname;
             ls.put(keyToPath(conceptkey), row.secure_obj_token);
