@@ -18,23 +18,18 @@
  ******************************************************************/
   
 
-import org.springframework.web.multipart.MultipartFile;
-import org.transmart.biomart.BioAssayAnalysisData;
-import org.transmart.biomart.BioAssayDataAnnotation;
-import org.transmart.biomart.BioAssayFeatureGroup;
-import org.transmart.searchapp.AuthUser;
 
-import org.transmart.searchapp.GeneSignatureItem;
-import org.transmart.searchapp.GeneSignatureFileSchema;
-import org.transmart.searchapp.GeneSignature;
-import org.transmart.biomart.BioMarker;
-import org.transmart.biomart.BioData;
-import com.recomdata.search.query.Query;
-import com.recomdata.genesignature.FileSchemaException;
-import com.recomdata.util.ExcelSheet
-import com.recomdata.util.ExcelGenerator
-import org.hibernate.*;
-
+import com.recomdata.genesignature.FileSchemaException
+import com.recomdata.search.query.Query
+import org.hibernate.Hibernate
+import org.springframework.web.multipart.MultipartFile
+import org.transmart.biomart.BioAssayDataAnnotation
+import org.transmart.biomart.BioAssayFeatureGroup
+import org.transmart.biomart.BioData
+import org.transmart.biomart.BioMarker
+import org.transmart.searchapp.AuthUser
+import org.transmart.searchapp.GeneSignature
+import org.transmart.searchapp.GeneSignatureItem
 /**
  * Service class for Gene Signature functionality
  * $Id: GeneSignatureService.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
@@ -583,7 +578,7 @@ public class GeneSignatureService {
 		results.each { countMap.put(it.getAt(0), it) }
 		*/
 
-		def permCriteria = (bAdmin) ? "(1=1)" : "(gs.CREATED_BY_AUTH_USER_ID="+userId+" or gs.PUBLIC_FLAG=1)"
+		def permCriteria = (bAdmin) ? "(1=1)" : "(gs.CREATED_BY_AUTH_USER_ID="+userId+" or gs.PUBLIC_FLAG=TRUE)"
 		StringBuffer nativeSQL = new StringBuffer();
 		nativeSQL.append("select gsi.SEARCH_GENE_SIGNATURE_ID as id, count(*) Gene_Ct, sum(CASE WHEN gsi.FOLD_CHG_METRIC>0 THEN 1 ELSE 0 END) Up_Ct, sum(CASE WHEN gsi.FOLD_CHG_METRIC<0 THEN 1 ELSE 0 END) Down_Ct ");
 		nativeSQL.append("from SEARCH_GENE_SIGNATURE_ITEM gsi join SEARCH_GENE_SIGNATURE gs on gsi.search_gene_signature_id=gs.search_gene_signature_id ");
