@@ -203,7 +203,7 @@ function checkJobStatus(jobName)	{
 	var cancBtn = Ext.getCmp('cancjob-button');
 	var jWindow = Ext.getCmp('showJobStatus');	
 	var secCount = 0;
-	var pollInterval = 3000;   // 4 second
+	var pollInterval = 10000;   // 4 second
 	var singletonflag= 0; // make sure we don't invoke heatmap more than once on job completion
 	
 	// Add the handler for the cancel button in the statusbar
