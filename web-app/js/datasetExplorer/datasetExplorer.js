@@ -531,6 +531,27 @@ Ext.onReady(function()
 								}
 							}
 					),
+                    new Ext.Toolbar.Separator(),
+                    new Ext.Toolbar.Button(
+                            {
+                                id : 'savesubsetsbutton',
+                                text : 'Save Subsets',
+                                iconCls : 'savebutton',
+                                disabled : false,
+                                handler : function()
+                                {
+                                    if(isSubsetEmpty(1) && isSubsetEmpty(2))
+                                    {
+                                        alert('Empty subsets found, need at least 1 valid subset to save a comparsion');
+                                        return;
+                                    }
+                                    else
+                                    {
+                                        showSaveSubsetsDialog();
+                                    }
+                                }
+                            }
+                    ),
 					'->',
 					new Ext.Toolbar.Separator(),
 					new Ext.Toolbar.Button({
@@ -838,6 +859,29 @@ Ext.onReady(function()
 					collapsible : true						
 				}
 		);
+
+        //jira DEMOTM-138 Workspaces tab - subset and report grid CRUD
+        var workspacePanel = new Ext.Panel(
+                {
+                    id : 'workspacePanel',
+                    title : 'Workspace',
+                    region : 'center',
+                    split : true,
+                    height : 90,
+                    layout : 'fit',
+                    autoScroll : true,
+                    listeners :
+                    {
+                        activate : function(p) {
+                            renderWorkspace(p)
+                        },
+                        deactivate: function(){
+
+                        }
+                    },
+                    collapsible : true
+                }
+        );
 		
 		metacoreEnrichmentPanel = new Ext.Panel(
 				{
@@ -883,6 +927,8 @@ Ext.onReady(function()
 		//resultsTabPanel.add(analysisJobsPanel);
 		resultsTabPanel.add(analysisDataExportPanel);
 		resultsTabPanel.add(analysisExportJobsPanel);
+        //jira DEMOTM-138 Workspaces tab - subset and report grid CRUD
+        resultsTabPanel.add(workspacePanel);
 		if (GLOBAL.metacoreAnalyticsEnabled) {
 			resultsTabPanel.add(metacoreEnrichmentPanel);
 		}
@@ -1948,6 +1994,9 @@ function setupDragAndDrop()
 
 			dts.notifyDrop = function(source, e, data)
 			{
+                GLOBAL.currentSubsetsStudy=data.node.attributes.comment.substr(6);
+                //Analysis will change as a result of this drop, mark this
+                GLOBAL.AnalysisHasBeenRun = false;
 				if(source.tree.id == "previousQueriesTree")
 				{
 					getPreviousQueryFromID(data.node.attributes.id);
@@ -2021,11 +2070,12 @@ function setupDragAndDrop()
 			}
 	);
 
+
 	dts.notifyDrop = function(source, e, data)
 	{
 		// createAnalysisItem(data.node.text, data.node.id);
 		// alert("build analsyis graph now!");
-		buildAnalysis(data.node);
+		buildAnalysis(data.node,'stats');
 		return true;
 	}
 
@@ -2041,7 +2091,7 @@ function setupDragAndDrop()
 	{
 		// createAnalysisItem(data.node.text, data.node.id);
 		// alert("build analsyis graph now!");
-		buildAnalysis(data.node);
+		buildAnalysis(data.node,'grid');
 		return true;
 	}
 }
@@ -2850,84 +2900,84 @@ function getNodeForAnalysis(node)
 }
 
 
-function buildAnalysis(nodein)
+function buildAnalysis(nodein, dropType)
 {
-	var node = nodein // getNodeForAnalysis(nodein);
-	/* if(GLOBAL.analysisFirst == undefined) // clear out the body
-   {
-   analysisPanel.body.update("");
-   GLOBAL.analysisFirst = false;
-   }
-   var html = "<div style='overflow:auto;height:100%; width:100%'><table border='1' class='demoTable' style='border:1px solid black;margin:5px;'>";
-   html = html + "<tr><td colspan='3'><b>" + node.attributes.text + " Distribution</b></td></tr>";
-   html = html + "<tr><td>Concept</td><td>Count</td><td>Percentage</td></tr>";
-   node.expand();
-   for(var p = 0; p < node.childNodes.length; p ++ )
-   {
-   html = html + "<tr><td>" + node.childNodes[p].attributes.text + "</td><td>9</td><td>33.3%</td></tr>"
-   }
-   html = html + "</table></div>"
-   analysisPanel.body.update(html); */
-	if(isSubsetEmpty(1) && isSubsetEmpty(2))
-	{
-		alert('Empty subsets found, need a valid subset to analyze!');
-		return;
-	}
+
+    if(dropType == 'stats')
+    {
+        analysisPanel.body.mask("Running analysis...", 'x-mask-loading');
+    }
+
+    if(dropType == 'grid')
+    {
+        analysisGridPanel.body.mask("Loading...", 'x-mask-loading');
+    }
+
+    var node = nodein;
 
 
-	if((GLOBAL.CurrentSubsetIDs[1] == null && ! isSubsetEmpty(1)) || (GLOBAL.CurrentSubsetIDs[2] == null && ! isSubsetEmpty(2)))
-	{
-		runAllQueries(function()
-				{
-			buildAnalysis(node);
-				}
-		);
-		return;
-	}
-	/* analysisPanel.load({
-   // url : "analysis.jsp",
-   url : "chart",
-   params : Ext.urlEncode({charttype : "analysis",
-   concept_key : node.attributes.id,
-   result_instance_id1 : GLOBAL.CurrentSubsetIDs[1],
-   result_instance_id2 : GLOBAL.CurrentSubsetIDs[2]}), // or a URL encoded string
-   // callback : yourFunction,
-   // scope : yourObject, // optional scope for the callback
-   discardUrl : false,
-   nocache : true,
-   text : "Loading...",
-   timeout : 30,
-   scripts : true
-   }); */
+    if(isSubsetEmpty(1) && isSubsetEmpty(2))
+    {
+        analysisPanel.body.unmask();
+        analysisGridPanel.body.unmask();
 
-	Ext.Ajax.request(
-			{
-				url : pageInfo.basePath+"/chart/analysis",
-				method : 'POST',
-				timeout: '600000',
-				params :  Ext.urlEncode(
-						{
-							charttype : "analysis",
-							concept_key : node.attributes.id,
-							result_instance_id1 : GLOBAL.CurrentSubsetIDs[1],
-							result_instance_id2 : GLOBAL.CurrentSubsetIDs[2]
-						}
-				), // or a URL encoded string
-				success : function(result, request)
-				{
-				buildAnalysisComplete(result);
-				}
-			,
-			failure : function(result, request)
-			{
-				buildAnalysisComplete(result);
-			}
-			}
-	);
+        alert('Empty subsets found, need a valid subset to analyze!');
+        return;
+    }
 
-	resultsTabPanel.body.mask("Running analysis...", 'x-mask-loading');
-	// analysisPanel.setTitle("Results/Analysis - Analysis of concept " + getShortNameFromKey(node.attributes.id));
-	getAnalysisGridData(node.attributes.id);
+
+    if((GLOBAL.CurrentSubsetIDs[1] == null && ! isSubsetEmpty(1)) || (GLOBAL.CurrentSubsetIDs[2] == null && ! isSubsetEmpty(2)))
+    {
+        runAllQueries(function()
+            {
+                buildAnalysis(node, dropType);
+            }
+        );
+        analysisPanel.body.unmask();
+        return;
+    }
+
+    if(dropType == 'grid')
+    {
+        window.dragToGrid = true;
+        getAnalysisGridData(node.attributes.id);
+    }
+
+    if(dropType == 'stats')
+    {
+        Ext.Ajax.request(
+            {
+                url : pageInfo.basePath+"/chart/analysis",
+                method : 'POST',
+                timeout: '600000',
+                params :  Ext.urlEncode(
+                    {
+                        charttype : "analysis",
+                        concept_key : node.attributes.id,
+                        result_instance_id1 : GLOBAL.CurrentSubsetIDs[1],
+                        result_instance_id2 : GLOBAL.CurrentSubsetIDs[2]
+                    }
+                ), // or a URL encoded string
+                success : function(result, request)
+                {
+
+                    //Add the code we just dragged in to the report list.
+                    GLOBAL.currentReportCodes.push(node.attributes.id)
+                    GLOBAL.currentReportStudy.push(node.attributes.comment)
+
+                    //node.comment
+                    buildAnalysisComplete(result);
+
+                }
+                ,
+                failure : function(result, request)
+                {
+                    buildAnalysisComplete(result);
+                }
+            }
+        );
+    }
+
 }
 
 function buildAnalysisComplete(result)
@@ -2939,6 +2989,8 @@ function buildAnalysisComplete(result)
 
 function updateAnalysisPanel(html, insert)
 {
+    var saveButtonHtml="<div id='reportSaveButton'><button style='float:right' type='button' onclick='saveCodeReport()'>Save Report</button></div>";
+    var printButtonHtml="<div id='printButton'><button style='float:right' type='button' onclick='print()'>Print or Save Results</button></div><br>";
 	/* if(insert)
    {
    var frame = analysisPanel.getFrame();
@@ -2956,12 +3008,36 @@ function updateAnalysisPanel(html, insert)
 	{
 		var body = analysisPanel.body;
 		body.insertHtml('afterBegin', html, false);
+        jQuery("#reportSaveButton").remove();
+        jQuery("#printButton").remove();
+
+        body.insertHtml('afterBegin', printButtonHtml, false);
+        body.insertHtml('afterBegin', saveButtonHtml, false);
 		body.scrollTo('top', 0, false);
 	}
 	else
 	{
 		analysisPanel.body.update(html, false, null);
+        analysisPanel.body.insertHtml('afterBegin', printButtonHtml, false);
 	}
+    analysisPanel.body.unmask();
+}
+
+function print(){
+    var text = getAnalysisPanelContent();
+
+    //Using string manipulation to hide the redundant buttons when printing reports screen.
+    //There should be a better way to do this by cloning the dom and manipulating it using jQuery.
+    if(text.indexOf("id=printButton")>-1){
+        text = text.replace("id=reportSaveButton","id=\"reportSaveButton\" style=\"display:none\"");
+        text = text.replace("id=printButton","id=\"printButton\" style=\"display:none\"");
+    }else{
+        text = text.replace("id=\"reportSaveButton\"","id=\"reportSaveButton\" style=\"display:none\"");
+        text = text.replace("id=\"printButton\"","id=\"printButton\" style=\"display:none\"");
+    }
+
+
+    printPreview(text);
 }
 
 function searchByNameComplete(response)

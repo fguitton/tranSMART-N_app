@@ -1917,7 +1917,7 @@ function getTreeNodeFromJsonNode(concept)
     tablename			= concept.dimensionTableName;
     visualattributes	= concept.visualAttributes;
 
-    comment				= ''; //XXX
+    comment				= concept.comment; //XXX
     normalunits			= concept.metadata
                               ? concept.metadata.unitValues.normalUnits
                               : '';

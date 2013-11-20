@@ -976,6 +976,8 @@ class NetezzaI2b2HelperService {
      * Gets the querymasterid for resultinstanceid
      */
     def String getQIDFromRID(String resultInstanceId) {
+        //The client can pass in an absent resultInstanceId as a 'null' string. Handle that here by explicitely making the absent resultInstanceId null
+        if(resultInstanceId=='null') resultInstanceId=null
         String qid=""
         if (resultInstanceId != null && resultInstanceId.length() > 0)	{
             groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
@@ -4649,6 +4651,15 @@ class NetezzaI2b2HelperService {
         }
         log.debug(access.toString());
         return access;
+    }
+
+    def renderQueryDefinitionToString(String qid, String title, regionParams)
+    {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        renderQueryDefinition(qid, title, pw);
+        StringBuffer sb = sw.getBuffer();
+        return sb.toString();
     }
 
     /**

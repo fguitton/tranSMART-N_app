@@ -48,6 +48,9 @@
     <script type="text/javascript" src="${resource(dir:'js/jQuery', file:'jquery-1.7.1.min.js')}"></script>
     <script type="text/javascript" src="${resource(dir:'js/jQuery', file:'jquery-ui-1.8.17.custom.min.js')}"></script>
     <script type="text/javascript" src="${resource(dir:'js/jQuery', file:'jquery.tablesorter.min.js')}"></script>
+    <script type="text/javascript" src="${resource(dir:'js/jQuery/validate', file:'jquery.validate.min.js')}"></script>
+    <script type="text/javascript" src="${resource(dir:'js/jQuery/validate', file:'additional-methods.min.js')}"></script>
+    <script type="text/javascript" src="${resource(dir:'js/jQuery', file: 'jquery.dataTables.js')}"></script>
   
 <script type="text/javascript" src="${resource(dir:'js', file:'ajax_queue.js')}"></script> 
 
@@ -61,7 +64,8 @@
 <script type="text/javascript"
 	src="${resource(dir:'js/datasetExplorer', file: 'workflowStatus.js')}"></script>
 <script type="text/javascript" src="${resource(dir:'js', file:'myJobs.js')}"></script>
-
+<script type="text/javascript" src="${resource(dir:'js/datasetExplorer', file: 'reports.js')}"></script>
+<script type="text/javascript" src="${resource(dir:'js/datasetExplorer', file: 'workspace.js')}"></script>
 <script type="text/javascript"
 	src="${resource(dir:'js/datasetExplorer/exportData', file: 'dataTab.js')}"></script>
 <script type="text/javascript"
@@ -72,10 +76,13 @@
 </script>
  <script type="text/javascript"
 	src="${resource(dir:'js', file:'bioheatmap.js')}"></script>-->
-	
+
+    <!--Datatable styling and scripts-->
+    <link rel="stylesheet" type="text/css" href="${resource(dir:'css', file:'jquery.dataTables.css')}">
 	<!-- Include Ext stylesheets here: -->
 	<link rel="stylesheet" type="text/css" href="${resource(dir:'js/ext/resources/css', file:'ext-all.css')}">
 	<link rel="stylesheet" type="text/css" href="${resource(dir:'js/ext/resources/css', file:'xtheme-gray.css')}">
+
 	<!-- Include JQuery stylesheets here: -->
 	<link rel="stylesheet" type="text/css" href="${resource(dir:'css/jQueryUI/smoothness', file:'jquery-ui-1.8.17.custom.css')}">
 	
@@ -181,7 +188,10 @@
 	  basePath: pageInfo.basePath,
 	  hideAcrossTrialsPanel:'${grailsApplication.config.com.recomdata.datasetExplorer.hideAcrossTrialsPanel}',
 	  metacoreAnalyticsEnabled: '${grailsApplication.config.com.thomsonreuters.transmart.metacoreAnalyticsEnable}',
-	  metacoreUrl: '${grailsApplication.config.com.thomsonreuters.transmart.metacoreURL}'
+	  metacoreUrl: '${grailsApplication.config.com.thomsonreuters.transmart.metacoreURL}',
+      currentReportCodes: [],
+      currentReportStudy: [],
+      currentSubsetsStudy: ''
 	};
 	// initialize browser version variables; see http://www.quirksmode.org/js/detect.html
 	BrowserDetect.init();
@@ -205,7 +215,26 @@
 	</g:else>
 	<IFRAME src="${gplogout}" width="1" height="1" scrolling="no" frameborder="0" id="gplogin"></IFRAME>
 	<IFRAME src="${gplogout}" width="1" height="1" scrolling="no" frameborder="0" id="altgplogin"></IFRAME>
-		
+
+    <div id="saveReportDialog" style="display:none;font: 11px arial,tahoma,helvetica,sans-serif;font-weight:normal;">
+        <br />
+        Report Name : <input id='txtReportName' type='text' title="Report Name" /> <br />
+        Make Report Public : <input id='chkReportPublic' type='checkbox' value='Y' title="Make Report Public" /><br /><br />
+
+        <input type="button" onclick="saveReport(true,jQuery('#txtReportName').val(),jQuery('#txtReportDescription').val(),jQuery('#chkReportPublic').is(':checked'),GLOBAL.currentReportCodes.join('|'),GLOBAL.currentReportStudy)" value="Create Report" />
+    </div>
+
+    <div id="saveSubsetsDialog" style="display:none;font: 11px arial,tahoma,helvetica,sans-serif;font-weight:normal;">
+        <form id="saveSubsetForm">
+            <br />
+            <em>*</em> Description : <input id='txtSubsetDescription' type='text' name='txtSubsetDescription' title="Subset Description"/>
+            <br />
+            <em>*</em> Make Subset Public : <input id='chkSubsetPublic' type='checkbox' value='Y' title="Subset Public" />
+            <br />
+            <br />
+            <input class="submit" type="submit" value="Save Subsets"/>
+        </form>
+    </div>
 	<span id="visualizerSpan0"></span> <!-- place applet tag here -->
 	<span id="visualizerSpan1"></span> <!-- place applet tag here -->
 <!-- ************************************** -->

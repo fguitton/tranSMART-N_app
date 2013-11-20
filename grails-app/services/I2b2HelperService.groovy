@@ -1016,7 +1016,9 @@ class I2b2HelperService {
 	/**
 	 * Gets the querymasterid for resultinstanceid
 	 */
-	def String getQIDFromRID(String resultInstanceId) {		
+	def String getQIDFromRID(String resultInstanceId) {
+        //The client can pass in an absent resultInstanceId as a 'null' string. Handle that here by explicitely making the absent resultInstanceId null
+        if(resultInstanceId=='null') resultInstanceId=null
 		String qid=""
 		if (resultInstanceId != null && resultInstanceId.length() > 0)	{
 			groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
@@ -4690,6 +4692,15 @@ class I2b2HelperService {
 		log.debug(access.toString());
 		return access;
 	}
+
+    def renderQueryDefinitionToString(String qid, String title, regionParams)
+    {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        renderQueryDefinition(qid, title, pw);
+        StringBuffer sb = sw.getBuffer();
+        return sb.toString();
+    }
 	
 	/**
 	 * renderQueryDefinition provides an XML based string given a result instance ID
@@ -4699,7 +4710,7 @@ class I2b2HelperService {
 	 * @param pw - the StringWriter used to build the XML string
 	 * 
 	 * @return an XML String
-	 */	
+	 */
     def renderQueryDefinition(String resultInstanceId, String title, Writer pw) {
 		if (log.isDebugEnabled())	{
 			log.debug("renderQueryDefinition called with ${resultInstanceId} and ${title}")
@@ -4709,19 +4720,19 @@ class I2b2HelperService {
 				String xmlrequest = getQueryDefinitionXML(resultInstanceId)
 				if(log.isDebugEnabled())	{
 					log.debug("${xmlrequest}")
-				}	   
+				}
 				DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance()
 			    domFactory.setNamespaceAware(true) // mandatory!
 			    DocumentBuilder builder = domFactory.newDocumentBuilder()
 			    Document doc = builder.parse(new InputSource(new StringReader(xmlrequest)))
-			   
+
 			    XPathFactory factory = XPathFactory.newInstance()
 			    XPath xpath = factory.newXPath()
-	
+
 				Object result = xpath.evaluate("//panel", doc, XPathConstants.NODESET)
 	   		    NodeList panels = (NodeList) result
 			    Node panel = null
-	
+
 				pw.write("<table class='analysis'>")
 			    pw.write("<tr><th>${title}</th></tr>")
 			    pw.write("<tr>")
@@ -4730,42 +4741,42 @@ class I2b2HelperService {
 			    for (int p = 0; p < panels.getLength(); p++) {
 					panel=panels.item(p)
 				    Node panelnumber=(Node)xpath.evaluate("panel_number", panel, XPathConstants.NODE)
-				    
+
 					if(panelnumber?.getTextContent()?.equalsIgnoreCase("21")) {
                         log.debug("Skipping the security panel in printing the output")
 						continue
 					}
-				    
+
 					if(p!=0 && p!=(panels.getLength()))	{
 						pw.write("<br><b>AND</b><br>")
 				    }
-				    
+
 					Node invert=(Node)xpath.evaluate("invert", panel, XPathConstants.NODE)
 				    if(invert?.getTextContent()?.equalsIgnoreCase("1")) {
 					    pw.write("<br><b>NOT</b><br>")
-	  			    } 
-				   
+	  			    }
+
 					NodeList items=(NodeList)xpath.evaluate("item", panel, XPathConstants.NODESET)
 				    pw.write("<b>(</b>")
-				    
+
 					for(int i=0; i<items.getLength(); i++) {
 					   Node item=items.item(i);
 					   if(i!=0 && i!=(items.getLength()))	{
 						   pw.write("<br><b>OR</b><br>")
 					   }
-	
+
 					   Node key=(Node)xpath.evaluate("item_key", item, XPathConstants.NODE)
 					   Node valueinfo=(Node)xpath.evaluate("constrain_by_value", item, XPathConstants.NODE)
 					   String operator="";
 					   String constraints="";
-					   
+
 					   if(valueinfo!=null) {
 						   operator=((Node)xpath.evaluate("value_operator", valueinfo, XPathConstants.NODE)).getTextContent()
 						   constraints=((Node)xpath.evaluate("value_constraint", valueinfo, XPathConstants.NODE)).getTextContent()
 					   }
 					   String textContent = key.getTextContent()
-					   log.debug("Found item ${textContent}")				   
-					   pw.write(textContent+" "+operator+" "+constraints)				   
+					   log.debug("Found item ${textContent}")
+					   pw.write(textContent+" "+operator+" "+constraints)
 				   }
 				   pw.write("<b>)</b>")
 			   }
@@ -4774,7 +4785,7 @@ class I2b2HelperService {
 			   log.error(e)
 		   	}
 		}
-    }   
+    }
 	
 	def getSecureTokensCommaSeparated(user) {
 		def tokenmap=getSecureTokensWithAccessForUser(user);
