@@ -4013,7 +4013,7 @@ function searchByName()
 	);
 }
 
-function getSummaryStatistics()
+function getSummaryStatistics(postCompletionFunction,postCompletionFunctionParameter)
 {
 	Ext.Ajax.request(
 			{
@@ -4022,6 +4022,7 @@ function getSummaryStatistics()
 				success : function(result, request)
 				{
 				getSummaryStatisticsComplete(result);
+                if(postCompletionFunction) postCompletionFunction(postCompletionFunctionParameter)
 				}
 			,
 			failure : function(result, request)
