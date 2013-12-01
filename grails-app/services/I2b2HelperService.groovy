@@ -397,7 +397,7 @@ class I2b2HelperService {
 	/**
 	 *  Gets the count of a a patient set fromt he result instance id
 	 */
-	def  Integer getPatientSetSize(String result_instance_id) {
+	/*def  Integer getPatientSetSize(String result_instance_id) {
 		log.trace("Getting patient set size with id:" + result_instance_id);
 		Integer i=0;
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
@@ -412,12 +412,33 @@ class I2b2HelperService {
 			log.trace(row.patcount);
 		});
 		return i;
-	}
+	}*/
+
+
+
+    /**
+     *  Gets the count of a a patient set fromt he result instance id
+     */
+    def  Integer getPatientSetSize(String result_instance_id) {
+        log.trace("Getting patient set size with id:" + result_instance_id);
+        Integer i=0;
+        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
+        String sqlt = """select count(*) as patcount FROM (select distinct patient_num
+		        from qt_patient_set_collection
+				where result_instance_id = ?)""";
+        log.trace(sqlt);
+        sql.eachRow(sqlt, [result_instance_id], {row ->
+            log.trace("inrow");
+            i=row.patcount;
+            log.trace(row.patcount);
+        });
+        return i;
+    }
 	
 	/**
 	 *  Gets the intersection of the patient sets from two result instance ids
 	 */
-	def int getPatientSetIntersectionSize(String result_instance_id1, String result_instance_id2) {
+	/*def int getPatientSetIntersectionSize(String result_instance_id1, String result_instance_id2) {
 		log.trace("Getting patient set intersection");
 		Integer i=0;
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
@@ -434,8 +455,32 @@ class I2b2HelperService {
 			log.trace(row.patcount);
 		})
 		return i;
-	}
-	
+	}*/
+
+
+
+    /**
+     *  Gets the intersection of the patient sets from two result instance ids
+     */
+    def int getPatientSetIntersectionSize(String result_instance_id1, String result_instance_id2) {
+        log.trace("Getting patient set intersection");
+        Integer i=0;
+        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
+        String sqlt = """Select count(*) as patcount FROM ((select distinct patient_num from qt_patient_set_collection
+		        where result_instance_id = ?) a inner join (select distinct patient_num from qt_patient_set_collection
+		        where result_instance_id = ?) b ON a.patient_num=b.patient_num)""";
+        log.trace(sqlt);
+        sql.eachRow(sqlt, [
+                result_instance_id1,
+                result_instance_id2
+        ], {row ->
+            log.trace("inrow of intersection")
+            i=row.patcount;
+            log.trace(row.patcount);
+        })
+        return i;
+    }
+
 	/**
 	 * Converts a clob to a string I hope
 	 */
@@ -1019,7 +1064,7 @@ class I2b2HelperService {
 	def String getQIDFromRID(String resultInstanceId) {
         //The client can pass in an absent resultInstanceId as a 'null' string. Handle that here by explicitely making the absent resultInstanceId null
         if(resultInstanceId=='null') resultInstanceId=null
-		String qid=""
+        String qid=""
 		if (resultInstanceId != null && resultInstanceId.length() > 0)	{
 			groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
 			String sqlt="""select QUERY_MASTER_ID FROM QT_QUERY_INSTANCE a
@@ -4693,13 +4738,98 @@ class I2b2HelperService {
 		return access;
 	}
 
-    def renderQueryDefinitionToString(String qid, String title, regionParams)
-    {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        renderQueryDefinition(qid, title, pw);
-        StringBuffer sb = sw.getBuffer();
-        return sb.toString();
+
+
+def renderQueryDefinitionToString(String qid, String title, regionParams)
+{
+StringWriter sw = new StringWriter();
+PrintWriter pw = new PrintWriter(sw);
+renderQueryDefinition(qid, title, pw);
+StringBuffer sb = sw.getBuffer();
+return sb.toString();
+}
+
+
+    /**
+     * renderQueryDefinition provides an XML based string given a result instance ID
+     *
+     * @param qid - the query master id
+     * @param title - the title for the query (e.g. subset 2)
+     * @param pw - the StringWriter used to build the XML string
+     *
+     * @return an XML String
+     */
+    def renderQueryDefinition(String qid, String title, Writer pw, regionParams) {
+        if (log.isDebugEnabled())	{
+            log.debug("renderQueryDefinition called with ${qid} and ${title}")
+        }
+        if (qid != null) {
+            try {
+                String xmlrequest = getQueryDefinitionXMLFromQID(qid)
+                if(log.isDebugEnabled())	{
+                    log.debug("${xmlrequest}")
+                }
+                DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance()
+                domFactory.setNamespaceAware(true) // mandatory!
+                DocumentBuilder builder = domFactory.newDocumentBuilder()
+                Document doc = builder.parse(new InputSource(new StringReader(xmlrequest)))
+
+                XPathFactory factory = XPathFactory.newInstance()
+                XPath xpath = factory.newXPath()
+
+                Object result = xpath.evaluate("//panel", doc, XPathConstants.NODESET)
+                NodeList panels = (NodeList) result
+                Node panel = null
+
+
+                log.debug("Integrating over the nodes...")
+                for (int p = 0; p < panels.getLength(); p++) {
+                    panel=panels.item(p)
+                    Node panelnumber=(Node)xpath.evaluate("panel_number", panel, XPathConstants.NODE)
+
+                    if(panelnumber.getTextContent().equalsIgnoreCase("21"))	{
+                        log.debug("Skipping the security panel in printing the output")
+                        continue
+                    }
+
+                    if(p!=0 && p!=(panels.getLength()))	{
+                        pw.write("<br><b>AND</b><br>")
+                    }
+
+                    Node invert=(Node)xpath.evaluate("invert", panel, XPathConstants.NODE)
+                    if(invert.getTextContent().equalsIgnoreCase("1")) {
+                        pw.write("<br><b>NOT</b><br>")
+                    }
+
+                    NodeList items=(NodeList)xpath.evaluate("item", panel, XPathConstants.NODESET)
+                    pw.write("<b>(</b>")
+
+                    for(int i=0; i<items.getLength(); i++) {
+                        Node item=items.item(i);
+                        if(i!=0 && i!=(items.getLength()))	{
+                            pw.write("<br><b>OR</b><br>")
+                        }
+                        //jira - DEMOTM-231 : Summary of Concept in Summary Statistics view uses modifer_cd instead of modifer_path
+                        //Node key=(Node)xpath.evaluate("item_key", item, XPathConstants.NODE)
+                        Node key=(Node)xpath.evaluate("item_name", item, XPathConstants.NODE)
+
+                        String textContent = key.getTextContent()
+                        log.debug("Found item ${textContent}")
+                        pw.write(textContent+" "+renderConstrainByValue(item, xpath)+" "+renderConstrainByModifier(item, xpath));
+
+
+                        //TODO Tie region limitations into individual items
+                        if (regionParams) {
+                            pw.write(renderRegionParams(regionParams))
+                        }
+                    }
+                    pw.write("<b>)</b>")
+                }
+
+            } catch (Exception e) {
+                log.error(e)
+            }
+        }
     }
 	
 	/**
@@ -4710,8 +4840,8 @@ class I2b2HelperService {
 	 * @param pw - the StringWriter used to build the XML string
 	 * 
 	 * @return an XML String
-	 */
-    def renderQueryDefinition(String resultInstanceId, String title, Writer pw) {
+	 */	
+   /* def renderQueryDefinition(String resultInstanceId, String title, Writer pw) {
 		if (log.isDebugEnabled())	{
 			log.debug("renderQueryDefinition called with ${resultInstanceId} and ${title}")
 		}
@@ -4720,19 +4850,19 @@ class I2b2HelperService {
 				String xmlrequest = getQueryDefinitionXML(resultInstanceId)
 				if(log.isDebugEnabled())	{
 					log.debug("${xmlrequest}")
-				}
+				}	   
 				DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance()
 			    domFactory.setNamespaceAware(true) // mandatory!
 			    DocumentBuilder builder = domFactory.newDocumentBuilder()
 			    Document doc = builder.parse(new InputSource(new StringReader(xmlrequest)))
-
+			   
 			    XPathFactory factory = XPathFactory.newInstance()
 			    XPath xpath = factory.newXPath()
-
+	
 				Object result = xpath.evaluate("//panel", doc, XPathConstants.NODESET)
 	   		    NodeList panels = (NodeList) result
 			    Node panel = null
-
+	
 				pw.write("<table class='analysis'>")
 			    pw.write("<tr><th>${title}</th></tr>")
 			    pw.write("<tr>")
@@ -4741,42 +4871,44 @@ class I2b2HelperService {
 			    for (int p = 0; p < panels.getLength(); p++) {
 					panel=panels.item(p)
 				    Node panelnumber=(Node)xpath.evaluate("panel_number", panel, XPathConstants.NODE)
-
+				    
 					if(panelnumber?.getTextContent()?.equalsIgnoreCase("21")) {
                         log.debug("Skipping the security panel in printing the output")
 						continue
 					}
-
+				    
 					if(p!=0 && p!=(panels.getLength()))	{
 						pw.write("<br><b>AND</b><br>")
 				    }
-
+				    
 					Node invert=(Node)xpath.evaluate("invert", panel, XPathConstants.NODE)
 				    if(invert?.getTextContent()?.equalsIgnoreCase("1")) {
 					    pw.write("<br><b>NOT</b><br>")
-	  			    }
-
+	  			    } 
+				   
 					NodeList items=(NodeList)xpath.evaluate("item", panel, XPathConstants.NODESET)
 				    pw.write("<b>(</b>")
-
+				    
 					for(int i=0; i<items.getLength(); i++) {
 					   Node item=items.item(i);
 					   if(i!=0 && i!=(items.getLength()))	{
 						   pw.write("<br><b>OR</b><br>")
 					   }
-
+	
 					   Node key=(Node)xpath.evaluate("item_key", item, XPathConstants.NODE)
 					   Node valueinfo=(Node)xpath.evaluate("constrain_by_value", item, XPathConstants.NODE)
 					   String operator="";
 					   String constraints="";
-
+					   
 					   if(valueinfo!=null) {
 						   operator=((Node)xpath.evaluate("value_operator", valueinfo, XPathConstants.NODE)).getTextContent()
 						   constraints=((Node)xpath.evaluate("value_constraint", valueinfo, XPathConstants.NODE)).getTextContent()
 					   }
 					   String textContent = key.getTextContent()
-					   log.debug("Found item ${textContent}")
+					   log.debug("Found item ${textContent}")				   
 					   pw.write(textContent+" "+operator+" "+constraints)
+
+
 				   }
 				   pw.write("<b>)</b>")
 			   }
@@ -4785,7 +4917,7 @@ class I2b2HelperService {
 			   log.error(e)
 		   	}
 		}
-    }
+    }  */
 	
 	def getSecureTokensCommaSeparated(user) {
 		def tokenmap=getSecureTokensWithAccessForUser(user);
@@ -5216,4 +5348,136 @@ class I2b2HelperService {
 			return trials;
 		}
 	}
+
+    def renderQueryDefinitionTable(String resultInstanceId, String title, Writer pw, regionParams)
+    {
+        String qid=getQIDFromRID(resultInstanceId);
+        pw.write("<table class='analysis'>")
+        pw.write("<tr><th>${title}</th></tr>")
+        pw.write("<tr>")
+        pw.write("<td>")
+        renderQueryDefinition(qid, title, pw, regionParams);
+        pw.write("</td></tr></table>")
+    }
+
+    TransmartQueryDefinition getQueryDefinition(String resultInstanceId) {
+
+        TransmartQueryDefinition tQD = null;
+
+        if (resultInstanceId != null) {
+            try {
+
+                String xmlRequest = getQueryDefinitionXML(resultInstanceId)
+
+                DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance()
+                domFactory.setNamespaceAware(true)
+                DocumentBuilder builder = domFactory.newDocumentBuilder()
+                Document doc = builder.parse(new InputSource(new StringReader(xmlRequest)))
+
+                XPathFactory factory = XPathFactory.newInstance()
+                XPath xpath = factory.newXPath()
+
+                Object queryTimingNodes=xpath.evaluate("//query_timing", doc, XPathConstants.NODESET)
+                NodeList qts =  (NodeList) queryTimingNodes
+                tQD = new TransmartQueryDefinition(resultInstanceId)
+                Node qtsNode = qts.item(0)
+                tQD.queryTiming = qtsNode.getTextContent()
+
+                Object result = xpath.evaluate("//panel", doc, XPathConstants.NODESET)
+                NodeList panels = (NodeList) result
+
+                for (int p = 0; p < panels.getLength(); p++) {
+
+                    TransmartQueryPanel tQP = new TransmartQueryPanel()
+
+                    Node panel=panels.item(p)
+                    Node panelNumber=(Node)xpath.evaluate("panel_number", panel, XPathConstants.NODE)
+                    tQP.panelNum = panelNumber.getTextContent();
+
+                    Node invert=(Node)xpath.evaluate("invert", panel, XPathConstants.NODE)
+                    tQP.invert = invert.getTextContent() != "0"
+
+                    Node panelTiming=(Node)xpath.evaluate("panel_timing", panel, XPathConstants.NODE)
+                    tQP.panelTiming = panelTiming.getTextContent()
+
+                    NodeList items=(NodeList)xpath.evaluate("item", panel, XPathConstants.NODESET)
+
+                    for(int i=0; i<items.getLength(); i++) {
+
+                        TransmartQueryItem tQI = new TransmartQueryItem()
+
+                        Node item=items.item(i);
+
+                        Node key=(Node)xpath.evaluate("item_key", item, XPathConstants.NODE)
+
+                        tQI.itemKey = key.getTextContent()
+
+                        tQI.concept_cd = getConceptCodeFromPath(tQI.fullName);
+                        tQI.linkType = getLinkTypeFromConceptCode(tQI.concept_cd)
+
+                        tQP.items.add(tQI)
+
+                    }
+
+                    tQD.panels.add(tQP);
+
+                }
+
+            } catch (Exception e) {
+                log.error(e)
+            }
+        }
+
+        return tQD
+
+    }
+
+    def renderConstrainByValue(Node item, XPath xpath)
+    {
+        Node valueinfo=(Node)xpath.evaluate("constrain_by_value", item, XPathConstants.NODE)
+        String operator="";
+        String constraints="";
+
+        if(valueinfo!=null) {
+            operator=((Node)xpath.evaluate("value_operator", valueinfo, XPathConstants.NODE)).getTextContent()
+            constraints=((Node)xpath.evaluate("value_constraint", valueinfo, XPathConstants.NODE)).getTextContent()
+        }
+        return operator+" "+constraints;
+    }
+
+    def renderConstrainByModifier(Node item, XPath xpath)
+    {
+        //initial modifier support
+        Node modifierinfo=(Node)xpath.evaluate("constrain_by_modifier", item, XPathConstants.NODE)
+        String modifierstring="";
+        String modifiername="";
+        String constraints="";
+        if(modifierinfo!=null) {
+            modifiername=((Node)xpath.evaluate("modifier_name", modifierinfo, XPathConstants.NODE)).getTextContent()
+            constraints=renderConstrainByValue(modifierinfo, xpath);
+            modifierstring="["+modifiername+" "+constraints+ "]";
+        }
+        return modifierstring;
+
+    }
+
+
+    def renderRegionParams(rp) {
+        if (rp.range?.equals("both")) {
+            rp.range = "+/-"
+        }
+        else if (rp.range?.equals("plus")) {
+            rp.range = "+"
+        }
+        else {
+            rp.range = "-"
+        }
+
+        if (rp.mode?.equals('gene')) {
+            return 'Gene: ' + rp.genename + ' ' + rp.range + ' ' + rp.basepairs + ' base pairs (HG' + rp.version + '): ' + rp.inclusionCriteria;
+        }
+        else {
+            return 'Chromosome: ' + rp.chromosome + ', ' + rp.position + ' ' + rp.range + ' ' + rp.basepairs + ' base pairs (HG' + rp.version + '): ' + rp.inclusionCriteria;
+        }
+    }
 }
