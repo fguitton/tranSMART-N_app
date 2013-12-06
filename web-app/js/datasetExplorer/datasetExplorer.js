@@ -789,6 +789,12 @@ Ext.onReady(function()
 						},
 						deactivate: function(){
 							//resultsTabPanel.tools['help help-resana-panel'].dom.style.display="none";
+                            if(Ext.get('dataTypesGridPanel')){
+                                this.remove('dataTypesGridPanel');
+                            }
+                            if(Ext.get('advancedDataExportPanel')){
+                                this.remove('advancedDataExportPanel');
+                            }
 						}
 					},
 					collapsible : true						

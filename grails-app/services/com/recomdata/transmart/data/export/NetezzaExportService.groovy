@@ -42,6 +42,7 @@ class NetezzaExportService {
     def quartzScheduler
     def grailsApplication
     def dataExportService
+    def conceptService
 
     def Map createJSONFileObject(fileType, dataFormat, fileDataCount, gplId, gplTitle) {
         def file = [:]
@@ -404,5 +405,63 @@ class NetezzaExportService {
 
         InputStream is = exportDataProcessor.getExportJobFileStream(job.viewerURL, tempDir, ftpServer, ftpServerPort, ftpServerUserName, ftpServerPassword, ftpServerRemotePath)
         return is;
+    }
+
+    def getChildConceptsJSON(childConcepts){
+
+        def JSONData = []
+
+        childConcepts.each(){	childConcept ->
+
+            //First figure out value type (N : Numeric or T  : Categorical) from observation fact table.
+            def valtypeCd = conceptService.getValueType(childConcept)
+
+            //Each node has a metadata section which the jstree uses to pass data around about the nodes.
+            def metaDataJson = [:]
+            metaDataJson["id"] = childConcept.id
+            metaDataJson["qtip"] = childConcept.toolTip
+            metaDataJson["dimcode"] = childConcept.dimCode
+            metaDataJson["iconCls"] = valtypeCd
+            metaDataJson["tablename"] = "CONCEPT_DIMENSION"
+            metaDataJson["level"] = childConcept.level
+            //metaDataJson["visitInd"] = modifierNode.visitInd ? modifierNode.visitInd : ""
+            //metaDataJson["inOutCode"] = modifierNode.inOutCode ? modifierNode.inOutCode : ""
+
+            //The attribute section controls how the node is displayed.
+            def attrDataJson = [:]
+
+            //If the modifier is a folder node, we put in an empty "rel" attribute.
+            if(childConcept.visualAttributes.trim()== "FA")
+            {
+                attrDataJson["rel"] = ""
+            }
+            else
+            {
+                attrDataJson["rel"] = valtypeCd
+            }
+
+            attrDataJson["name"] = childConcept.name
+            //The node name shouldn't have counts for the root node, modifer the name if the node isn't root.
+            def nodeName = childConcept.name
+
+            def finalJson = [:]
+            finalJson["data"] = nodeName
+
+            //If it's a folder, add this attribute so we know to draw the "+" sign indicating there are children.
+            def va = childConcept.visualAttributes
+            if(childConcept.visualAttributes.trim()== "FA")
+            {
+                finalJson["state"] = "closed"
+            }
+
+            //Build the final object from the sub arrays.
+            finalJson["metadata"] = metaDataJson
+            finalJson["attr"] = attrDataJson
+            finalJson["children"] = []
+
+            JSONData.add(finalJson)
+        }
+
+        return JSONData
     }
 }
