@@ -39,22 +39,25 @@ public class WizardModelDetails extends ModelDetails{
 	
 	// default is create
 	def wizardType = WIZ_TYPE_CREATE
-	 
-	// pick lists
-	def sources
-	def owners
-	def species
-	def mouseSources
-	def tissueTypes
-	def expTypes
-	def analyticTypes
-	def normMethods
-	def analysisMethods
-	def schemas
-	def pValCutoffs
-	def foldChgMetrics
-	def platforms
-	def compounds
+
+    // pick lists
+    def sources
+    def owners
+    def species
+    def mouseSources
+    def tissueTypes
+    def expTypes
+    def analyticTypes
+    def normMethods
+    def analysisMethods
+    def schemas
+    def pValCutoffs
+    def foldChgMetrics
+    def platforms
+    def compounds
+    def geneSigText
+    def manipulatedGeneSigText
+    def geneSigFile
 	
 	// domain class
 	def geneSigInst

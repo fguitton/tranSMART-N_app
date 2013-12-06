@@ -1,9 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="JAVA_MODULE" version="4">
   <component name="FacetManager">
+    <facet type="web" name="Web">
+      <configuration>
+        <descriptors>
+          <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/src/templates/war/web.xml" />
+        </descriptors>
+        <webroots>
+          <root url="file://$MODULE_DIR$/src/templates/war" relative="/WEB-INF" />
+        </webroots>
+        <sourceRoots />
+      </configuration>
+    </facet>
+    <facet type="hibernate" name="Hibernate">
+      <configuration>
+        <datasource-map />
+        <deploymentDescriptor name="hibernate.cfg.xml" url="file://$MODULE_DIR$/src/templates/artifacts/hibernate.cfg.xml" />
+      </configuration>
+    </facet>
     <facet type="Spring" name="Spring">
       <configuration>
-        <fileset id="Grails" name="Grails" removed="false" />
+        <fileset id="fileset" name="Spring Application Context" removed="false">
+          <file>file://$MODULE_DIR$/web-app/WEB-INF/applicationContext.xml</file>
+        </fileset>
       </configuration>
     </facet>
     <facet type="web" name="GrailsWeb">
@@ -15,15 +34,12 @@
         <sourceRoots />
       </configuration>
     </facet>
-    <facet type="hibernate" name="Hibernate">
-      <configuration>
-        <datasource-map />
-      </configuration>
-    </facet>
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/groovy" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/grails-app/jobs" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/grails-app/i18n" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/grails-app/controllers" isTestSource="false" />
@@ -32,6 +48,9 @@
       <sourceFolder url="file://$MODULE_DIR$/grails-app/taglib" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test/unit" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/test/integration" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/grails-app/utils" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/target/classes" />
+      <excludeFolder url="file://$MODULE_DIR$/target/test-classes" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -40,25 +59,93 @@
       <library name="Grails User Library (tranSMART-N_app)">
         <CLASSES>
           <root url="file://$MODULE_DIR$/lib" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/jaxrpc.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/jaxb-impl.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/jaxb-api.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/Jama-1.0.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/iText-2.0.8.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/igvtools.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/httpmime-4.2.3.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/httpcore-4.2.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/httpclient-cache-4.2.3.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/httpclient-4.2.3.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/http-builder-0.5.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/gp-modules.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/GenePattern.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/fluent-hc-4.2.3.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/ezmorph-1.0.6.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/core-renderer.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/commons-net-3.0.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/commons-math-1.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/commons-logging-1.1.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/commons-logging-1.0.4.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/commons-lang-2.4.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/commons-httpclient-3.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/commons-httpclient-3.0.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/commons-discovery-0.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/commons-collections-3.2.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/commons-codec-1.6.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/commons-codec-1.4.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/commons-beanutils-1.8.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/axis.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/asm-util-3.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/asm-tree-3.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/asm-commons-3.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/asm-analysis-3.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/asm-3.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/appengine-api-1.0-sdk-1.3.8.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/antlr-2.7.7.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/ant-launcher-1.7.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/ant-1.7.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/activation.jar!/" />
           <root url="jar://$USER_HOME$/.grails/ivy-cache/org.hibernate/jtidy/jars/jtidy-r8-20060801.jar!/" />
           <root url="jar://$USER_HOME$/.grails/ivy-cache/org.hibernate/hibernate-tools/jars/hibernate-tools-3.6.0.CR1.jar!/" />
           <root url="jar://$USER_HOME$/.grails/ivy-cache/freemarker/freemarker/jars/freemarker-2.3.8.jar!/" />
-          <root url="jar://$USER_HOME$/.grails/ivy-cache/org.springframework.security/spring-security-web/jars/spring-security-web-3.0.7.RELEASE.jar!/" />
-          <root url="jar://$USER_HOME$/.grails/ivy-cache/org.springframework.security/spring-security-core/jars/spring-security-core-3.0.7.RELEASE.jar!/" />
-          <root url="jar://$USER_HOME$/.grails/ivy-cache/net.sf.opencsv/opencsv/jars/opencsv-2.3.jar!/" />
-          <root url="jar://$USER_HOME$/.grails/ivy-cache/org.rosuda/REngine/jars/REngine-1.7.3.jar!/" />
-          <root url="jar://$USER_HOME$/.grails/ivy-cache/org.rosuda/Rserve/jars/Rserve-1.7.3.jar!/" />
-          <root url="jar://$USER_HOME$/.grails/ivy-cache/org.quartz-scheduler/quartz/jars/quartz-1.8.4.jar!/" />
-          <root url="jar://$USER_HOME$/.grails/ivy-cache/net.sf.ehcache/ehcache-core/jars/ehcache-core-2.4.3.jar!/" />
-          <root url="jar://$USER_HOME$/.grails/ivy-cache/org.transmartproject/transmart-core-api/jars/transmart-core-api-1.0-SNAPSHOT.jar!/" />
-          <root url="jar://$USER_HOME$/.grails/ivy-cache/antlr/antlr/jars/antlr-2.7.7.jar!/" />
-          <root url="jar://$USER_HOME$/.grails/ivy-cache/commons-collections/commons-collections/jars/commons-collections-3.2.1.jar!/" />
-          <root url="jar://$USER_HOME$/.grails/ivy-cache/org.hamcrest/hamcrest-library/jars/hamcrest-library-1.3.jar!/" />
-          <root url="jar://$USER_HOME$/.grails/ivy-cache/postgresql/postgresql/jars/postgresql-9.1-901.jdbc4.jar!/" />
-          <root url="jar://$USER_HOME$/.grails/ivy-cache/com.google.guava/guava/bundles/guava-14.0.1.jar!/" />
           <root url="jar://$USER_HOME$/.grails/ivy-cache/org.hamcrest/hamcrest-core/jars/hamcrest-core-1.3.jar!/" />
           <root url="jar://$USER_HOME$/.grails/ivy-cache/junit/junit/jars/junit-4.11.jar!/" />
+          <root url="jar://$USER_HOME$/.grails/ivy-cache/com.google.guava/guava/bundles/guava-14.0.1.jar!/" />
+          <root url="jar://$USER_HOME$/.grails/ivy-cache/org.transmartproject/transmart-core-api/jars/transmart-core-api-1.0-SNAPSHOT.jar!/" />
+          <root url="jar://$USER_HOME$/.grails/ivy-cache/org.rosuda/REngine/jars/REngine-1.7.3.jar!/" />
+          <root url="jar://$USER_HOME$/.grails/ivy-cache/org.rosuda/Rserve/jars/Rserve-1.7.3.jar!/" />
+          <root url="jar://$USER_HOME$/.grails/ivy-cache/net.sf.opencsv/opencsv/jars/opencsv-2.3.jar!/" />
+          <root url="jar://$USER_HOME$/.grails/ivy-cache/org.springframework.security/spring-security-web/jars/spring-security-web-3.0.7.RELEASE.jar!/" />
+          <root url="jar://$USER_HOME$/.grails/ivy-cache/org.springframework.security/spring-security-core/jars/spring-security-core-3.0.7.RELEASE.jar!/" />
+          <root url="jar://$USER_HOME$/.grails/ivy-cache/org.quartz-scheduler/quartz/jars/quartz-1.8.4.jar!/" />
+          <root url="jar://$USER_HOME$/.grails/ivy-cache/net.sf.ehcache/ehcache-core/jars/ehcache-core-2.4.3.jar!/" />
+          <root url="jar://$USER_HOME$/.grails/ivy-cache/antlr/antlr/jars/antlr-2.7.7.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/xstream-1.3.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/xpp3_min-1.1.4c.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/xml-resolver-1.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/xalan-2.7.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/wsdl4j-1.5.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/sqljdbc.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/signpost-core-1.2.1.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/signpost-commonshttp4-1.2.1.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/saaj.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/poi-scratchpad-3.1-FINAL-20080629.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/poi-contrib-3.1-FINAL-20080629.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/poi-3.1-FINAL-20080629.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/PDFRenderer.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/opencsv-2.3.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/ojdbc5.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/nzjdbc3.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/NetezzaDialect.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/nekohtml-1.9.9.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/mail.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/MAGEstk-2003-10-24-v1.1-compatible.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/lucene-highlighter-2.4.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/lucene-demos-2.4.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/lucene-core-2.4.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/jtds-1.2.2.jar!/" />
+          <root url="jar://$USER_HOME$/.grails/ivy-cache/commons-collections/commons-collections/jars/commons-collections-3.2.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/json-lib-2.3-jdk15.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/jsch-0.1.42.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/joda-time-1.5.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/jfreechart-1.0.11.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../src/tranSMART-N_app/lib/jcommon-1.0.14.jar!/" />
+          <root url="jar://$USER_HOME$/.grails/ivy-cache/postgresql/postgresql/jars/postgresql-9.1-901.jdbc4.jar!/" />
           <root url="jar://$USER_HOME$/.grails/ivy-cache/xpp3/xpp3_min/jars/xpp3_min-1.1.4c.jar!/" />
+          <root url="jar://$USER_HOME$/.grails/ivy-cache/org.hamcrest/hamcrest-library/jars/hamcrest-library-1.3.jar!/" />
           <root url="jar://$USER_HOME$/.grails/ivy-cache/asm/asm-tree/jars/asm-tree-3.0.jar!/" />
           <root url="jar://$USER_HOME$/.grails/ivy-cache/net.sourceforge.cobertura/cobertura/jars/cobertura-1.9.4.1.jar!/" />
           <root url="jar://$USER_HOME$/.grails/ivy-cache/nekohtml/nekohtml/jars/nekohtml-1.9.6.2.jar!/" />
@@ -102,6 +189,8 @@
       </library>
     </orderEntry>
     <orderEntry type="module" module-name="tranSMART-N_app-grailsPlugins" />
+    <orderEntry type="module" module-name="rdcModules-inplacePlugin" exported="" />
+    <orderEntry type="module" module-name="transmartCore-inplacePlugin" exported="" />
   </component>
 </module>
 

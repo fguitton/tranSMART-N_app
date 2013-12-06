@@ -24,7 +24,7 @@ table.dataTable tfoot th {
 
 table.dataTable td {
 	padding: 3px 10px;
-    border-left: 1px solid #DDF;
+    /*border-left: 1px solid #DDF;*/
 }
 
 table.dataTable td.center,
@@ -225,4 +225,3 @@ table.dataTable th:active {
 	*margin-top: -1px;
 	-webkit-overflow-scrolling: touch;
 }
-
