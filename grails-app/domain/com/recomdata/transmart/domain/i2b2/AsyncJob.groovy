@@ -32,8 +32,9 @@ class AsyncJob {
 	String jobType
 	
 	static mapping = {
+        datasource 'tx'
 		table 'I2B2DEMODATA.ASYNC_JOB'
-        id generator:'sequence', params:[sequence:'sq_async_job']
+        id generator:'sequence', params:[sequence:'i2b2demodata.sq_async_job']
         id              column: "id" //,  generator: "identity"
 		version false
 		jobName column:'JOB_NAME'
