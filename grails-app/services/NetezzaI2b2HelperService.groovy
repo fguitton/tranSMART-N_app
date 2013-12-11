@@ -4767,7 +4767,7 @@ class NetezzaI2b2HelperService {
 	{
 	StringWriter sw = new StringWriter();
 	PrintWriter pw = new PrintWriter(sw);
-	renderQueryDefinition(qid, title, pw);
+	renderQueryDefinition(qid, title, pw, regionParams);
 	StringBuffer sb = sw.getBuffer();
 	return sb.toString();
 	} 
@@ -4810,7 +4810,7 @@ class NetezzaI2b2HelperService {
                     panel=panels.item(p)
                     Node panelnumber=(Node)xpath.evaluate("panel_number", panel, XPathConstants.NODE)
 
-                    if(panelnumber.getTextContent().equalsIgnoreCase("21"))	{
+                    if(panelnumber?.getTextContent()?.equalsIgnoreCase("21"))	{
                         log.debug("Skipping the security panel in printing the output")
                         continue
                     }
@@ -4820,7 +4820,7 @@ class NetezzaI2b2HelperService {
                     }
 
                     Node invert=(Node)xpath.evaluate("invert", panel, XPathConstants.NODE)
-                    if(invert.getTextContent().equalsIgnoreCase("1")) {
+                    if(invert?.getTextContent()?.equalsIgnoreCase("1")) {
                         pw.write("<br><b>NOT</b><br>")
                     }
 
@@ -4832,10 +4832,7 @@ class NetezzaI2b2HelperService {
                         if(i!=0 && i!=(items.getLength()))	{
                             pw.write("<br><b>OR</b><br>")
                         }
-                        //jira - DEMOTM-231 : Summary of Concept in Summary Statistics view uses modifer_cd instead of modifer_path
-                        //Node key=(Node)xpath.evaluate("item_key", item, XPathConstants.NODE)
-                        Node key=(Node)xpath.evaluate("item_name", item, XPathConstants.NODE)
-
+                        Node key=(Node)xpath.evaluate("item_key", item, XPathConstants.NODE)
                         String textContent = key.getTextContent()
                         log.debug("Found item ${textContent}")
                         pw.write(textContent+" "+renderConstrainByValue(item, xpath)+" "+renderConstrainByModifier(item, xpath));
