@@ -1,5 +1,3 @@
-import org.transmart.searchapp.AccessLog;
-
 /*************************************************************************
  * tranSMART - translational medicine data mart
  * 
@@ -20,40 +18,46 @@ import org.transmart.searchapp.AccessLog;
  ******************************************************************/
   
 
-
 /**
- * Central landing zone controller for post login events
- * 
- * $Id: UserLandingController.groovy 10133 2011-10-20 21:34:43Z mmcduffie $
+ * $Id: BioAssayAnalysisData.groovy 9178 2011-08-24 13:50:06Z mmcduffie $
  * @author $Author: mmcduffie $
- * @version $Revision: 10133 $
+ * @version $Revision: 9178 $
  */
-class UserLandingController {
-	/**
-	 * Dependency injection for the springSecurityService.
-	 */
-    def springSecurityService
+
+package org.transmart.biomart
+
+import com.recomdata.util.IExcelProfile
+
+class BioAssayAnalysisGwas implements IExcelProfile {
+
+	BioAssayAnalysisPlatform analysis
+	String rsId
+	Double pValue
+	Double logPValue
+	Long etlId
+	Long id
+	String ext_data
 	
-	   def index = {
-            new AccessLog(username: springSecurityService.getPrincipal().username, event:"Login",
-                  eventmessage: request.getHeader("user-agent"),
-                  accesstime:new Date()).save()
-                  def skip_disclaimer = grailsApplication.config.com.recomdata?.skipdisclaimer?:false;
-                  if(skip_disclaimer){
-                        redirect(uri:'/RWG/index');
-                  }else{
-                  redirect(uri: '/userLanding/disclaimer.gsp')
-                  }
-      }
-	def agree = {
-		new AccessLog(username: springSecurityService.getPrincipal().username, event:"Disclaimer accepted",
-			accesstime:new Date()).save()				
-		redirect(uri: '/RWG/index')
+	static mapping = {
+	 table name:'BIO_ASSAY_ANALYSIS_GWAS', schema:'BIOMART'
+	 version false
+	 id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+	 columns {
+		 id column:'BIO_ASY_ANALYSIS_GWAS_ID'
+		 analysis column:'BIO_ASSAY_ANALYSIS_ID'
+		 rsId column:'RS_ID'
+		 pValue column:'P_VALUE'
+		 logPValue column:'LOG_P_VALUE'
+		 etlId column:'ETL_ID'
+		 ext_data column:'EXT_DATA'
+		}
+	 	
 	}
-	
-	def disagree = {
-		new AccessLog(username: springSecurityService.getPrincipal().username, event:"Disclaimer not accepted",			
-			accesstime:new Date()).save()
-	    redirect(uri: '/logout')
+
+	/**
+	 * Get values to Export to Excel
+	 */
+	public List getValues() {
+		return [rsId, pValue, logPValue]
 	}
 }
