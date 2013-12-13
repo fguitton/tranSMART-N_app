@@ -24,7 +24,7 @@ STATE = {
 		QueryRequestCounter: 0
 }
 
-function Concept(name, key, level, tooltip, tablename, dimcode, comment, normalunits, oktousevalues, value, nodeType, inOutCode, timingLevel)
+function Concept(name, key, level, tooltip, tablename, dimcode, comment, normalunits, oktousevalues, value, nodeType, ismodifier, modifiername, modifierappliedpath, modifierkey, inOutCode, timingLevel)
 {
     this.name=name;
     this.key=key;
@@ -37,8 +37,12 @@ function Concept(name, key, level, tooltip, tablename, dimcode, comment, normalu
     this.oktousevalues=oktousevalues;
     this.value=value;
     this.nodeType = nodeType;
+    this.ismodifier = ismodifier;
+    this.modifiername = modifiername;
+    this.modifierappliedpath = modifierappliedpath;
+    this.modifierkey = modifierkey;
     this.inOutCode = inOutCode;
-    this.timingLevel = timingLevel
+    this.timingLevel = timingLevel;
 }
 
 function Value(mode, operator, highlowselect, lowvalue, highvalue, units)
@@ -78,28 +82,39 @@ function Value(mode, operator, highlowselect, lowvalue, highvalue, units)
 	else{
 		this.units=units;
 		}
-} 
+}
 
 function convertNodeToConcept(node)
 {
-	var value=new Value();
-	var level=node.attributes.level;
-	var name=node.text;
-	var key=node.id;
-	var tooltip=node.attributes.qtip;
-	var tablename=node.attributes.tablename;
-	var dimcode=node.attributes.dimcode;
-	var comment=node.attributes.comment;
-	var normalunits=node.attributes.normalunits;
-	var oktousevalues=node.attributes.oktousevalues;
-	
-	//Each node has a type (Categorical, Continuous, High Dimensional Data) that we need to populate. For now we will use the icon class.
-	var nodeType = node.attributes.iconCls
-	
-	if(oktousevalues=="Y"){value.mode="novalue";} //default to novalue
-	
-	var myConcept=new Concept(name, key, level, tooltip, tablename, dimcode, comment, normalunits, oktousevalues, value, nodeType);
-	return myConcept;
+    var ismodifier = node.attributes.ismodifier;
+    var modifierappliedpath = null;
+    var modifiername = null;
+    var modifierkey = null;
+    if(ismodifier)
+    {
+        modifierappliedpath = node.attributes.appliedpath;
+        modifiername =node.text;
+        modifierkey=node.id;
+        node=node.parentNode; //swap out for rest of properties;
+    }
+    var value=new Value();
+    var level=node.attributes.level;
+    var name=node.text;
+    var key=node.id;
+    var tooltip=node.attributes.qtip;
+    var tablename=node.attributes.tablename;
+    var dimcode=node.attributes.dimcode;
+    var comment=node.attributes.comment;
+    var normalunits=node.attributes.normalunits;
+    var oktousevalues=node.attributes.oktousevalues;
+
+
+    //Each node has a type (Categorical, Continuous, High Dimensional Data) that we need to populate. For now we will use the icon class.
+    var nodeType = node.attributes.iconCls
+
+    if(oktousevalues=="Y"){value.mode="numeric";} //default to numeric
+    var myConcept=new Concept(name, key, level, tooltip, tablename, dimcode, comment, normalunits, oktousevalues, value, nodeType, ismodifier, modifiername, modifierappliedpath, modifierkey, null, null);
+    return myConcept;
 }
 
 

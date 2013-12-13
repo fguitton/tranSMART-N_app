@@ -511,7 +511,7 @@ function runDataExportJob(result) {
 			) // or a URL encoded string
 	});
     // Temporary workaround - Added delay of 3 secs before calling the method to avoid concurrency issue
-    //checkJobStatus(jobName);
-    setTimeout(function(){checkJobStatus(jobName)},10000);
+    checkJobStatus(jobName);
+    //setTimeout(function(){checkJobStatus(jobName)},40000);
 
 }

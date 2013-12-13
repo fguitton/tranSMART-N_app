@@ -2151,7 +2151,7 @@ function setupDragAndDrop()
 	{
 		// createAnalysisItem(data.node.text, data.node.id);
 		// alert("build analsyis graph now!");
-		buildAnalysis(data.node,'stats');
+        buildAnalysis(convertNodeToConcept(data.node), 'stats');
 		return true;
 	}
 
@@ -2170,7 +2170,7 @@ function setupDragAndDrop()
 	{
 		// createAnalysisItem(data.node.text, data.node.id);
 		// alert("build analsyis graph now!");
-		buildAnalysis(data.node,'grid');
+        buildAnalysis(convertNodeToConcept(data.node),'grid');
 		return true;
 	}
 }
@@ -2994,9 +2994,8 @@ function getNodeForAnalysis(node)
 }
 
 
-function buildAnalysis(nodein, dropType)
+function buildAnalysis(conceptin, dropType)
 {
-    //alert(nodein);
 
     if(dropType == 'stats')
     {
@@ -3008,7 +3007,7 @@ function buildAnalysis(nodein, dropType)
         analysisGridPanel.body.mask("Loading...", 'x-mask-loading');
     }
 
-    var node = nodein;
+    var concept = conceptin;
 
 
     if(isSubsetEmpty(1) && isSubsetEmpty(2))
@@ -3025,7 +3024,7 @@ function buildAnalysis(nodein, dropType)
     {
         runAllQueries(function()
             {
-                buildAnalysis(node, dropType);
+                buildAnalysis(concept, dropType);
             }
         );
         analysisPanel.body.unmask();
@@ -3035,7 +3034,7 @@ function buildAnalysis(nodein, dropType)
     if(dropType == 'grid')
     {
         window.dragToGrid = true;
-        getAnalysisGridData(node.attributes.id);
+        getAnalysisGridData(concept.key);
     }
 
     if(dropType == 'stats')
@@ -3048,7 +3047,9 @@ function buildAnalysis(nodein, dropType)
                 params :  Ext.urlEncode(
                     {
                         charttype : "analysis",
-                        concept_key : node.attributes.id,
+                        concept_key : concept.key,
+                        //modifier_key: concept.modifierkey,
+                        //concept: Ext.util.JSON.encode(concept),
                         result_instance_id1 : GLOBAL.CurrentSubsetIDs[1],
                         result_instance_id2 : GLOBAL.CurrentSubsetIDs[2]
                     }
@@ -3057,8 +3058,8 @@ function buildAnalysis(nodein, dropType)
                 {
 
                     //Add the code we just dragged in to the report list.
-                    GLOBAL.currentReportCodes.push(node.attributes.id)
-                    GLOBAL.currentReportStudy.push(node.attributes.comment)
+                    GLOBAL.currentReportCodes.push(concept.key)
+                    GLOBAL.currentReportStudy.push(concept.comment)
 
                     //node.comment
                     buildAnalysisComplete(result);
