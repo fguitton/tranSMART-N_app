@@ -72,6 +72,10 @@
 	src="${resource(dir:'js/datasetExplorer/exportData', file: 'dataTab.js')}"></script>
 <script type="text/javascript"
 	src="${resource(dir:'js/datasetExplorer/exportData', file: 'exportJobsTab.js')}"></script>
+    <script type="text/javascript" src="${resource(dir:'js/jsTree', file:'jquery.jstree.js')}"></script>
+    <script type="text/javascript" src="${resource(dir:'js/datasetExplorer', file: 'acrossTrial.js')}"></script>
+    <script type="text/javascript" src="${resource(dir:'js/datasetExplorer', file: 'jsTreeFunctions.js')}"></script>
+
 <!-- <script type="text/javascript" src="http://www.google.com/jsapi"></script>
 <script type="text/javascript">
 	google.load("visualization", "1", {});
@@ -96,7 +100,9 @@
 	<link rel="stylesheet" type="text/css" href="${resource(dir:'css', file:'metacore.css')}">
     <script type="text/javascript" src="${resource(dir:'js/datasetExplorer', file: 'yui-combo-build-min.js')}"></script>
 	<script type="text/javascript" src="${resource(dir:'js/datasetExplorer', file:'datasetExplorer.js')}"></script>
-	<script type="text/javascript" src="${resource(dir:'js', file:'advancedWorkflowFunctions.js')}"></script>
+    <script type="text/javascript" src="${resource(dir:'js', file:'ColVis.js')}"></script>
+
+    <script type="text/javascript" src="${resource(dir:'js', file:'advancedWorkflowFunctions.js')}"></script>
 	
 	<script type="text/javascript" src="${resource(dir:'js/datasetExplorer', file:'highDimensionData.js')}"></script>
 		<script type="text/javascript" src="${resource(dir:'js', file:'utilitiesMenu.js')}"></script>
@@ -121,6 +127,9 @@
 
 	// this overrides the above
 	Ext.Updater.defaults.timeout = 1800000;
+
+    var basicGridUrl = "${createLink(controller:'chart', action:'basicGrid')}"
+    var analysisGridUrl = "${createLink(controller:'chart', action:'analysisGrid')}"
 
 	var pageInfo = {
 		basePath :"${request.getContextPath()}"
@@ -147,6 +156,7 @@
 	  PMproxy:${grailsApplication.config.com.recomdata.datasetExplorer.pmServiceProxy},
 	  CRCUrl: '',
 	  ONTUrl: '',
+      usePMHost: '${grailsApplication.config.com.recomdata.datasetExplorer.usePMHost}',
 	  Config:'jj',
 	  CurrentQueryName:'',
 	  CurrentComparisonName:' ',
@@ -191,9 +201,13 @@
 	  hideAcrossTrialsPanel:'${grailsApplication.config.com.recomdata.datasetExplorer.hideAcrossTrialsPanel}',
 	  metacoreAnalyticsEnabled: '${grailsApplication.config.com.thomsonreuters.transmart.metacoreAnalyticsEnable}',
 	  metacoreUrl: '${grailsApplication.config.com.thomsonreuters.transmart.metacoreURL}',
+      codeType: 'Concept',
+      AnalysisHasBeenRun: false,
+      ResultSetRegionParams: {},
       currentReportCodes: [],
       currentReportStudy: [],
-      currentSubsetsStudy: ''
+      currentSubsetsStudy: '',
+      isGridViewLoaded: false
 	};
 	// initialize browser version variables; see http://www.quirksmode.org/js/detect.html
 	BrowserDetect.init();

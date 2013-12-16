@@ -39,6 +39,9 @@ import org.transmart.searchapp.CustomFilter
 import org.transmart.searchapp.SearchKeyword
 import org.transmart.searchapp.SearchKeywordTerm
 
+import org.transmart.biomart.BioAssayAnalysis;
+import org.transmart.biomart.BioDataExternalCode
+
 import com.recomdata.util.*
 
 public class SearchController{
@@ -50,6 +53,8 @@ public class SearchController{
 	def SearchService
 	def documentService
 	def searchKeywordService
+    def regionSearchService
+
 	String authKeyGG = null
 	
 	def SEARCH_DELIMITER='SEARCHDELIMITER'
@@ -635,6 +640,427 @@ public class SearchController{
 		}
 		return keyword
 	}
+
+    //Retrieve the results for all analyses currently examined.
+    def getTableResults = {
+
+        def paramMap = params;
+        def max = params.long('max')
+        def offset = params.long('offset')
+        def cutoff = params.double('cutoff')
+        if ("".equals(params.cutoff)) {cutoff = 0;} //Special case - cutoff is 0 if blank string
+        def sortField = params.sortField
+        def order = params.order
+        def search = params.search
+
+        def export = params.boolean('export')
+
+        def filter = session['filterTableView'];
+        if (filter == null) {
+            filter = [:]
+        }
+
+        if (max != null) { filter.max = max }
+        if (!filter.max || filter.max < 10) {filter.max = 10;}
+
+        if (offset != null) { filter.offset = offset }
+        if (!filter.offset || filter.offset < 0) {filter.offset = 0;}
+
+        if (cutoff != null) { filter.cutoff = cutoff }
+
+        if (sortField != null) { filter.sortField = sortField }
+        if (!filter.sortField) {filter.sortField = 'null';}
+
+        if (order != null) { filter.order = order }
+        if (!filter.order) {filter.order = 'asc';}
+
+        if (search != null) { filter.search = search }
+
+        def analysisIds = session['solrAnalysisIds']
+
+        session['filterTableView'] = filter
+
+        if (analysisIds.size() >= 100) {
+            render(text: "<p>The table view cannot be used with more than 100 analyses (${analysisIds.size()} analyses in current search results). Narrow down your results by adding filters.</p>")
+            return
+        }
+        else if (analysisIds.size() == 0) {
+            render(text: "<p>No analyses were found for the current filter!</p>")
+            return
+        }
+        else if (analysisIds[0] == -1) {
+            render(text: "<p>To use the table view, please select a study or set of analyses from the filter browser in the left pane.</p>")
+            return
+        }
+
+        //Override max and offset if we're exporting
+        def maxToUse = filter.max
+        def offsetToUse = filter.offset
+        if (export) {
+            maxToUse = 0
+            offsetToUse = 0
+        }
+
+        def regionSearchResults
+        try {
+            regionSearchResults = getRegionSearchResults(maxToUse, offsetToUse, filter.cutoff, filter.sortField, filter.order, filter.search, analysisIds)
+        }
+        catch (Exception e) {
+            //render(text: "<pre>" + e.getMessage() + "</pre>")
+            return
+        }
+        //Return the data as a GRAILS template or CSV
+        if (export) {
+            if (params.type?.equals('GWAS')) {
+                exportResults(regionSearchResults.gwasResults.columnNames, regionSearchResults.gwasResults.analysisData, "results.csv")
+            }
+            else {
+                exportResults(regionSearchResults.eqtlResults.columnNames, regionSearchResults.eqtlResults.analysisData, "results.csv")
+            }
+        }
+        else {
+            render(template: "gwasAndEqtlResults", model: [results: regionSearchResults, cutoff: filter.cutoff, sortField: filter.sortField, order: filter.order, search: filter.search])
+        }
+    }
+
+    private def getRegionSearchResults(Long max, Long offset, Double cutoff, String sortField, String order, String search, List analysisIds) throws Exception {
+
+        //Get list of REGION restrictions from session and translate to regions
+        def regions = getSearchRegions(session['solrSearchFilter'])
+        def geneNames = getGeneNames(session['solrSearchFilter'])
+
+        //Find out if we're querying for EQTL, GWAS...
+        def hasGwas = BioAssayAnalysis.createCriteria().list([max: 1]) {
+            or {
+                eq('assayDataType', 'GWAS')
+                eq('assayDataType', 'Metabolic GWAS')
+            }
+            'in'('id', analysisIds)
+        }
+
+        def hasEqtl = BioAssayAnalysis.createCriteria().list([max: 1]) {
+            eq('assayDataType', 'EQTL')
+            'in'('id', analysisIds)
+        }
+
+        def hasGeneExpression = BioAssayAnalysis.createCriteria().list([max: 1]) {
+            eq('assayDataType', 'Gene Expression')
+            'in'('id', analysisIds)
+        }
+
+        def gwasResult
+        def eqtlResult
+        def geneExpressionResult
+
+        if (hasGwas) {
+            gwasResult = runRegionQuery(analysisIds, regions, max, offset, cutoff, sortField, order, search, "gwas", geneNames)
+        }
+        if (hasEqtl) {
+            eqtlResult = runRegionQuery(analysisIds, regions, max, offset, cutoff, sortField, order, search, "eqtl", geneNames)
+        }
+        if (hasGeneExpression) {
+            println("Passing to region query for gene expression")
+            geneExpressionResult = runRegionQuery(analysisIds, regions, max, offset, cutoff, sortField, order, search, "geneExpression", geneNames)
+            println("Done region search for gene expression")
+        }
+
+        return [gwasResults: gwasResult, eqtlResults: eqtlResult, geneExpressionResults: geneExpressionResult]
+    }
+
+    def getSearchRegions(solrSearch) {
+        def regions = []
+
+        for (s in solrSearch) {
+
+            s = s.replaceAll('::[^:]+\$',''); //Get rid of logical operator
+
+            if (s.startsWith("REGION")) {
+                //Cut off REGION:, split by pipe and interpret chromosomes and genes
+                s = s.substring(7)
+                def regionparams = s.split("\\|")
+                for (r in regionparams) {
+                    //Chromosome
+                    if (r.startsWith("CHROMOSOME")) {
+                        def region = r.split(";")
+                        def chrom = region[1]
+                        def position = region[3] as long
+                        def direction = region[4]
+                        def range = region[5] as long
+                        def ver = region[6]
+                        def low = position
+                        def high = position
+
+                        if (direction.equals("plus")) {
+                            high = position + range;
+                        }
+                        else if (direction.equals("minus")) {
+                            low = position - range;
+                        }
+                        else {
+                            high = position + range;
+                            low = position - range;
+                        }
+
+                        regions.push([gene: null, chromosome: chrom, low: low, high: high, ver: ver])
+                    }
+                    //Gene
+                    else {
+                        def region = r.split(";")
+                        def geneId = region[1] as long
+                        def direction = region[2]
+                        def range = region[3] as long
+                        def ver = region[4]
+                        def searchKeyword = SearchKeyword.get(geneId)
+                        def limits
+                        if (searchKeyword.dataCategory.equals("GENE")) {
+                            limits = regionSearchService.getGeneLimits(geneId, ver)
+                        }
+                        else if (searchKeyword.dataCategory.equals("SNP")) {
+                            limits = regionSearchService.getSnpLimits(geneId, ver)
+                        }
+                        def low = limits.get('low')
+                        def high = limits.get('high')
+                        def chrom = limits.get('chrom')
+
+                        if (direction.equals("plus")) {
+                            high = high + range;
+                        }
+                        else if (direction.equals("minus")) {
+                            low = low - range;
+                        }
+                        else {
+                            high = high + range;
+                            low = low - range;
+                        }
+                        regions.push([gene: geneId, chromosome: chrom, low: low, high: high, ver: ver])
+                    }
+                }
+            }
+            else if (s.startsWith("GENESIG")) {
+                //Expand regions to genes and get their limits
+                s = s.substring(8)
+                def sigIds = s.split("\\|")
+                for (sigId in sigIds) {
+                    def sigSearchKeyword = SearchKeyword.get(sigId as long)
+                    def sigItems = GeneSignatureItem.createCriteria().list() {
+                        eq('geneSignature', GeneSignature.get(sigSearchKeyword.bioDataId))
+                        like('bioDataUniqueId', 'GENE%')
+                    }
+                    for (sigItem in sigItems) {
+                        def searchGene = SearchKeyword.findByUniqueId(sigItem.bioDataUniqueId)
+                        def geneId = searchGene.id
+                        def limits = regionSearchService.getGeneLimits(geneId, '19')
+                        regions.push([gene: geneId, chromosome: limits.get('chrom'), low: limits.get('low'), high: limits.get('high'), ver: "19"])
+                    }
+                }
+            }
+            else if (s.startsWith("GENE")) {
+                //If just plain genes, get the limits and default to HG19 as the version
+                s = s.substring(5)
+                def geneIds = s.split("\\|")
+                for (geneString in geneIds) {
+                    def geneId = geneString as long
+                    def limits = regionSearchService.getGeneLimits(geneId, '19')
+                    regions.push([gene: geneId, chromosome: limits.get('chrom'), low: limits.get('low'), high: limits.get('high'), ver: "19"])
+                }
+            }
+            else if (s.startsWith("SNP")) {
+                //If plain SNPs, as above (default to HG19)
+                s = s.substring(4)
+                def rsIds = s.split("\\|")
+                for (rsId in rsIds) {
+                    def limits = regionSearchService.getSnpLimits(rsId as long, '19')
+                    regions.push([gene: rsId, chromosome: limits.get('chrom'), low: limits.get('low'), high: limits.get('high'), ver: "19"])
+                }
+            }
+        }
+
+        return regions
+    }
+
+
+    def getGeneNames(solrSearch) {
+        def genes = []
+
+        for (s in solrSearch) {
+
+            s = s.replaceAll('::[^:]+\$',''); //Get rid of logical operator
+
+            if (s.startsWith("GENESIG")) {
+                //Expand regions to genes and get their names
+                s = s.substring(8)
+                def sigIds = s.split("\\|")
+                for (sigId in sigIds) {
+                    def sigSearchKeyword = SearchKeyword.get(sigId as long)
+                    def sigItems = GeneSignatureItem.createCriteria().list() {
+                        eq('geneSignature', GeneSignature.get(sigSearchKeyword.bioDataId))
+                        like('bioDataUniqueId', 'GENE%')
+                    }
+                    for (sigItem in sigItems) {
+                        def searchGene = SearchKeyword.findByUniqueId(sigItem.bioDataUniqueId)
+                        def geneId = searchGene.id
+                        def searchKeyword = SearchKeyword.get(geneId)
+                        genes.push(searchKeyword.keyword)
+                    }
+                }
+            }
+            else if (s.startsWith("GENE")) {
+                //If just plain genes, get the names
+                s = s.substring(5)
+                def geneIds = s.split("\\|")
+                for (geneString in geneIds) {
+                    def geneId = geneString as long
+                    def searchKeyword = SearchKeyword.get(geneId)
+                    genes.push(searchKeyword.keyword)
+                }
+            }
+        }
+
+        return genes
+    }
+
+    def runRegionQuery(analysisIds, regions, max, offset, cutoff, sortField, order, search, type, geneNames) throws Exception {
+
+        //This will hold the index lookups for deciphering the large text meta-data field.
+        def indexMap = [:]
+
+        //Set a flag to record that the list was filtered by region
+        def wasRegionFiltered = regions ? true : false
+
+        def queryResult
+        def analysisData = []
+        def totalCount = 0L
+
+        def columnNames = []
+        def searchDAO = new SearchDAO()
+        def needRowCount = true
+
+        //If there are no limiting criteria, use the recorded row count
+        if (!regions && !geneNames && !cutoff && !search) {
+            for (analysisId in analysisIds) {
+                def analysis = BioAssayAnalysis.get(analysisId)
+                if (analysis.dataCount) {
+                    totalCount += analysis.dataCount
+                }
+            }
+            if (totalCount > 0) {
+                needRowCount = false
+            }
+        }
+
+        //For plain queries of one analysis, consult the precalculated tables
+        if (!needRowCount && !type.equals("geneExpression") && analysisIds.size() == 1 && sortField.equals('null') && max > 0 && false) { // XXX DISABLED DISABLED DISABLED
+            println("Triggering shortcut query")
+            def analysis = BioAssayAnalysis.get(analysisIds[0])
+            def quickAnalysisData = regionSearchService.getQuickAnalysisDataByName(analysis.name, type)
+            for (int i = offset; i < (max+offset); i++) {
+                analysisData.push(quickAnalysisData.results[i]);
+            }
+            println("Got quick query results in a batch of " + analysisData.size())
+        }
+        else {
+            //Otherwise, run the query
+            queryResult = regionSearchService.getAnalysisData(analysisIds, regions, max, offset, cutoff, sortField, order, search, type, geneNames, needRowCount)
+            analysisData = queryResult.results
+            if (needRowCount) {
+                totalCount = queryResult.total
+            }
+        }
+
+        def returnedAnalysisData = []
+
+        if (type.equals("geneExpression")) {
+            columnNames.add(["sTitle":"Analysis", "sortField":"data.analysis_name", "displayType":""])
+            columnNames.add(["sTitle":"Probe ID", "sortField":"DATA.feature_group_name", "displayType":""])
+            columnNames.add(["sTitle":"Gene", "sortField":"genebm.bio_marker_name", "displayType":"gene"])
+            columnNames.add(["sTitle":"Fold change", "sortField":"DATA.fold_change_ratio", "displayType":""])
+            columnNames.add(["sTitle":"p-value", "sortField":"DATA.preferred_pvalue", "displayType":""])
+            columnNames.add(["sTitle":"tea-value", "sortField":"DATA.tea_normalized_pvalue", "displayType":""])
+
+            analysisData.each() {
+                returnedAnalysisData.add([it[0],it[1],it[2],it[3],it[4], it[5]])
+            }
+        }
+        else {
+
+            def analysisIndexData
+            if (type.equals("eqtl")) {
+                analysisIndexData = searchDAO.getEqtlIndexData()
+            }
+            else {
+                analysisIndexData = searchDAO.getGwasIndexData()
+            }
+
+            //These columns aren't dynamic and should always be included. Might be a better way to do this than just dropping it here.
+            columnNames.add(["sTitle":"Analysis", "sortField":"baa.analysis_name", "displayType":""])
+            columnNames.add(["sTitle":"Probe ID", "sortField":"data.rs_id", "displayType":""])
+            columnNames.add(["sTitle":"p-value", "sortField":"data.p_value", "displayType":""])
+            columnNames.add(["sTitle":"-log 10 p-value", "sortField":"data.log_p_value", "displayType":""])
+            columnNames.add(["sTitle":"RS Gene", "sortField":"info.gene_name", "displayType":"gene"])
+            columnNames.add(["sTitle":"Chromosome", "sortField":"info.chrom", "displayType":""])
+            columnNames.add(["sTitle":"Position", "sortField":"info.pos", "displayType":""])
+
+            if (type.equals("eqtl")) {
+                columnNames.add(["sTitle":"Gene", "sortField":"data.gene", "displayType":"gene"])
+            }
+
+            analysisIndexData.each()
+                    {
+                        //Put the index information into a map so we can look it up later.
+                        indexMap[it.field_idx] = it.display_idx
+
+                        //We need to take the data from the index table and extract the list of column names.
+                        columnNames.add(["sTitle":it.field_name])
+                    }
+
+            println("About to process results")
+
+            //The returned data needs to have the large text field broken out by delimiter.
+            analysisData.each()
+                    {
+                        if (it != null) {
+                            //This temporary list is used so that we return a list of lists.
+                            def temporaryList = []
+
+                            //The third element is our large text field. Split it into an array, leaving trailing empties.
+                            def largeTextField = it[3].split(";", -1)
+
+                            //This will be the array that is reordered according to the meta-data index table.
+                            String[] newLargeTextField = new String[largeTextField.size()]
+
+                            //Loop over the elements in the index map.
+                            indexMap.each()
+                                    {
+                                        //Reorder the array based on the index table.
+                                        newLargeTextField[it.value-1] = largeTextField[it.key-1]
+                                    }
+
+                            //Swap around the data types for easy array addition.
+                            def finalFields = new ArrayList(Arrays.asList(newLargeTextField));
+
+                            //Add the non-dynamic meta data fields to the returned data.
+                            temporaryList.add(it[4])
+                            temporaryList.add(it[0])
+                            temporaryList.add(it[1])
+                            temporaryList.add(it[2])
+                            temporaryList.add(it[5])
+                            temporaryList.add(it[6])
+                            temporaryList.add(it[7])
+                            if (type.equals("eqtl")) {
+                                temporaryList.add(it[8])
+                            }
+
+                            //Add the dynamic fields to the returned data.
+                            temporaryList+=finalFields
+
+                            returnedAnalysisData.add(temporaryList)
+                        }
+                    }
+        }
+        println("Results processed OK")
+        return [analysisData: returnedAnalysisData, columnNames: columnNames, max: max, offset: offset, cutoff: cutoff, totalCount: totalCount, wasRegionFiltered: wasRegionFiltered]
+
+    }
 
 	def noResult = {
 		//Comment

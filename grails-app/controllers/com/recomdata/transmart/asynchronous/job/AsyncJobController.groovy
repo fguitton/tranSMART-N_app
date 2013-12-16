@@ -149,4 +149,19 @@ class AsyncJobController {
 	   wfstatus.setCancelled();
 	   render(wfstatus.jobStatusList as JSON)
    }
+
+    def deleteJobs = {
+        def selectedJobNames = params['selectedJobNames']
+
+        if(selectedJobNames!=""){
+            String[] jobNames = selectedJobNames.split("\\|")
+
+            List jobNamesList = new ArrayList(Arrays.asList(jobNames));
+
+
+            asyncJobService.deleteJobs(jobNamesList)
+        }
+
+        render 'success'
+    }
 }

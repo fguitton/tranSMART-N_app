@@ -67,7 +67,7 @@ table.menuDetail th.menuVisited {
 
 div.topall {
 	padding-top:4px;
-    background-color: #fafafa);
+    background-color: #fafafa;
     background-image:url(../images/skin/shadow30.jpg);
 font-family:verdana,arial,helvetica,sans-serif;
 font-size:12px;
@@ -106,7 +106,7 @@ a.toplink1{
 	color:#00c !important;
 	vertical-align:bottom;
 	font-weight: bold;
-    background-color: #fafafa);
+    background-color: #fafafa;
     background-image:url(../images/skin/shadow30.jpg);
 	text-decoration:none;
 }
@@ -162,7 +162,7 @@ height:0;
 position:absolute;
 top:30px;
 width:100%;
-    background-color: #fafafa);
+    background-color: #fafafa;
     background-image:url(../images/skin/shadow30.jpg);
 }
 

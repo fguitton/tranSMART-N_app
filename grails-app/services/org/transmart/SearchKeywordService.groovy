@@ -34,7 +34,29 @@ public class SearchKeywordService {
 	// probably not needed but makes all methods transactional
 	static transactional = true
 
+    /** Finds all of the search categories pertaining to search keywords */
+    def findSearchCategories()	{
+        log.info "Finding all of the search categories..."
 
+        def c = SearchKeyword.createCriteria()
+        def results = c.list	{
+            projections {
+                distinct("dataCategory")
+            }
+            //order("dataCategory", "asc")
+        }
+
+        log.info("Categories found: " + results.size())
+
+        def categories = []
+
+        for (result in results)	{
+            categories.add(["category":result])
+        }
+
+
+        return categories.sort()
+    }
 	/**
 	 * convert pathways to a list of genes
 	 */

@@ -52,6 +52,7 @@ class AsyncJobService {
 			jobResults = c {
 				like("jobName", "${userName}%")
 				eq("jobType", "${jobType}")
+                ne("jobStatus", "Deleted")
 				ge("lastRunOn", new Date()-7)
 				order("id", "desc")
 			}
@@ -72,7 +73,7 @@ class AsyncJobService {
 			m["name"] = jobResult.jobName
 			m["status"] = jobResult.jobStatus
 			m["runTime"] = jobResult.runTime
-			m["startDate"] = jobResult.lastRunOn
+            m["startDate"] = jobResult.lastRunOn.format("yyyy-MM-dd hh:mm:ss a")
 			m["viewerURL"] = jobResult.viewerURL
 			m["altViewerURL"] = jobResult.altViewerURL
 			rows.put(m)
@@ -238,11 +239,21 @@ class AsyncJobService {
 		 if (viewerURL && viewerURL != '') asyncJob.viewerURL = viewerURL
 		 if (altViewerURL && altViewerURL != '' && asyncJob.altViewerURL != null) asyncJob.altViewerURL = altViewerURL
 		 if (results && results != '') asyncJob.results = results
-		 
+
 		 //We need to flush so that the value doesn't overwrite cancelled when the controller finishes.
 		 asyncJob.save(flush:true)
 	 }
 	 
 	 return retValue
   }
+
+    def deleteJobs(jobNames){
+        def job
+        jobNames.each(){jobName->
+            job = AsyncJob.findByJobName(jobName)
+            job.setJobStatus("Deleted")
+        }
+
+        job.save(flush:true)
+    }
 }

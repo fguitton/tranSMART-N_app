@@ -5,7 +5,7 @@
  *
  * This product includes software developed at Janssen Research & Development, LLC.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
  * as published by the Free Software  * Foundation, either version 3 of the License, or (at your option) any later version, along with the following terms:
  * 1.	You may convey a work based on this program in accordance with section 5, provided that you retain the above notices.
  * 2.	You may convey verbatim copies of this program code as you receive it, in any medium, provided that you retain the above notices.
@@ -86,12 +86,33 @@ class NetezzaI2b2HelperService {
     /**
      * Converts a concept key to a path
      */
+//    def keyToPath(String concept_key) {
+//        String path = concept_key
+//        try{
+//            log.trace("keytoPath from key: "+concept_key);
+//            String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length());
+//            path=fullname;
+//            if(!fullname.endsWith("\\")) {
+//                path=path+"\\";
+//            }
+//         }
+//        catch (Exception e){
+//            path = concept_key;
+//        }
+//        return path;
+//    }
     def keyToPath(String concept_key) {
-        log.trace("keytoPath from key: "+concept_key);
-        String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length());
-        String path=fullname;
-        if(!fullname.endsWith("\\")) {
-            path=path+"\\";
+        String path = concept_key
+        try{
+            log.trace("keytoPath from key: "+concept_key);
+            String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length());
+            path=fullname;
+            if(!fullname.endsWith("\\")) {
+                path=path+"\\";
+            }
+        }
+        catch (Exception e){
+            path = concept_key;
         }
         return path;
     }
@@ -115,7 +136,7 @@ class NetezzaI2b2HelperService {
     /**
      * Gets the short display name from a concept key
      */
-    def String getShortNameFromKey(String concept_key) {
+    /*def String getShortNameFromKey(String concept_key) {
         String[] splits=concept_key.split("\\\\");
         String concept_name="";
         if(splits.length>2) {
@@ -125,6 +146,24 @@ class NetezzaI2b2HelperService {
             concept_name="...\\"+splits[splits.length-2]+"\\"+splits[splits.length-1];
         }
         else concept_name=splits[splits.length-1];
+        return concept_name;
+    }*/
+
+
+    def String getShortNameFromKey(String concept_key) {
+        String[] splits=concept_key.split("\\\\");
+        String concept_name="";
+
+        //Pull everything after the third backslash split. This should remove the extra token that lives above the study name. If the concept path is too short, use the whole path.
+        if(splits.length>3)
+        {
+            concept_name = "\\" + splits[3..splits.size()-1].join("\\")
+        }
+        else
+        {
+            concept_name = "\\" + splits.join("\\")
+        }
+
         return concept_name;
     }
 
@@ -166,7 +205,7 @@ class NetezzaI2b2HelperService {
         return concepts.toString();
     }
 
-    def String getConceptPathFromCode(String code) {
+        def String getConceptPathFromCode(String code) {
         String path = null;
         groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
         String sqlt =
@@ -174,6 +213,19 @@ class NetezzaI2b2HelperService {
                 path = row.CONCEPT_PATH;
             })
         return path;
+    }
+
+    /**
+     * Determines if a concept key is a folder or not
+     */
+    def Boolean isFolderConceptKey(String concept_key) {
+        String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length());
+        Boolean res=false;
+        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
+        sql.eachRow("SELECT C_VISUALATTRIBUTES FROM I2B2METADATA.I2B2 WHERE C_FULLNAME = ?", [fullname], {row ->
+            res=row.c_visualattributes.indexOf('F')>-1
+        })
+        return res;
     }
 
     /**
@@ -227,19 +279,55 @@ class NetezzaI2b2HelperService {
      * Determines if a concept key is a value concept or not
      */
     def Boolean isValueConceptKey(String concept_key) {
-        return isValueConceptCode(getConceptCodeFromKey(concept_key));
+        return isValueConceptCode(getConceptCodeFromLongPath(concept_key));
+    }
+
+    /**
+     * Gets the concept codes associated with a concept key (comma delimited string returned)
+     */
+    def String getConceptCodeFromLongPath(String path)  {
+        log.trace("Getting concept codes for long path:" +path);
+        print "test-------------------------------->"+path;
+        String shortPath = "";
+        try{
+            shortPath=path.substring(path.indexOf("\\",2), path.length());
+        }
+        catch(Exception e){
+            print e.getMessage();
+        }
+
+
+        if(!path.endsWith("\\")){
+            path +="\\";
+        }
+        return getConceptCodeFromPath(shortPath);
     }
 
     /**
      * Determines if a concept key is a leaf or not
      */
+//    def Boolean isLeafConceptKey(String concept_key) {
+//        print "Pinaki"+ concept_key;
+//        String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length());
+//        Boolean res=false;
+//        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
+//        sql.eachRow("SELECT C_VISUALATTRIBUTES FROM I2B2METADATA.I2B2 WHERE C_FULLNAME = ?", [fullname], {row ->
+//            res=row.c_visualattributes.indexOf('L')>-1
+//        })
+//        return res;
+//    }
     def Boolean isLeafConceptKey(String concept_key) {
-        String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length());
         Boolean res=false;
-        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-        sql.eachRow("SELECT C_VISUALATTRIBUTES FROM I2B2METADATA.I2B2 WHERE C_FULLNAME = ?", [fullname], {row ->
-            res=row.c_visualattributes.indexOf('L')>-1
-        })
+        try{
+            String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length());
+            groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
+            sql.eachRow("SELECT C_VISUALATTRIBUTES FROM I2B2METADATA.I2B2 WHERE C_FULLNAME = ?", [fullname], {row ->
+                res=row.c_visualattributes.indexOf('L')>-1
+            })
+        }
+        catch (Exception e){
+
+        }
         return res;
     }
 
@@ -355,11 +443,11 @@ class NetezzaI2b2HelperService {
     /**
      *  Gets the count of a a patient set fromt he result instance id
      */
-    def  Integer getPatientSetSize(String result_instance_id) {
+    /*def  Integer getPatientSetSize(String result_instance_id) {
         log.trace("Getting patient set size with id:" + result_instance_id);
         Integer i=0;
         groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
-        String sqlt = """select count(distinct(patient_num)) as patcount 
+        String sqlt = """select count(distinct(patient_num)) as patcount
 						 FROM qt_patient_set_collection
 						 WHERE result_instance_id = CAST(? AS numeric)""";
 
@@ -370,7 +458,55 @@ class NetezzaI2b2HelperService {
             log.trace(row.patcount);
         });
         return i;
+    }*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /**
+     *  Gets the count of a a patient set fromt he result instance id
+     */
+    def  Integer getPatientSetSize(String result_instance_id) {
+        log.trace("Getting patient set size with id:" + result_instance_id);
+        Integer i=0;
+        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
+        String sqlt = """select count(*) as patcount FROM (select distinct a.patient_num
+		        from qt_patient_set_collection a
+				where a.result_instance_id = CAST(? AS numeric)) t""";
+        log.trace(sqlt);
+        sql.eachRow(sqlt, [result_instance_id], {row ->
+            log.trace("inrow");
+            i=row.patcount;
+            log.trace(row.patcount);
+        });
+        return i;
     }
+
+
+
+
+
+
 
     /**
      *  Gets the intersection of the patient sets from two result instance ids
@@ -393,6 +529,27 @@ class NetezzaI2b2HelperService {
         })
         return i;
     }
+    /**
+     *  Gets the intersection of the patient sets from two result instance ids
+     */
+  /*  def int getPatientSetIntersectionSize(String result_instance_id1, String result_instance_id2) {
+        log.trace("Getting patient set intersection");
+        Integer i=0;
+        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
+        String sqlt = """Select count(*) as patcount FROM ((select distinct patient_num from qt_patient_set_collection
+		        where result_instance_id = CAST(? AS numeric)) a inner join (select distinct patient_num from qt_patient_set_collection
+		        where result_instance_id = CAST(? AS numeric)) b ON a.patient_num=b.patient_num)""";
+        log.trace(sqlt);
+        sql.eachRow(sqlt, [
+                result_instance_id1,
+                result_instance_id2
+        ], {row ->
+            log.trace("inrow of intersection")
+            i=row.patcount;
+            log.trace(row.patcount);
+        })
+        return i;
+    }*/
 
     /**
      * Converts a clob to a string I hope
@@ -529,13 +686,80 @@ class NetezzaI2b2HelperService {
         return results;
     }
 
+    def  HashMap<String,Integer> getConceptDistributionDataForConceptSameEvent(String concept_key, TransmartQueryDefinition tQD) throws SQLException {
+
+        String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length());
+        HashMap<String,Integer> results = new LinkedHashMap<String, Integer>();
+
+        // check to see if there is a mapping from this concept_key to a concept_key for the results
+        log.debug("getConceptDistributionDataForConcept: looking up parent_concept of fullname: " + fullname)
+        String parent_concept = lookupParentConcept(fullname);
+        log.debug("getConceptDistributionDataForConcept: parent_concept: "+parent_concept);
+        Set<String>	concepts = new HashSet<String>();
+
+        if (parent_concept != null) {
+            // lookup appropriate children
+            Set<String>	childConcepts = lookupChildConcepts(parent_concept, tQD.resultInstanceId);
+            if (childConcepts.isEmpty()) {
+                childConcepts.add(concept_key);
+            }
+            log.debug("getConceptDistributionDataForConcept: childConcepts: "+childConcepts);
+            for (c in childConcepts) {
+                int i=getLevelFromKey(concept_key)+1;
+                fullname = getConceptPathFromCode(c);
+                log.debug("** IN LOOP: fullname: "+fullname);
+                groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
+                String sqlt =
+                    "SELECT DISTINCT c_name, c_fullname FROM i2b2metadata.i2b2 WHERE C_FULLNAME LIKE ? AND c_hlevel = ? ORDER BY C_FULLNAME";
+                log.trace(sqlt);
+                sql.eachRow(sqlt, [fullname+"%", i], {row ->
+                    if (results.get(row[0]) == null) {
+                        results.put(row[0], getObservationCountForConceptForSubsetSameEvent("\\blah"+row[1], tQD));
+                    } else {
+                        results.put(row[0], results.get(row[0]) + getObservationCountForConceptForSubsetSameEvent("\\blah"+row[1], tQD));
+                    }
+                })
+            }
+        } else {
+            int i=getLevelFromKey(concept_key)+1;
+            groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
+            String sqlt = "SELECT DISTINCT c_name, c_fullname FROM i2b2metadata.i2b2 WHERE C_FULLNAME LIKE ? AND c_hlevel = ? ORDER BY C_FULLNAME";
+            log.trace(sqlt);
+
+            //is this concept also a concept in one of the query panels?
+            def isConceptInPanels = tQD.distributions.keySet().find({ k->
+                def kShortened = k.substring(k.indexOf("\\",2), k.length());
+                return kShortened == fullname;
+            });
+
+            //Get children and loop through them to display observation counts for each
+            sql.eachRow(sqlt, [fullname+"%", i], {row ->
+
+                //Does the concept have a distribution to use to calculate the count from?
+                //Note: The hashmap keys (concepts) have the double slash study prefix so use a predicate as a filter
+                Boolean isConceptInPanelDistribution = tQD.distributions.containsKey(row[1]);
+
+                if (isConceptInPanelDistribution) {
+                    results.put(row[0], getObservationCountForConceptForSubsetSameEvent("\\blah" + row[1], tQD));
+                }
+                //This child concept wasn't in the panels but it's parent was so get count for it but not using same event
+                else if (isConceptInPanels) {
+                    results.put(row[0], getObservationCountForConceptForSubset("\\blah" + row[1], tQD.resultInstanceId));
+                }
+            });
+        }
+        return results;
+    }
+
     /**
      * Gets the children value type concepts of a parent key
      */
     def List<String> getChildValueConceptsFromParentKey(String concept_key) {
+        print "********************************Concept_key:"+ concept_key;
         String prefix=concept_key.substring(0, concept_key.indexOf("\\",2)); //get the prefix to put on to the fullname to make a key
-        String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length()).replaceAll((/\\${''}/), "\\\\\\\\");
-
+        //String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length()).replaceAll((/\\${''}/), "\\\\\\\\");
+        String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length());
+        print  prefix+"********"+fullname;
         String xml;
         ArrayList ls=new ArrayList();
         int i=getLevelFromKey(concept_key)+1;
@@ -972,6 +1196,11 @@ class NetezzaI2b2HelperService {
     }
 
 
+
+
+
+
+
     /**
      * Gets the querymasterid for resultinstanceid
      */
@@ -1037,7 +1266,7 @@ class NetezzaI2b2HelperService {
         StringBuilder subjectIds = new StringBuilder();
         groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
 
-        String sqlt = """select distinct patient_num from qt_patient_set_collection where result_instance_id = CAST(? AS numeric) 
+        String sqlt = """select distinct patient_num from qt_patient_set_collection where result_instance_id = CAST(? AS numeric)
 		AND patient_num IN (select patient_num from patient_dimension where sourcesystem_cd not like '%:S:%')""";
         log.trace("before sql call")
         sql.eachRow(sqlt, [resultInstanceId], {row ->
@@ -1369,7 +1598,7 @@ class NetezzaI2b2HelperService {
                 }
                 assayIdValueMap.put(assayId, zvalue);
             }
-            if (assayIdValueMap != null) { // process the last gene 
+            if (assayIdValueMap != null) { // process the last gene
                 outputMRNAValueToBuffer(sampleInfoList, curGeneSymbol, assayIdValueMap, dataBuf, analysisType);
             }
 
@@ -1886,7 +2115,7 @@ class NetezzaI2b2HelperService {
         // Get the compacted SNP data and insert them into the map, organized by chrom, and further ordered by chrom position
         Map<String, List<SnpDataByProbe>> snpDataByChromMap = allDataByProbe.snpDataByChromMap;
 
-        // 
+        //
         Set<Long> allSnpIdSet = getSnpSet(allGeneSnpMap);
         getSNPDataByProbeByChrom(datasetList, snpDataByChromMap, allSnpIdSet);
 
@@ -2513,7 +2742,7 @@ class NetezzaI2b2HelperService {
 
         /** There is a bug in GenePattern SNPViewer. If there is no probe position information for previous chrom,
          * The display of chroms becomes erratic.
-         * The work-around is to enter dummy data for starting and ending probes of the absent chrom, so 
+         * The work-around is to enter dummy data for starting and ending probes of the absent chrom, so
          SNPViewer can display the chrom number correctly. Need to build a list of chroms to the last used chrom*/
 
         List<String> neededChroms = getSortedChromList(chroms);
@@ -4106,7 +4335,7 @@ class NetezzaI2b2HelperService {
 
         groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
 
-        //Get the list of trial names based on 
+        //Get the list of trial names based on
         String trialNames  = getTrialName(ids);
         String assayIds    = getAssayIds(ids, sampleTypes, timepoint);
 
@@ -4269,8 +4498,8 @@ class NetezzaI2b2HelperService {
      */
     def List<String> getChildPathsFromParentKey(String concept_key) {
         String prefix=concept_key.substring(0, concept_key.indexOf("\\",2)); //get the prefix to put on to the fullname to make a key
-        String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length()).replaceAll((/\\${''}/), "\\\\\\\\");
-
+        //String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length()).replaceAll((/\\${''}/), "\\\\\\\\");
+        String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length());
         String xml;
         ArrayList ls=new ArrayList();
         int i=getLevelFromKey(concept_key)+1;
@@ -4652,17 +4881,97 @@ class NetezzaI2b2HelperService {
         log.debug(access.toString());
         return access;
     }
+	def renderQueryDefinitionToString(String qid, String title, regionParams)
+	{
+	StringWriter sw = new StringWriter();
+	PrintWriter pw = new PrintWriter(sw);
+	renderQueryDefinition(qid, title, pw, regionParams);
+	StringBuffer sb = sw.getBuffer();
+	return sb.toString();
+	} 
 
-    def renderQueryDefinitionToString(String qid, String title, regionParams)
-    {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        renderQueryDefinition(qid, title, pw);
-        StringBuffer sb = sw.getBuffer();
-        return sb.toString();
+
+    /**
+     * renderQueryDefinition provides an XML based string given a result instance ID
+     *
+     * @param qid - the query master id
+     * @param title - the title for the query (e.g. subset 2)
+     * @param pw - the StringWriter used to build the XML string
+     *
+     * @return an XML String
+     */
+    def renderQueryDefinition(String qid, String title, Writer pw, regionParams) {
+        if (log.isDebugEnabled())	{
+            log.debug("renderQueryDefinition called with ${qid} and ${title}")
+        }
+        if (qid != null) {
+            try {
+                String xmlrequest = getQueryDefinitionXMLFromQID(qid)
+                if(log.isDebugEnabled())	{
+                    log.debug("${xmlrequest}")
+                }
+                DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance()
+                domFactory.setNamespaceAware(true) // mandatory!
+                DocumentBuilder builder = domFactory.newDocumentBuilder()
+                Document doc = builder.parse(new InputSource(new StringReader(xmlrequest)))
+
+                XPathFactory factory = XPathFactory.newInstance()
+                XPath xpath = factory.newXPath()
+
+                Object result = xpath.evaluate("//panel", doc, XPathConstants.NODESET)
+                NodeList panels = (NodeList) result
+                Node panel = null
+
+
+                log.debug("Integrating over the nodes...")
+                for (int p = 0; p < panels.getLength(); p++) {
+                    panel=panels.item(p)
+                    Node panelnumber=(Node)xpath.evaluate("panel_number", panel, XPathConstants.NODE)
+
+                    if(panelnumber?.getTextContent()?.equalsIgnoreCase("21"))	{
+                        log.debug("Skipping the security panel in printing the output")
+                        continue
+                    }
+
+                    if(p!=0 && p!=(panels.getLength()))	{
+                        pw.write("<br><b>AND</b><br>")
+                    }
+
+                    Node invert=(Node)xpath.evaluate("invert", panel, XPathConstants.NODE)
+                    if(invert?.getTextContent()?.equalsIgnoreCase("1")) {
+                        pw.write("<br><b>NOT</b><br>")
+                    }
+
+                    NodeList items=(NodeList)xpath.evaluate("item", panel, XPathConstants.NODESET)
+                    pw.write("<b>(</b>")
+
+                    for(int i=0; i<items.getLength(); i++) {
+                        Node item=items.item(i);
+                        if(i!=0 && i!=(items.getLength()))	{
+                            pw.write("<br><b>OR</b><br>")
+                        }
+                        Node key=(Node)xpath.evaluate("item_key", item, XPathConstants.NODE)
+                        String textContent = key.getTextContent()
+                        log.debug("Found item ${textContent}")
+                        pw.write(textContent+" "+renderConstrainByValue(item, xpath)+" "+renderConstrainByModifier(item, xpath));
+
+
+                        //TODO Tie region limitations into individual items
+                        if (regionParams) {
+                            pw.write(renderRegionParams(regionParams))
+                        }
+                    }
+                    pw.write("<b>)</b>")
+                }
+
+            } catch (Exception e) {
+                log.error(e)
+            }
+        }
     }
 
     /**
+     *
      * renderQueryDefinition provides an XML based string given a result instance ID
      *
      * @param resultInstanceId - the result instance ID
@@ -4671,7 +4980,7 @@ class NetezzaI2b2HelperService {
      *
      * @return an XML String
      */
-    def renderQueryDefinition(String resultInstanceId, String title, Writer pw) {
+    /*def renderQueryDefinition(String resultInstanceId, String title, Writer pw ) {
         if (log.isDebugEnabled())	{
             log.debug("renderQueryDefinition called with ${resultInstanceId} and ${title}")
         }
@@ -4737,6 +5046,8 @@ class NetezzaI2b2HelperService {
                         String textContent = key.getTextContent()
                         log.debug("Found item ${textContent}")
                         pw.write(textContent+" "+operator+" "+constraints)
+
+
                     }
                     pw.write("<b>)</b>")
                 }
@@ -4745,7 +5056,7 @@ class NetezzaI2b2HelperService {
                 log.error(e)
             }
         }
-    }
+    }*/
 
     def getSecureTokensCommaSeparated(user) {
         def tokenmap=getSecureTokensWithAccessForUser(user);
@@ -5176,4 +5487,184 @@ class NetezzaI2b2HelperService {
             return trials;
         }
     }
+
+    def renderQueryDefinitionTable(String resultInstanceId, String title, Writer pw, regionParams)
+    {
+        String qid=getQIDFromRID(resultInstanceId);
+        pw.write("<table class='analysis'>")
+        pw.write("<tr><th>${title}</th></tr>")
+        pw.write("<tr>")
+        pw.write("<td>")
+        renderQueryDefinition(qid, title, pw, regionParams);
+        pw.write("</td></tr></table>")
+    }
+
+
+    TransmartQueryDefinition getQueryDefinition(String resultInstanceId) {
+
+        TransmartQueryDefinition tQD = null;
+
+        if (resultInstanceId != null) {
+            try {
+
+                String xmlRequest = getQueryDefinitionXML(resultInstanceId)
+
+                DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance()
+                domFactory.setNamespaceAware(true)
+                DocumentBuilder builder = domFactory.newDocumentBuilder()
+                Document doc = builder.parse(new InputSource(new StringReader(xmlRequest)))
+
+                XPathFactory factory = XPathFactory.newInstance()
+                XPath xpath = factory.newXPath()
+
+                Object queryTimingNodes=xpath.evaluate("//query_timing", doc, XPathConstants.NODESET)
+                NodeList qts =  (NodeList) queryTimingNodes
+                tQD = new TransmartQueryDefinition(resultInstanceId)
+                Node qtsNode = qts.item(0)
+                tQD.queryTiming = qtsNode.getTextContent()
+
+                Object result = xpath.evaluate("//panel", doc, XPathConstants.NODESET)
+                NodeList panels = (NodeList) result
+
+                for (int p = 0; p < panels.getLength(); p++) {
+
+                    TransmartQueryPanel tQP = new TransmartQueryPanel()
+
+                    Node panel=panels.item(p)
+                    Node panelNumber=(Node)xpath.evaluate("panel_number", panel, XPathConstants.NODE)
+                    tQP.panelNum = panelNumber.getTextContent();
+
+                    Node invert=(Node)xpath.evaluate("invert", panel, XPathConstants.NODE)
+                    tQP.invert = invert.getTextContent() != "0"
+
+                    Node panelTiming=(Node)xpath.evaluate("panel_timing", panel, XPathConstants.NODE)
+                    tQP.panelTiming = panelTiming.getTextContent()
+
+                    NodeList items=(NodeList)xpath.evaluate("item", panel, XPathConstants.NODESET)
+
+                    for(int i=0; i<items.getLength(); i++) {
+
+                        TransmartQueryItem tQI = new TransmartQueryItem()
+
+                        Node item=items.item(i);
+
+                        Node key=(Node)xpath.evaluate("item_key", item, XPathConstants.NODE)
+
+                        tQI.itemKey = key.getTextContent()
+
+                        tQI.concept_cd = getConceptCodeFromPath(tQI.fullName);
+                        tQI.linkType = getLinkTypeFromConceptCode(tQI.concept_cd)
+
+                        tQP.items.add(tQI)
+
+                    }
+
+                    tQD.panels.add(tQP);
+
+                }
+
+            } catch (Exception e) {
+                log.error(e)
+            }
+        }
+
+        return tQD
+
+    }
+
+    def String getLinkTypeFromConceptCode(String concept_cd)  {
+
+        log.trace("Getting link type for concept code:" + concept_cd);
+
+        String linkType;
+
+        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
+        def foundRow = sql.firstRow("SELECT link_type FROM de_encounter_level WHERE concept_cd = ?", [concept_cd]);
+
+        if (foundRow){
+            linkType = foundRow.link_type;
+        }
+
+        log.trace("Done getting link type for key:" +concept_cd);
+        return linkType;
+    }
+
+    def String getConceptCodeFromPath(String path)  {
+        StringBuilder concepts = new StringBuilder();
+        log.trace("Getting concept codes for path:" +path);
+        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
+        String sqlt =
+            sql.eachRow("SELECT CONCEPT_CD FROM CONCEPT_DIMENSION c WHERE CONCEPT_PATH = ?", [path], {row ->
+                log.trace("Found code:"+row.CONCEPT_CD);
+                concepts.append(row.CONCEPT_CD);
+            });
+        log.trace("Done getting concept codes for path:" +path);
+        return concepts.toString();
+    }
+
+    def renderConstrainByValue(Node item, XPath xpath)
+    {
+        Node valueinfo=(Node)xpath.evaluate("constrain_by_value", item, XPathConstants.NODE)
+        String operator="";
+        String constraints="";
+
+        if(valueinfo!=null) {
+            operator=((Node)xpath.evaluate("value_operator", valueinfo, XPathConstants.NODE)).getTextContent()
+            constraints=((Node)xpath.evaluate("value_constraint", valueinfo, XPathConstants.NODE)).getTextContent()
+        }
+        return operator+" "+constraints;
+    }
+
+    def renderConstrainByModifier(Node item, XPath xpath)
+    {
+        //initial modifier support
+        Node modifierinfo=(Node)xpath.evaluate("constrain_by_modifier", item, XPathConstants.NODE)
+        String modifierstring="";
+        String modifiername="";
+        String constraints="";
+        if(modifierinfo!=null) {
+            modifiername=((Node)xpath.evaluate("modifier_name", modifierinfo, XPathConstants.NODE)).getTextContent()
+            constraints=renderConstrainByValue(modifierinfo, xpath);
+            modifierstring="["+modifiername+" "+constraints+ "]";
+        }
+        return modifierstring;
+
+    }
+
+
+    def renderRegionParams(rp) {
+        if (rp.range?.equals("both")) {
+            rp.range = "+/-"
+        }
+        else if (rp.range?.equals("plus")) {
+            rp.range = "+"
+        }
+        else {
+            rp.range = "-"
+        }
+
+        if (rp.mode?.equals('gene')) {
+            return 'Gene: ' + rp.genename + ' ' + rp.range + ' ' + rp.basepairs + ' base pairs (HG' + rp.version + '): ' + rp.inclusionCriteria;
+        }
+        else {
+            return 'Chromosome: ' + rp.chromosome + ', ' + rp.position + ' ' + rp.range + ' ' + rp.basepairs + ' base pairs (HG' + rp.version + '): ' + rp.inclusionCriteria;
+        }
+    }
+
+    def List<String> getChildKeysFromParentKey(String concept_key) {
+        String prefix=concept_key.substring(0, concept_key.indexOf("\\",2)); //get the prefix to put on to the fullname to make a key
+        String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length());
+
+        String xml;
+        ArrayList ls=new ArrayList();
+        int i=getLevelFromKey(concept_key)+1;
+        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
+        String sqlt = "SELECT C_FULLNAME FROM i2b2metadata.i2b2 WHERE C_FULLNAME LIKE ? AND c_hlevel = ? ORDER BY C_FULLNAME";
+        sql.eachRow(sqlt, [fullname+"%", i], {row ->
+            String conceptkey=prefix+row.c_fullname;
+            ls.add(conceptkey);
+        })
+        return ls;
+    }
+
 }

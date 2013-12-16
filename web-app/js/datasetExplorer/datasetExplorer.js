@@ -41,6 +41,12 @@ var runner = new Ext.util.TaskRunner();
 
 var wfsWindow = null;
 
+//Grid state
+var isGridLoadDone = false;
+var isGridLoadRunning = false;
+var gridPanelHeaderTips;
+
+var searchPage = "datasetExplorer";
 
 function dataSelectionCheckboxChanged(ctl)
 {
@@ -707,16 +713,42 @@ Ext.onReady(function()
 		);
 
 
-		analysisGridPanel = new Ext.Panel(
-				{
-					id : 'analysisGridPanel',
-					title : 'Grid View',
-					region : 'center',
-					split : true,
-					height : 90,
-					layout : 'fit'
-				}
-		);
+            analysisGridPanel = new Ext.Panel(
+                {
+                    id : 'analysisGridPanel',
+                    title : 'Grid View',
+                    region : 'center',
+                    split : true,
+                    height : 90,
+                    layout : 'fit',
+                    listeners :
+                    {
+                        activate: function(p)
+                        {
+                            //If we haven't loaded the subsets yet, do so and load the grid.
+                            if (GLOBAL.CurrentSubsetIDs[1] == null && GLOBAL.CurrentSubsetIDs[2] == null)
+                            {
+                                analysisGridPanel.body.mask('Getting subsets...', 'x-mask-loading');
+
+                                //Run the query and get the grid data.
+                                runAllQueries(getSummaryGridData, p);
+                            }
+                            else if(!GLOBAL.isGridViewLoaded)
+                            {
+                                analysisGridPanel.body.mask('Getting subsets...', 'x-mask-loading');
+
+                                //The grid isn't loaded but subsets have been run already, just load the grid.
+                                getSummaryGridData();
+                            }
+                            else
+                            {
+                                //The grid is already loaded, just try to resize it.
+                                trySizeGridTable ();
+                            }
+                        }
+                    }
+                }
+        );
 		analysisPanel = new Ext.Panel(
 				{
 					id : 'analysisPanel',
@@ -783,6 +815,12 @@ Ext.onReady(function()
 						},
 						deactivate: function(){
 							//resultsTabPanel.tools['help help-resana-panel'].dom.style.display="none";
+                            if(Ext.get('dataTypesGridPanel')){
+                                this.remove('dataTypesGridPanel');
+                            }
+                            if(Ext.get('advancedDataExportPanel')){
+                                this.remove('advancedDataExportPanel');
+                            }
 						}
 					},
 					collapsible : true						
@@ -1144,24 +1182,34 @@ Ext.onReady(function()
 						        		   subset = getSubsetFromPanel(selectedConcept.parentNode)
 						        	   }
 
-						        	   if(!isSubsetEmpty(subset))
-						        	   {
-						        		   runQuery(subset, showConceptDistributionHistogramForSubset);
-						        	   }
-						        	   else alert('Subset is empty!');
-						        	   }
-						           }
-						           ,
-						           {
-						        	   text : 'OK',
-						        	   handler : function()
-						        	   {
-						        	   var mode = getSelected(document.getElementsByName("setValueMethod"))[0].value;
-						        	   var highvalue = document.getElementById("setValueHighValue").value;
-						        	   var lowvalue = document.getElementById("setValueLowValue").value;
-						        	   var units = document.getElementById("setValueUnits").value;
-						        	   var operator = document.getElementById("setValueOperator").value;
-						        	   var highlowselect = document.getElementById("setValueHighLowSelect").value;
+                                if(!isSubsetEmpty(subset))
+                                {
+
+                                    //AccrossTrial Changes 
+                                    if(GLOBAL.codeType == "Modifier")
+                                    {
+                                        runQueryAcrossTrial(subset, showConceptDistributionHistogramForSubset);
+                                    }
+                                    else
+                                    {
+                                        runQuery(subset, showConceptDistributionHistogramForSubset);
+                                    }
+                                    //AccrossTrial Changes
+                                }
+                                else alert('Subset is empty!');
+                            }
+                        }
+                        ,
+                        {
+                            text : 'OK',
+                            handler : function()
+                            {
+                                var mode = getSelected(document.getElementsByName("setValueMethod"))[0].value;
+                                var highvalue = document.getElementById("setValueHighValue").value;
+                                var lowvalue = document.getElementById("setValueLowValue").value;
+                                var units = document.getElementById("setValueUnits").value;
+                                var operator = document.getElementById("setValueOperator").value;
+                                var highlowselect = document.getElementById("setValueHighLowSelect").value;
 
 						        	   // make sure that there is a value set
 						        	   if (mode=="numeric" && operator == "BETWEEN" && (highvalue == "" || lowvalue== "")){
@@ -1246,33 +1294,39 @@ function hasMultipleTimeSeries()
 
 function createOntPanel()
 {
-	// make tab panel, search panel, ontTree and combine them
-	ontTabPanel = new Ext.TabPanel(
-			{
-				id : 'ontPanel',
-				region : 'center',
-				defaults :
-				{
-				hideMode : 'offsets'
-				}
-			,
-			collapsible : false,
-			height : 300,
-			width : 300,
-			deferredRender : false,
-			split : true,
-	        tools:[
-	               {
-		        		id:'help help-tree-panel',
-		        		qtip:'Click for context sensitive help',
-			        	handler: function(event, toolEl, panel)
-					    {
-					    	D2H_ShowHelp("1064", helpURL,"wndExternal",CTXT_DISPLAY_FULLHELP );
-					    }
-	        		}
-	        ]
-			}
-	);
+
+    // make tab panel, search panel, ontTree and combine them
+    ontTabPanel = new Ext.TabPanel(
+        {
+            id : 'ontPanel',
+            region : 'center',
+            defaults :
+            {
+                hideMode : 'offsets'
+            }
+            ,
+            collapsible : false,
+            height : 300,
+            width : 316,
+            deferredRender : false,
+            split : true,
+            listeners: {
+                tabchange: function(tp,newTab){
+
+
+                    if(newTab.id == "acrossTrialTreePanel")
+                    {
+                        GLOBAL.codeType = "Modifier"
+                    }
+                    else
+                    {
+                        GLOBAL.codeType = "Concept"
+                    }
+
+                }
+            }
+        }
+    );
 
 	/* ontSearchTermsPanel = new Ext.TabPanel({
    id : 'searchTermsPanel',
@@ -1774,14 +1828,16 @@ function getPreviousQueriesComplete(response)
 }
 
 function getCategoriesComplete(ontresponse){
-	ontTabPanel.add(ontFilterPanel);
-	ontFilterTree.dragZone.addToGroup("analysis");
-	getSubCategories('navigateTermsPanel', 'Navigate Terms', ontresponse);
 
-	if(GLOBAL.hideAcrossTrialsPanel != 'true') {
+    ontTabPanel.add(ontFilterPanel);
+    ontFilterTree.dragZone.addToGroup("analysis");
+    getSubCategories('navigateTermsPanel', 'Navigate Terms', ontresponse);
+    /*if(GLOBAL.hideAcrossTrialsPanel != 'true') {
         getSubCategories('crossTrialsPanel', 'Across Trials', ontresponse);
-    }
-	setActiveTab();
+    }*/
+
+    drawHardcodedJQueryTree();
+    setActiveTab();
 }
 
 function setActiveTab(){
@@ -1892,28 +1948,42 @@ function getSubCategories(id_in, title_in, ontresponse)
 		    iconCls: "contextHelpBtn"  
 		}
     ]);
-	
-	var ontTree = new Tree.TreePanel(
-			{
-				id : id_in,
-				title : title_in,
-				animate : false,
-				autoScroll : true,
-				loader : new Ext.ux.OntologyTreeLoader(
-						{
-							dataUrl : 'none'
-						}
-				),
-				enableDrag : true,
-				ddGroup : 'makeQuery',
-				containerScroll : true,
-				enableDrop : false,
-				region : 'center',
-				rootVisible : false,
-				expanded : true,
-				onShow : showFn
-			}
-	);
+
+    var ontTree = new Tree.TreePanel(
+        {
+            id : id_in,
+            title : title_in,
+            animate : false,
+            autoScroll : true,
+            loader : new Ext.ux.OntologyTreeLoader(
+                {
+                    dataUrl : 'none'
+                }
+            ),
+            enableDrag : true,
+            ddGroup : 'makeQuery',
+            containerScroll : true,
+            enableDrop : false,
+            region : 'center',
+            rootVisible : false,
+            expanded : true,
+            onShow : showFn ,
+
+            listeners :
+            {
+                activate: function(p){
+
+                    sizeNavigateTreePanel("navigateTermsPanel");
+
+                    $j(window).resize(function() {
+                        ontTabPanel.doLayout();
+                        sizeNavigateTreePanel("navigateTermsPanel");
+                    });
+
+                }
+            }
+        }
+    );
 
 	ontTree.on('startdrag', function(panel, node, event)
 			{
@@ -1950,14 +2020,40 @@ function getSubCategories(id_in, title_in, ontresponse)
 		alert(ontresponse.responseText);
 	}
 
-	// ontTabPanel.add(ontSearchTermsPanel);
-	ontTabPanel.doLayout();
-	ontTree.dragZone.addToGroup("analysis");
-	/*if(GLOBAL.IsAdmin)
-   {
-   	searchByNameTree.dragZone.addToGroup("analysis");
-   }*/
-	
+    // ontTabPanel.add(ontSearchTermsPanel);
+    ontTabPanel.doLayout();
+    ontTree.dragZone.addToGroup("analysis");
+    sizeNavigateTreePanel("navigateTermsPanel");
+    /*if(GLOBAL.IsAdmin)
+     {
+     searchByNameTree.dragZone.addToGroup("analysis");
+     }*/
+
+}
+
+//Setup the navigate tree for scrolling. We need to wrap the UL element in a DIV and setup scrolling and height
+function sizeNavigateTreePanel(panelId)
+{
+
+    var parentPanel = $j("#" + panelId);
+    var rootEl = $j("#" + panelId + " ul").first();
+
+    var parentHeight = parentPanel.innerHeight();
+
+    var otherHeight = 0;
+
+    if (rootEl.parent().attr("id") != "nbtTreeWrapper") {
+        rootEl.wrap('<div id="nbtTreeWrapper" />');
+    }
+
+    var wrapper = $j("#nbtTreeWrapper");
+
+    wrapper.siblings().filter(":visible").each( function() {
+        otherHeight += $j(this).outerHeight();
+    });
+
+    wrapper.css("overflow", "auto").css("height", parentHeight - otherHeight );
+
 }
 
 function ontLoadNode(node)
@@ -1992,6 +2088,8 @@ function setupDragAndDrop()
 					}
 			);
 
+            //Enable jQuery dragging into the DIV.
+            jQuery("#queryCriteriaDiv" + s.toString() + '_' + i.toString()).addClass("jstree-drop");
 			dts.notifyDrop = function(source, e, data)
 			{
                 GLOBAL.currentSubsetsStudy=data.node.attributes.comment.substr(6);
@@ -2069,13 +2167,17 @@ function setupDragAndDrop()
 		ddGroup : 'analysis'
 			}
 	);
+    //Add a css class which lets us drop across trial nodes into the results/analysis screen.
+    jQuery("#" + analysisPanel.body.id).addClass("jstree-drop");
+    jQuery("#" + analysisPanel.body.id).addClass("excludeValuePopup");
+    jQuery("#" + analysisPanel.body.id).addClass("results_analysis");
 
 
-	dts.notifyDrop = function(source, e, data)
+    dts.notifyDrop = function(source, e, data)
 	{
 		// createAnalysisItem(data.node.text, data.node.id);
 		// alert("build analsyis graph now!");
-		buildAnalysis(data.node,'stats');
+        buildAnalysis(convertNodeToConcept(data.node), 'stats');
 		return true;
 	}
 
@@ -2086,12 +2188,15 @@ function setupDragAndDrop()
 		ddGroup : 'analysis'
 			}
 	);
+    jQuery("#" + analysisGridPanel.body.id).addClass("jstree-drop");
+    jQuery("#" + analysisGridPanel.body.id).addClass("excludeValuePopup");
+    jQuery("#" + analysisGridPanel.body.id).addClass("results_grid");
 
-	dtg.notifyDrop = function(source, e, data)
+    dtg.notifyDrop = function(source, e, data)
 	{
 		// createAnalysisItem(data.node.text, data.node.id);
 		// alert("build analsyis graph now!");
-		buildAnalysis(data.node,'grid');
+        buildAnalysis(convertNodeToConcept(data.node),'grid');
 		return true;
 	}
 }
@@ -2621,14 +2726,29 @@ function runAllQueries(callback, panel)
 	STATE.QueryRequestCounter = subsetstorun;
 	/* set the number of requests before callback is fired for runquery complete */
 
-	// iterate through all subsets calling the ones that need to be run
-	for (i = 1; i <= GLOBAL.NumOfSubsets; i = i + 1)
-	{
-		if( ! isSubsetEmpty(i) && GLOBAL.CurrentSubsetIDs[i] == null)
-		{
-			runQuery(i, callback);
-		}
-	}
+    //Accross Trial Changes
+    if(ontTabPanel.getActiveTab().title == "Across Trial")
+    {
+        for (i = 1; i <= GLOBAL.NumOfSubsets; i = i + 1)
+        {
+            if( ! isSubsetEmpty(i) && GLOBAL.CurrentSubsetIDs[i] == null)
+            {
+                runQueryAcrossTrial(i, callback);
+            }
+        }
+    }
+    else
+    {
+        //For the navigate by study tab we use i2b2 to get the data.
+        // iterate through all subsets calling the ones that need to be run
+        for (i = 1; i <= GLOBAL.NumOfSubsets; i = i + 1)
+        {
+            if( ! isSubsetEmpty(i) && GLOBAL.CurrentSubsetIDs[i] == null)
+            {
+                runQuery(i, callback);
+            }
+        }
+    }//Accross Trial Changes
 }
 
 function runQuery(subset, callback) {
@@ -2900,7 +3020,7 @@ function getNodeForAnalysis(node)
 }
 
 
-function buildAnalysis(nodein, dropType)
+function buildAnalysis(conceptin, dropType)
 {
 
     if(dropType == 'stats')
@@ -2913,7 +3033,7 @@ function buildAnalysis(nodein, dropType)
         analysisGridPanel.body.mask("Loading...", 'x-mask-loading');
     }
 
-    var node = nodein;
+    var concept = conceptin;
 
 
     if(isSubsetEmpty(1) && isSubsetEmpty(2))
@@ -2930,7 +3050,7 @@ function buildAnalysis(nodein, dropType)
     {
         runAllQueries(function()
             {
-                buildAnalysis(node, dropType);
+                buildAnalysis(concept, dropType);
             }
         );
         analysisPanel.body.unmask();
@@ -2940,7 +3060,7 @@ function buildAnalysis(nodein, dropType)
     if(dropType == 'grid')
     {
         window.dragToGrid = true;
-        getAnalysisGridData(node.attributes.id);
+        getAnalysisGridData(concept.key);
     }
 
     if(dropType == 'stats')
@@ -2953,7 +3073,9 @@ function buildAnalysis(nodein, dropType)
                 params :  Ext.urlEncode(
                     {
                         charttype : "analysis",
-                        concept_key : node.attributes.id,
+                        concept_key : concept.key,
+                        //modifier_key: concept.modifierkey,
+                        //concept: Ext.util.JSON.encode(concept),
                         result_instance_id1 : GLOBAL.CurrentSubsetIDs[1],
                         result_instance_id2 : GLOBAL.CurrentSubsetIDs[2]
                     }
@@ -2962,8 +3084,8 @@ function buildAnalysis(nodein, dropType)
                 {
 
                     //Add the code we just dragged in to the report list.
-                    GLOBAL.currentReportCodes.push(node.attributes.id)
-                    GLOBAL.currentReportStudy.push(node.attributes.comment)
+                    GLOBAL.currentReportCodes.push(concept.key)
+                    GLOBAL.currentReportStudy.push(concept.comment)
 
                     //node.comment
                     buildAnalysisComplete(result);
@@ -4148,32 +4270,202 @@ function activateTab(tab)
     resultsTabPanel.tools['help help-resana-panel'].dom.style.display="";
 }
 
+/*function getSummaryGridData()
+{
+    gridstore = new Ext.data.JsonStore(
+        {
+            url : pageInfo.basePath+'/chart/basicGrid',
+            root : 'rows',
+            fields : ['name', 'url']
+        }
+    );
+    gridstore.on('load', storeLoaded);
+    var myparams = Ext.urlEncode(
+        {
+            charttype : "basicgrid",
+            concept_key : "",
+            result_instance_id1 : GLOBAL.CurrentSubsetIDs[1],
+            result_instance_id2 : GLOBAL.CurrentSubsetIDs[2]
+        }
+    );
+    // or a URL encoded string *//*
+
+    gridstore.load(
+        {
+            params : myparams
+        }
+    );
+}*/
+
+
 function getSummaryGridData()
 {
-	gridstore = new Ext.data.JsonStore(
-			{
-				url : pageInfo.basePath+'/chart/basicGrid',
-				root : 'rows',
-				fields : ['name', 'url']
-			}
-	);
-	gridstore.on('load', storeLoaded);
-	var myparams = Ext.urlEncode(
-			{
-				charttype : "basicgrid",
-				concept_key : "",
-				result_instance_id1 : GLOBAL.CurrentSubsetIDs[1],
-				result_instance_id2 : GLOBAL.CurrentSubsetIDs[2]
-			}
-	);
-	// or a URL encoded string */
 
-	gridstore.load(
-			{
-				params : myparams
-			}
-	);
+    isGridLoadRunning = true;
+    analysisGridPanel.body.mask("Loading...", 'x-mask-loading');
+
+    var subset1 = GLOBAL.CurrentSubsetIDs[1] == null ? "" : GLOBAL.CurrentSubsetIDs[1];
+    var subset2 = GLOBAL.CurrentSubsetIDs[2] == null ? "" : GLOBAL.CurrentSubsetIDs[2];
+    var dataArray = {columnsOnly: false, result_instance_id1:subset1, result_instance_id2: subset2, codeType : GLOBAL.codeType };
+
+    setupGridViewWrapper();  //Add the datatable html if needed
+
+    setTimeout(function(){}, 1);
+
+    $j.getJSON(basicGridUrl, dataArray, function (data) {
+
+        setupGridData(data);
+
+        gridPanelHeaderTips = data.headerToolTips.slice(0);
+
+        data.fnDrawCallback = function( oSettings ) {
+
+        };
+
+        modifyDataTable();
+
+        setTimeout(function(){}, 1);
+
+        analysisGridPanel.body.mask("Data fetched, processing results...", 'x-mask-loading');
+
+        /* This removes the subject profile link from the grid
+         data.aoColumnDefs=[ {
+         "aTargets": [ 1 ],
+         "mData": function ( source, type, val ) {
+         return source[1];
+         },
+         "mRender": function ( data, type, full ) {
+         return '<a onclick="displayProfile('+full[0]+',\''+data+'\',\''+full[3]+'\')" href="#">'+data+'</a>';
+         }
+         } ];
+         */
+
+        window.dt = $j('#gridViewTable').dataTable(data);
+
+        $j(window).bind('resize', function () {
+            $j('#gridViewTable').dataTable().fnAdjustColumnSizing();
+        } );
+
+        analysisGridPanel.body.unmask();
+
+        ColVis.fnSaveVis(window.dt);
+
+    });
+
+    //resultsTabPanel.setActiveTab('analysisGridPanel');
+    analysisGridPanel.doLayout();
+
+    resultsTabPanel.body.unmask();
+
 }
+
+
+function modifyDataTable() {
+
+    //Override the pre-sorting algorithm for numerics so empty values go to top or bottom
+    $j.fn.dataTableExt.oSort['numeric-pre']  = function(a) {
+
+        var floatA = parseFloat(a);
+        var returnValue;
+
+        if (isNaN(floatA))
+            returnValue = Number.MAX_VALUE * -1;	//Emptys will go to top for -1, bottom for +1
+        else
+            returnValue = floatA;
+
+        return returnValue;
+    };
+}
+
+function setupGridViewWrapper()
+{
+    var gridTable = $j('#gridViewTable');
+    var gpBody = analysisGridPanel.body;
+
+    //Remove the wrapper html if it exists
+    if (gridTable.length != 0)
+    {
+        var gridViewWrapper = $j('#gridViewWrapper');
+        if (gridViewWrapper.length != 0) {
+            gridViewWrapper.remove();
+        }
+    }
+
+    gpBody.insertHtml('afterBegin', '<div id=\'gridViewWrapper\'><table id=\'gridViewTable\'></table></div><div id=\'subjectProfileWrapper\'></div>');
+}
+
+
+function setupGridData(data)
+{
+    data.bAutoWidth = true;
+    data.bScrollAutoCss = true;
+    data.sScrollY = 400;
+    data.sScrollX = "100%";
+    data.bDestroy = true;
+    data.bProcessing = true;
+    data.bLengthChange = false;
+    data.bScrollCollapse = false;
+    data.iDisplayLength = 100;
+    data.isDrawingDelayed = true;
+    data.fnLoadCallBack = function() {
+        isGridLoadDone = true;
+        GLOBAL.isGridViewLoaded = true;
+        trySizeGridTable();
+    };
+    data.sDom = "<\"top\"RfCp>rt<\"bottom\"ip><\"clear\">";
+}
+
+var trySizeGridTable = function ()
+{
+
+    if (!isGridLoadRunning) { return; }
+
+    var activePanel = resultsTabPanel.getActiveTab();
+
+    if (isGridLoadDone && activePanel == analysisGridPanel )
+    {
+        sizeGridTable();
+    }
+    else
+    {
+        setTimeout(function() {trySizeGridTable}, 500);
+    }
+}
+
+
+var sizeGridTable = function ()
+{
+
+    var gridTable = $j('#gridViewTable');
+
+    //Don't try to size the table if there is no table
+    if (gridTable == null)
+    {
+        return;
+    }
+
+    var d = gridTable.dataTable({"bRetrieve": true});
+    d.fnAdjustColumnSizing();
+
+    $j(".dataTables_scrollHeadInner > table > thead > tr > th").each( function (index) {
+
+        var titleAttr = $j(this).attr("title");
+
+        if (titleAttr == null && gridPanelHeaderTips != null)
+        {
+            $j(this).attr("title", gridPanelHeaderTips[index]);
+        }
+
+    });
+
+    analysisGridPanel.body.unmask();
+
+    isGridLoadRunning = false;
+    isGridLoadDone = false;
+
+
+}
+
 
 function storeLoaded()
 {
@@ -4211,29 +4503,76 @@ function storeLoaded()
 
 function getAnalysisGridData(concept_key)
 {
-	gridstore = new Ext.data.JsonStore(
-			{
-				url : pageInfo.basePath+'/chart/analysisGrid',
-				root : 'rows',
-				fields : ['name', 'url']
-			}
-	);
-	gridstore.on('load', storeLoaded);
-	var myparams = Ext.urlEncode(
-			{
-				charttype : "analysisgrid",
-				concept_key : concept_key,
-				result_instance_id1 : GLOBAL.CurrentSubsetIDs[1],
-				result_instance_id2 : GLOBAL.CurrentSubsetIDs[2]
-			}
-	);
-	// or a URL encoded string */
 
-	gridstore.load(
-			{
-				params : myparams
-			}
-	);
+    isGridLoadRunning = true;
+
+    analysisGridPanel.body.mask("Loading...", 'x-mask-loading');
+
+    var subset1 = GLOBAL.CurrentSubsetIDs[1] == null ? "" : GLOBAL.CurrentSubsetIDs[1];
+    var subset2 = GLOBAL.CurrentSubsetIDs[2] == null ? "" : GLOBAL.CurrentSubsetIDs[2];
+    var dataArray = {concept_key: concept_key, result_instance_id1:subset1, result_instance_id2: subset2, columnsOnly: false };
+
+    setupGridViewWrapper(); //Setup the html for the jquery datatable
+
+    setTimeout(function(){}, 1);
+
+    $j.getJSON(analysisGridUrl, dataArray, function (data) {
+
+        //Add the configuration settings for the grid
+        setupGridData(data);
+
+        gridPanelHeaderTips = data.headerToolTips.slice(0);
+
+        //Add the callback for when the grid is redrawn
+        data.fnDrawCallback = function( oSettings ) {
+
+            $j(".dataTables_scrollHeadInner > table > thead > tr > th").each( function (index) {
+
+                var titleAttr = $j(this).attr("title");
+
+                if (titleAttr == null && gridPanelHeaderTips != null)
+                {
+                    $j(this).attr("title", gridPanelHeaderTips[index]);
+                }
+
+            });
+
+            analysisGridPanel.body.unmask();
+        };
+        /* This removes the subject profile link from the grid
+         data.aoColumnDefs=[ {
+         "aTargets": [ 1 ],
+         "mData": function ( source, type, val ) {
+         return source[1];
+         },
+         "mRender": function ( data, type, full ) {
+         return '<a onclick="displayProfile('+full[0]+',\''+data+'\',\''+full[3]+'\')" href="#">'+data+'</a>';
+         }
+         } ];
+         */
+
+        modifyDataTable();
+
+        setTimeout(function(){}, 1);
+
+        window.dt = $j('#gridViewTable').dataTable(data);
+
+        if (window.dt.dataTableSettings[0].aoColumns.length !==  window.columnVis.length)
+        {
+            window.columnVis.push(true);
+        }
+
+        ColVis.fnApplyVis(window.dt) ;
+
+        $j(window).bind('resize', function () {
+            $j('#gridViewTable').dataTable().fnAdjustColumnSizing()
+        } );
+
+
+    });
+
+    analysisGridPanel.doLayout();
+    resultsTabPanel.body.unmask();
 }
 
 function getAnalysisPanelContent()

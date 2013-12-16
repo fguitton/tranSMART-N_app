@@ -37,5 +37,23 @@ class ConceptService {
 				[fullNameLike: concept.getFullName() + "%", levelNew: concept.getLevel().intValue() + 1]);
 		return conceptList;
 	}
+
+    def getValueType(concept){
+        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
+        StringBuilder sqlBuilder=new StringBuilder("select distinct(valtype_cd) from observation_fact ofa")
+                .append(" join concept_dimension cdim")
+                .append(" on ofa.concept_cd=cdim.concept_cd")
+                .append(" where cdim.concept_path='")
+                .append(concept.fullName)
+                .append("'")
+
+        def valType
+        sql.eachRow(sqlBuilder.toString(),
+                {row ->
+                    valType=row.valtype_cd;
+                }
+        )
+        return valType
+    }
 	
 }
