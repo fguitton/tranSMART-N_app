@@ -51,8 +51,10 @@
     <script type="text/javascript" src="${resource(dir:'js/jQuery/validate', file:'jquery.validate.min.js')}"></script>
     <script type="text/javascript" src="${resource(dir:'js/jQuery/validate', file:'additional-methods.min.js')}"></script>
     <script type="text/javascript" src="${resource(dir:'js/jQuery', file: 'jquery.dataTables.js')}"></script>
-  
-<script type="text/javascript" src="${resource(dir:'js', file:'ajax_queue.js')}"></script> 
+    <script type="text/javascript" src="${resource(dir:'js/datasetExplorer', file:'workflowValidationFunctions.js')}"></script>
+
+
+    <script type="text/javascript" src="${resource(dir:'js', file:'ajax_queue.js')}"></script>
 
 <script type="text/javascript"
 	src="${resource(dir:'js/ext-ux', file:'miframe.js')}"></script>

@@ -520,7 +520,7 @@ class NetezzaGeneExpressionDataService {
         String geneID = null;
         String geneSymbolId = null;
         String searchKeywordId = null;
-        String log2 = null;
+        String log2 = 0;
         def sttMap = [:]
 
         long elapsetime = System.currentTimeMillis();

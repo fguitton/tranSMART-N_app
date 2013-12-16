@@ -70,7 +70,9 @@ class NetezzaClinicalDataService {
             sqlQuery <<= "case ofa.VALTYPE_CD "
             sqlQuery <<= " WHEN 'T' THEN TVAL_CHAR "
             sqlQuery <<= " WHEN 'N' THEN CAST(NVAL_NUM AS VARCHAR (30)) "
-            sqlQuery <<= "END AS VALUE, ? SUBSET , pd.sourcesystem_cd "
+            sqlQuery <<= " WHEN 'D' THEN CAST(NVAL_NUM AS VARCHAR (30)) "
+            sqlQuery <<= "END VALUE, ? SUBSET , pd.sourcesystem_cd, ofa.ENCOUNTER_NUM, DEL.LINK_TYPE "
+
 
             //If we are going to union in the codes that have parent concepts, we include the parent columns here too.
             if(parentConceptCodeList.size() > 0)
@@ -99,6 +101,7 @@ class NetezzaClinicalDataService {
             }
 
             sqlQuery <<= "INNER JOIN CONCEPT_DIMENSION cd ON cd.CONCEPT_CD = ofa.CONCEPT_CD "
+            sqlQuery <<= "INNER JOIN DE_ENCOUNTER_LEVEL DEL ON cd.CONCEPT_CD = DEL.CONCEPT_CD "
             sqlQuery <<= "INNER JOIN PATIENT_DIMENSION pd on ofa.patient_num = pd.patient_num "
 
             if (retrievalTypeMRNAExists && null != filesDoneMap['MRNA.TXT'] && filesDoneMap['MRNA.TXT']) {
@@ -244,6 +247,8 @@ class NetezzaClinicalDataService {
 
                     //Actual Concept Path is required for Data Association
                     values.add(row.CONCEPT_PATH)
+                    values.add(row.ENCOUNTER_NUM?.toString())
+                    values.add(row.LINK_TYPE?.toString())
                     if (retrievalTypeExists("MRNA", retrievalTypes)) {
                         values.add(row.ASSAY_ID?.toString())
                     }
@@ -368,6 +373,8 @@ class NetezzaClinicalDataService {
     def private getColumnNames(List retrievalTypes, Map snpFilesMap, Boolean includeParentInfo, Boolean includeConceptContext) {
         def columnNames = []
         columnNames.add("PATIENT ID")
+        columnNames.add("ENCOUNTER_NUM")
+        columnNames.add("LINK_TYPE")
         columnNames.add("SUBSET")
         columnNames.add("CONCEPT CODE")
         columnNames.add("CONCEPT PATH")
