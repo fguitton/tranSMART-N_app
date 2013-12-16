@@ -2965,7 +2965,7 @@ function clearSearch()	{
 	currentCategories = new Array();
 	
 	// Change the category picker back to ALL and set autocomplete to not have a category (ALL by default)
-// todo nwb	document.getElementById("search-categories").selectedIndex = 0;
+	document.getElementById("search-categories").selectedIndex = 0;
 	jQuery('#search-ac').autocomplete('option', 'source', sourceURL);
 		
 	var tree = jQuery("#filter-div").dynatree("getTree");
@@ -3455,8 +3455,8 @@ jQuery(document).ready(function() {
         }
     });
 
-    addSelectCategories();
-    addSearchAutoComplete();
+   //addSelectCategories();
+   //addSearchAutoComplete();
 
     //Trigger a search immediately if RWG. Dataset Explorer does this on Ext load
     loadSearchFromSession();

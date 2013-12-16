@@ -19,7 +19,7 @@
   
 
 import org.transmart.searchapp.AuthUser;
-
+import com.recomdata.transmart.domain.searchapp.Subset
 import grails.converters.*
 
 
@@ -49,6 +49,36 @@ class DatasetExplorerController {
 				}
 			}
 			
+            def savedSubsetId = params["sId"]
+            log.trace("DatasetExplorer Controller found saved comparison id="+savedSubsetId)
+            if(savedSubsetId){
+                def savedSubset = Subset.get(savedSubsetId)
+                if(savedSubset){
+                    restorecomparison=true
+                    qid1=savedSubset.queryId1
+                    qid2=savedSubset.queryId2
+                }
+            }
+
+            def rwgSearchFilter = session['rwgSearchFilter'];
+            if (rwgSearchFilter) {
+                rwgSearchFilter = rwgSearchFilter.join(",,,")
+            }
+            else {
+                rwgSearchFilter = "";
+            }
+
+            def rwgSearchOperators = session['rwgSearchOperators'];
+            if (rwgSearchOperators) {
+                rwgSearchOperators = rwgSearchOperators.join(";")
+            }
+            else {
+                rwgSearchOperators = "";
+            }
+
+            def searchCategory = session['searchCategory'];
+            def globalOperator = session['globalOperator'];
+			
 			//Grab i2b2 credentials from the config file
 			def i2b2Domain = grailsApplication.config.com.recomdata.i2b2.subject.domain
 			def i2b2ProjectID = grailsApplication.config.com.recomdata.i2b2.subject.projectid
@@ -70,6 +100,14 @@ class DatasetExplorerController {
 													i2b2Domain: i2b2Domain,
 													i2b2ProjectID: i2b2ProjectID,
 													i2b2Username: i2b2Username,
-													i2b2Password: i2b2Password]) 
+													i2b2Password: i2b2Password,
+                                                    rwgSearchFilter: rwgSearchFilter,
+                                                    rwgSearchOperators: rwgSearchOperators,
+                                                    globalOperator: globalOperator,
+                                                    rwgSearchCategory: searchCategory])
+    		}
+	
+	def regionFilter = {
+		render(template: '/RWG/regionFilter', model: [ranges:['both':'+/-','plus':'+','minus':'-'], forDatasetExplorer: true])
     		}
 }

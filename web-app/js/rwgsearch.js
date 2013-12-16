@@ -1080,8 +1080,13 @@ jQuery(document).ready(function() {
     addSearchAutoComplete();
     
     //Trigger a search immediately if RWG. Dataset Explorer does this on Ext load
-    loadSearchFromSession();
-    showSearchResults();
+
+    //This will block a search if the user comes from a clicked path
+    if (GLOBAL.DefaultPathToExpand == '')
+    {
+        loadSearchFromSession();
+        showSearchResults();
+    }
 
 });
 
