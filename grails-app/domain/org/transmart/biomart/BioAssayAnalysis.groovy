@@ -46,8 +46,10 @@ class BioAssayAnalysis implements IExcelProfile {
 	String type
 	Long dataCount
 	Long teaDataCount
-	static hasMany=[datasets:BioAssayDataset,files:ContentReference]
-	static belongsTo=[ContentReference]
+	String etlId
+	static hasMany=[datasets:BioAssayDataset,files:ContentReference, diseases:Disease, observations:Observation, platforms:BioAssayPlatform]
+	static hasOne=[ext:BioAssayAnalysisExt]
+	static belongsTo=[ContentReference, Disease, Observation, BioAssayPlatform]
 
 	static mapping = {
 		table 'BIO_ASSAY_ANALYSIS'

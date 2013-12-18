@@ -463,140 +463,141 @@ Ext.onReady(function () {
             {
                 id: 'maintoolbar',
                 title: 'maintoolbar',
-                items: [new Ext.Toolbar.Button(
-                    {
-                        id: 'generatesubsetsbutton',
-                        text: 'Generate Summary Statistics',
-                        iconCls: 'runbutton',
-                        disabled: false,
-                        handler: function () {
-                            // alert('generate');
-                            GLOBAL.CurrentSubsetIDs[1] = null;
-                            GLOBAL.CurrentSubsetIDs[2] = null;
-                            runAllQueries(getSummaryStatistics);
+                items: [
+                    /*   new Ext.Toolbar.Button(
+                     {
+                     id: 'generatesubsetsbutton',
+                     text: 'Generate Summary Statistics',
+                     iconCls: 'runbutton',
+                     disabled: false,
+                     handler: function () {
+                     // alert('generate');
+                     GLOBAL.CurrentSubsetIDs[1] = null;
+                     GLOBAL.CurrentSubsetIDs[2] = null;
+                     runAllQueries(getSummaryStatistics);
 
-                        }
-                    }
-                ),
+                     }
+                     }
+                     ),
+                     new Ext.Toolbar.Separator(),
+                     new Ext.Toolbar.Button(
+                     {
+                     id: 'showquerysummarybutton',
+                     text: 'Summary',
+                     iconCls: 'summarybutton',
+                     disabled: false,
+                     handler: function () {
+                     // alert('clear');
+                     showQuerySummaryWindow();
+                     }
+                     }
+                     ),
 
-                    new Ext.Toolbar.Separator(),
-                    new Ext.Toolbar.Button(
-                        {
-                            id: 'showquerysummarybutton',
-                            text: 'Summary',
-                            iconCls: 'summarybutton',
-                            disabled: false,
-                            handler: function () {
-                                // alert('clear');
-                                showQuerySummaryWindow();
-                            }
-                        }
-                    ),
+                     new Ext.Toolbar.Separator(),
+                     new Ext.Toolbar.Button(
+                     {
+                     id: 'advancedbutton',
+                     text: 'Advanced',
+                     iconCls: 'comparebutton',
+                     hidden: GLOBAL.EnableGP != 'true',
+                     menu: advmenu,
+                     handler: function () {
+                     // alert('compare');
+                     // showCompareStepPathwaySelection();
+                     }
+                     }
+                     ),
 
-                    new Ext.Toolbar.Separator(),
-                    new Ext.Toolbar.Button(
-                        {
-                            id: 'advancedbutton',
-                            text: 'Advanced',
-                            iconCls: 'comparebutton',
-                            hidden: GLOBAL.EnableGP != 'true',
-                            menu: advmenu,
-                            handler: function () {
-                                // alert('compare');
-                                // showCompareStepPathwaySelection();
-                            }
-                        }
-                    ),
-
-                    new Ext.Toolbar.Separator(),
-                    new Ext.Toolbar.Button(
-                        {
-                            id: 'clearsubsetsbutton',
-                            text: 'Clear',
-                            iconCls: 'clearbutton',
-                            disabled: false,
-                            handler: function () {
-                                if (confirm("Are you sure you want to clear your current analysis?")) {
-                                    clearAnalysisPanel();
-                                    resetQuery();
-                                    clearDataAssociation();
-                                }
-                                // clearGrid(); blah
-                            }
-                        }
-                    ),
-                    new Ext.Toolbar.Separator(),
-                    new Ext.Toolbar.Button(
-                        {
-                            id: 'savecomparsionbutton',
-                            text: 'Save',
-                            iconCls: 'savebutton',
-                            disabled: false,
-                            handler: function () {
-                                if (isSubsetEmpty(1) && isSubsetEmpty(2)) {
-                                    alert('Empty subsets found, need at least 1 valid subset to save a comparsion');
-                                    return;
-                                }
-                                if ((GLOBAL.CurrentSubsetIDs[1] == null && !isSubsetEmpty(1)) || (GLOBAL.CurrentSubsetIDs[2] == null && !isSubsetEmpty(2))) {
-                                    runAllQueries(function () {
-                                        saveComparison();
-                                    });
-                                }
-                                else {
-                                    saveComparison();
-                                }
-                                return;
-                            }
-                        }
-                    ),
-                    new Ext.Toolbar.Separator(),
-                    new Ext.Toolbar.Button(
-                        {
-                            id: 'savesubsetsbutton',
-                            text: 'Save Subsets',
-                            iconCls: 'savebutton',
-                            disabled: false,
-                            handler: function () {
-                                if (isSubsetEmpty(1) && isSubsetEmpty(2)) {
-                                    alert('Empty subsets found, need at least 1 valid subset to save a comparsion');
-                                    return;
-                                }
-                                else {
-                                    showSaveSubsetsDialog();
-                                }
-                            }
-                        }
-                    ),
-                    '->',
-                    new Ext.Toolbar.Separator(),
-                    new Ext.Toolbar.Button({
-                        id: 'exportbutton',
-                        text: 'Export',
-                        iconCls: 'exportbutton',
-                        disabled: false,
-                        menu: expmenu,
-                        handler: function () {
-                            // alert('export');
-                            // showExportStepSplitTimeSeries();
-                            // if((typeof(grid)!='undefined') && (grid!=null)){exportGrid();}
-                            // else {alert("Nothing to export");}
-                        }}),
-                    new Ext.Toolbar.Separator(),
-                    new Ext.Toolbar.Button(
-                        {
-                            id: 'printanalysisbutton',
-                            text: 'Print',
-                            iconCls: 'printbutton',
-                            disabled: false,
-                            handler: function () {
-                                // alert('print');
-                                // analysisPanel.iframe.print();
-                                var text = getAnalysisPanelContent();
-                                printPreview(text);
-                            }
-                        }
-                    ),
-                    new Ext.Toolbar.Separator(),
+                     new Ext.Toolbar.Separator(),
+                     new Ext.Toolbar.Button(
+                     {
+                     id: 'clearsubsetsbutton',
+                     text: 'Clear',
+                     iconCls: 'clearbutton',
+                     disabled: false,
+                     handler: function () {
+                     if (confirm("Are you sure you want to clear your current analysis?")) {
+                     clearAnalysisPanel();
+                     resetQuery();
+                     clearDataAssociation();
+                     }
+                     // clearGrid(); blah
+                     }
+                     }
+                     ),
+                     new Ext.Toolbar.Separator(),
+                     new Ext.Toolbar.Button(
+                     {
+                     id: 'savecomparsionbutton',
+                     text: 'Save',
+                     iconCls: 'savebutton',
+                     disabled: false,
+                     handler: function () {
+                     if (isSubsetEmpty(1) && isSubsetEmpty(2)) {
+                     alert('Empty subsets found, need at least 1 valid subset to save a comparsion');
+                     return;
+                     }
+                     if ((GLOBAL.CurrentSubsetIDs[1] == null && !isSubsetEmpty(1)) || (GLOBAL.CurrentSubsetIDs[2] == null && !isSubsetEmpty(2))) {
+                     runAllQueries(function () {
+                     saveComparison();
+                     });
+                     }
+                     else {
+                     saveComparison();
+                     }
+                     return;
+                     }
+                     }
+                     ),
+                     new Ext.Toolbar.Separator(),
+                     new Ext.Toolbar.Button(
+                     {
+                     id: 'savesubsetsbutton',
+                     text: 'Save Subsets',
+                     iconCls: 'savebutton',
+                     disabled: false,
+                     handler: function () {
+                     if (isSubsetEmpty(1) && isSubsetEmpty(2)) {
+                     alert('Empty subsets found, need at least 1 valid subset to save a comparsion');
+                     return;
+                     }
+                     else {
+                     showSaveSubsetsDialog();
+                     }
+                     }
+                     }
+                     ),
+                     '->',
+                     new Ext.Toolbar.Separator(),
+                     new Ext.Toolbar.Button({
+                     id: 'exportbutton',
+                     text: 'Export',
+                     iconCls: 'exportbutton',
+                     disabled: false,
+                     menu: expmenu,
+                     handler: function () {
+                     // alert('export');
+                     // showExportStepSplitTimeSeries();
+                     // if((typeof(grid)!='undefined') && (grid!=null)){exportGrid();}
+                     // else {alert("Nothing to export");}
+                     }}),
+                     new Ext.Toolbar.Separator(),
+                     new Ext.Toolbar.Button(
+                     {
+                     id: 'printanalysisbutton',
+                     text: 'Print',
+                     iconCls: 'printbutton',
+                     disabled: false,
+                     handler: function () {
+                     // alert('print');
+                     // analysisPanel.iframe.print();
+                     var text = getAnalysisPanelContent();
+                     printPreview(text);
+                     }
+                     }
+                     ),
+                     new Ext.Toolbar.Separator(),
+                     */
                     new Ext.Toolbar.Button(
                         {
                             id: 'dataExplorerHelpButton',
@@ -656,6 +657,10 @@ Ext.onReady(function () {
                 listeners: {
                     activate: function () {
                         GLOBAL.Analysis = "Advanced";
+                        jQuery("#clearButton").show();
+                    },
+                    deactivate: function () {
+                        jQuery("#clearButton").hide();
                     }
                 },
                 bbar: new Ext.StatusBar({
@@ -687,12 +692,44 @@ Ext.onReady(function () {
                 height: 90
             }
         );
+        //jira- DEMOTM-115 Bringing Save report/save subset functionality to transmart Demo branch
+        var savesubsetsTbar = new Ext.Toolbar(
+            {
+                id: 'savesubsetsTbar',
+                title: 'Save Subsets',
+                items: [new Ext.Toolbar.Button(
+                    {
+                        id: 'savesubsetsButton',
+                        text: 'Save Subsets',
+                        iconCls: 'savebutton',
+                        disabled: false,
+                        handler: function () {
+                            showSaveSubsetsDialog();
 
+                        }
+                    }
+                ),
+                    new Ext.Toolbar.Button(
+                        {
+                            id: 'clearButton',
+                            text: 'Clear',
+                            iconCls: 'clearbutton2',
+                            disabled: false,
+                            handler: function () {
+                                clearQuery();
+
+                            }
+                        }
+                    )
+                ]
+            }
+        );
         resultsTabPanel = new Ext.TabPanel(
             {
                 id: 'resultsTabPanel',
                 title: 'Analysis/Results',
                 region: 'center',
+                tbar: savesubsetsTbar,
 
                 defaults: {
                     hideMode: 'display'
@@ -703,17 +740,15 @@ Ext.onReady(function () {
                 deferredRender: false,
                 //split : true,
                 //tbar : tb2,
-                activeTab: 0,
-                tools: [
-                    {
-                        id: 'help help-resana-panel',
-                        qtip: 'Click for Generate Summary Statistics help',
-                        handler: function (event, toolEl, panel) {
-                            D2H_ShowHelp("1074", helpURL, "wndExternal", CTXT_DISPLAY_FULLHELP);
-                        },
-                        hidden: true
-                    }
-                ]
+                activeTab: 0
+// tools:[{
+// id:'help',
+// qtip:'Click for Generate Summary Statistics help',
+// handler: function(event, toolEl, panel){
+// D2H_ShowHelp("1074",helpURL,"wndExternal",CTXT_DISPLAY_FULLHELP );
+// },
+// hidden:true
+// }]
             }
         );
 
@@ -752,13 +787,23 @@ Ext.onReady(function () {
         analysisPanel = new Ext.Panel(
             {
                 id: 'analysisPanel',
-                title: 'Results/Analysis',
+                title: 'Summary Statistics',
                 region: 'center',
                 fitToFrame: true,
                 listeners: {
-                    activate: activateTab,
+                    activate: function () {
+                        if (GLOBAL.AnalysisHasBeenRun == false) {
+                            GLOBAL.CurrentSubsetIDs[1] = null;
+                            GLOBAL.CurrentSubsetIDs[2] = null;
+                            resultsTabPanel.body.mask("Performing queries...", 'x-mask-loading');
+                            runAllQueries(getSummaryStatistics, resultsTabPanel);
+                            activateTab();
+                        }
+                    },
                     deactivate: function () {
-                        resultsTabPanel.tools['help help-resana-panel'].dom.style.display = "none";
+                        // resultsTabPanel.tools.help.dom.style.display="none";
+                    },
+                    'afterLayout': {
                     }
                 },
                 autoScroll: true,
@@ -949,9 +994,9 @@ Ext.onReady(function () {
         );
 
         resultsTabPanel.add(queryPanel);
-        resultsTabPanel.add(dataAssociationPanel);
         resultsTabPanel.add(analysisPanel);
         resultsTabPanel.add(analysisGridPanel);
+        resultsTabPanel.add(dataAssociationPanel);
         //Commented out the Jobs panel to hide as it isn't used without Gene Pattern
         //resultsTabPanel.add(analysisJobsPanel);
         resultsTabPanel.add(analysisDataExportPanel);
@@ -1221,6 +1266,124 @@ Ext.onReady(function () {
             );
             setvaluewin.show();
             setvaluewin.hide();
+        }
+
+        // preload set region dialog
+        setregionPanel = new Ext.Panel(
+            {
+                id: 'setregionPanel',
+                region: 'north',
+                height: 300,
+                width: 490,
+                split: false,
+                autoLoad: {
+                    url: pageInfo.basePath + '/datasetExplorer/regionFilter',
+                    scripts: true,
+                    nocache: true,
+                    discardUrl: true,
+                    method: 'POST'
+                }
+            }
+        );
+
+
+        if (!this.setregionwin) {
+            setregionwin = new Ext.Window(
+                {
+                    id: 'setregionwindow',
+                    title: 'Set Region',
+                    layout: '',
+                    width: 500,
+                    height: 350,
+                    closable: false,
+                    plain: true,
+                    modal: true,
+                    border: false,
+                    items: [setregionPanel],
+                    buttons: [
+                        {
+                            text: 'OK',
+                            handler: function () {
+                                var regionData = {
+                                    range: null,
+                                    basePairs: null,
+                                    geneId: null,
+                                    geneName: null,
+                                    mode: '',
+                                    chromosome: null,
+                                    position: null,
+                                    use: null,
+                                    inclusionCriteria: null
+                                }
+
+                                regionData.inclusionCriteria = jQuery('[name="filterInclusionCriteria"]:checked').val();
+
+                                if (jQuery('[name=\'regionFilter\'][value=\'gene\']:checked').size() > 0) {
+                                    regionData.mode = 'gene';
+                                    regionData.geneId = jQuery('#filterGeneId').val();
+                                    regionData.geneName = jQuery('#filterGeneId-input').val();
+                                    regionData.range = jQuery('#filterGeneRange').val();
+                                    regionData.basePairs = jQuery('#filterGeneBasePairs').val();
+                                    if (regionData.basePairs == null || regionData.basePairs == "") {
+                                        regionData.basePairs = 0;
+                                    }
+                                    regionData.use = jQuery('#filterGeneUse').val();
+                                }
+                                else if (jQuery('[name=\'regionFilter\'][value=\'chromosome\']:checked').size() > 0) {
+                                    regionData.mode = 'chromosome';
+                                    regionData.range = jQuery('#filterChromosomeRange').val();
+                                    regionData.basePairs = jQuery('#filterChromosomeBasePairs').val();
+                                    if (regionData.basePairs == null || regionData.basePairs == "") {
+                                        regionData.basePairs = 0;
+                                    }
+
+                                    regionData.use = jQuery('#filterChromosomeUse').val();
+                                    regionData.chromosome = jQuery('#filterChromosomeNumber').val();
+                                    regionData.position = jQuery('#filterChromosomePosition').val();
+                                    if (regionData.position == null || regionData.position == "") {
+                                        regionData.position = 0;
+                                    }
+                                }
+
+                                // make sure that there is a value set
+                                if (regionData.mode == "gene") {
+                                    if ((regionData.geneId == null || regionData.geneId == "") && (regionData.geneName == null || regionData.geneName == "")) {
+                                        alert("Please select a gene or enter an rsID.")
+                                    }
+                                    else {
+                                        setregionwin.hide();
+                                        setRegionDialogComplete(regionData);
+                                    }
+                                }
+                                else {
+                                    setregionwin.hide();
+                                    setRegionDialogComplete(regionData);
+                                }
+                            }
+                        }
+                        ,
+                        {
+                            text: 'Cancel',
+                            handler: function () {
+                                setregionwin.hide();
+                            }
+                        }
+                    ],
+                    resizable: false,
+                    tools: [
+                        {
+                            id: 'help',
+                            qtip: 'Click for context sensitive help',
+                            handler: function (event, toolEl, panel) {
+                                D2H_ShowHelp("1302", helpURL, "wndExternal", CTXT_DISPLAY_FULLHELP);
+                            }
+                        }
+                    ]
+
+                }
+            );
+            setregionwin.show();
+            setregionwin.hide();
         }
 
 

@@ -20,26 +20,26 @@ class SearchDAO {
 							gwas.pValue,
 							gwas.logPValue,
 							gwas.ext_data
-					FROM	bio.BioAssayAnalysisGwas gwas
+					FROM	org.transmart.biomart.BioAssayAnalysisGwas gwas
 					WHERE	gwas.analysis.id = :parAnalysisId""")
 		
 		if (ranges) {
 			qb.append(" AND gwas.rsId IN (:parSearchProbes)");
 		}
-		def results = bio.BioAssayAnalysisGwas.executeQuery(qb.toString(), queryParams,[max:100])
+		def results = org.transmart.biomart.BioAssayAnalysisGwas.executeQuery(qb.toString(), queryParams,[max:100])
 		return results
 	}
 	
 	def getGwasIndexData()
 	{
-		def results = bio.BioAssayAnalysisDataIdx.findAllByExt_type("GWAS", [sort:"display_idx",order:"asc"])
+		def results = org.transmart.biomart.BioAssayAnalysisDataIdx.findAllByExt_type("GWAS", [sort:"display_idx",order:"asc"])
 		
 		return results
 	}
 
 	def getEqtlIndexData()
 	{
-		def results = bio.BioAssayAnalysisDataIdx.findAllByExt_type("EQTL", [sort:"display_idx",order:"asc"])
+		def results = org.transmart.biomart.BioAssayAnalysisDataIdx.findAllByExt_type("EQTL", [sort:"display_idx",order:"asc"])
 		
 		return results
 	}
@@ -50,12 +50,12 @@ class SearchDAO {
 	
 	def getEqtlData(analysisId, searchProbes)
 	{
-		def results = bio.BioAssayAnalysisGwas.executeQuery("""
+		def results = org.transmart.biomart.BioAssayAnalysisGwas.executeQuery("""
 			SELECT	eqtl.rsId,
 					eqtl.pValue,
 					eqtl.logPValue,
 					eqtl.ext_data
-			FROM	bio.BioAssayAnalysisEqtl eqtl
+			FROM	org.transmart.biomart.BioAssayAnalysisEqtl eqtl
 			WHERE	eqtl.analysis.id = :parAnalaysisId
 			""",[parAnalaysisId : analysisId],[max:100])
 		

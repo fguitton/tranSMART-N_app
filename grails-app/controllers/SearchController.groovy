@@ -25,6 +25,7 @@
 *
 */
 
+import au.com.bytecode.opencsv.CSVWriter
 import grails.converters.*
 
 import org.hibernate.*
@@ -1066,4 +1067,115 @@ public class SearchController{
 		//Comment
 		render(view:'noresult')
 	}
+
+
+    //Retrieve the results for the search filter. This is used to populate the result grids on the search page.
+    def getAnalysisResults = {
+
+        //TODO Combine this and the table method, they're now near-identical
+        def paramMap = params;
+        def max = params.long('max')
+        def offset = params.long('offset')
+        def cutoff = params.double('cutoff')
+        if ("".equals(params.cutoff)) {cutoff = 0;} //Special case - cutoff is 0 if blank string
+        def sortField = params.sortField
+        def order = params.order
+        def search = params.search
+
+        def analysisId = params.long('analysisId')
+        def export = params.boolean('export')
+
+        def filter = session['filterAnalysis' + analysisId];
+        if (filter == null) {
+            filter = [:]
+        }
+        if (max != null) { filter.max = max }
+        if (!filter.max || filter.max < 10) {filter.max = 10;}
+
+        if (offset != null) { filter.offset = offset }
+        if (!filter.offset || filter.offset < 0) {filter.offset = 0;}
+
+        if (cutoff != null) { filter.cutoff = cutoff }
+
+        if (sortField != null) { filter.sortField = sortField }
+        if (!filter.sortField) {filter.sortField = 'null';}
+
+        if (order != null) { filter.order = order }
+        if (!filter.order) {filter.order = 'asc';}
+
+        if (search != null) { filter.search = search }
+
+        def analysisIds = []
+        analysisIds.push(analysisId)
+
+        session['filterAnalysis' + analysisId] = filter;
+
+        //Override max and offset if we're exporting
+        def maxToUse = filter.max
+        def offsetToUse = filter.offset
+        if (export) {
+            maxToUse = 0
+            offsetToUse = 0
+        }
+
+        def regionSearchResults
+        try {
+            regionSearchResults = getRegionSearchResults(maxToUse, offsetToUse, filter.cutoff, filter.sortField, filter.order, filter.search, analysisIds)
+        }
+        catch (Exception e) {
+            renderException(e);
+            return
+        }
+
+        try {
+            //regionSearchResults will contain one of three types of data. Overwrite the base object with the one that's populated
+            if (regionSearchResults.gwasResults) {
+                regionSearchResults = regionSearchResults.gwasResults
+            }
+            else if (regionSearchResults.eqtlResults) {
+                regionSearchResults = regionSearchResults.eqtlResults
+            }
+            else {
+                println("Retrieving gene expression results")
+                regionSearchResults = regionSearchResults.geneExpressionResults
+            }
+
+            //Return the data as a GRAILS template or CSV
+            if (export) {
+                exportResults(regionSearchResults.columnNames, regionSearchResults.analysisData, "analysis" + analysisId + ".csv")
+            }
+            else {
+                render(template: "analysisResults", model: [analysisData: regionSearchResults.analysisData, columnNames: regionSearchResults.columnNames, max: regionSearchResults.max, offset: regionSearchResults.offset, cutoff: filter.cutoff, sortField: filter.sortField, order: filter.order, search: filter.search, totalCount: regionSearchResults.totalCount, wasRegionFiltered: regionSearchResults.wasRegionFiltered, analysisId: analysisId])
+            }
+        }
+        catch (Exception e) {
+            render(status: 500, text: e.getMessage())
+        }
+    }
+
+    def exportResults(columns, rows, filename) {
+
+        response.setHeader('Content-disposition', 'attachment; filename=' + filename)
+        response.contentType = 'text/plain'
+
+        String lineSeparator = System.getProperty('line.separator')
+        CSVWriter csv = new CSVWriter(response.writer)
+        def headList = []
+        for (column in columns) {
+            headList.push(column.sTitle)
+        }
+        String[] head = headList
+        csv.writeNext(head)
+
+        for (row in rows) {
+            def rowData = []
+            for (data in row) {
+                rowData.push(data)
+            }
+            String[] vals = rowData
+            csv.writeNext(vals)
+        }
+        csv.close()
+    }
+
 }

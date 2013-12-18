@@ -16,12 +16,7 @@
  * 
  *
  ******************************************************************/
-  
-
-import java.io.File
-import com.recomdata.search.DocumentHit
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
-
+import java.text.SimpleDateFormat
 /**
  * $Id: RecomTagLib.groovy 10280 2011-10-29 03:00:52Z jliu $
  * @author $Author: jliu $
@@ -330,4 +325,57 @@ class RecomTagLib {
 		out << "</th></tr></thead>"
 	}
 
+    def fieldDate = { attrs, body ->
+
+        def bean = attrs["bean"]
+        def field = attrs["field"]
+        def format = attrs["format"]
+
+        def date = bean."${field}"
+        if (date) {
+            out << (new SimpleDateFormat(format).format(date))
+        }
+        else {
+            out << "None"
+        }
+    }
+
+    def fieldList = { attrs, body ->
+        def bean = attrs["bean"]
+        def field = attrs["field"]
+        def attribute = attrs["attribute"]
+
+        def items = bean."${field}"
+        if (items) {
+            out << "<ul>"
+            for (item in items) {
+                if (attribute) {
+                    out << "<li>" + item."${attribute}" + "</li>"
+                }
+                else {
+                    out << "<li>" + item + "</li>"
+                }
+            }
+            out << "</ul>"
+        }
+
+    }
+
+    def fieldGeneByName = { attrs, body ->
+        def name = attrs["name"]
+        def bm
+        if (name)
+            bm =  org.transmart.biomart.BioMarker.findByName(name)
+
+        if (bm) {
+            def appName = grailsApplication.metadata['app.name']
+            def output = """
+			<a href="#" onclick="var w=window.open('/${appName}/details/gene/${bm.id}?altId=', 'detailsWindow', 'width=900,height=800'); w.focus(); return false;"><span class="filter-item filter-item-gene">${name}</span>&nbsp;<img class="ExternalLink" src="/${appName}/images/linkext7.gif"></a>
+			"""
+            out << output
+        }
+        else {
+            out << name
+        }
+    }
 }
