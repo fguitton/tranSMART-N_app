@@ -4,7 +4,7 @@
 	</g:if>
 	<div id="analysis_results_table_${analysisId}_length_wrapper" class="dataTables_length">
 		<label>Show 
-			<g:select size="1" from="${['10':'10','25':'25','50':'50','100':'100']}" optionKey="${{it.key}}" optionValue="${{it.value}}" id="analysis_results_table_${analysisId}_length" onchange="loadAnalysisResultsGrid(${analysisId}, {max: jQuery(this).val()})" value="${max}"/> entries
+			<g:select name="anals"  size="1" from="${['10':'10','25':'25','50':'50','100':'100']}" optionKey="${{it.key}}" optionValue="${{it.value}}" id="analysis_results_table_${analysisId}_length" onchange="loadAnalysisResultsGrid(${analysisId}, {max: jQuery(this).val()})" value="${max}"/> entries
 		</label>	
 	</div>
 	<div class="dataTables_filter">
@@ -56,7 +56,7 @@
 					<g:each in="${row}" var="data" status="colNum">
 						<g:unless test="${colNum == 0}"> <%-- Skip analysis name --%>
 							<td class="">
-								<g:if test="${columnNames[colNum].displayType == 'gene'}">
+                                <g:if test="${columnNames[colNum] != null && columnNames[colNum].displayType == 'gene'}">
 									<%-- Pretty inefficient, but we only display up to 100 - move returning gene ID to query? --%>
 									<g:fieldGeneByName name="${data}"/>
 								</g:if>

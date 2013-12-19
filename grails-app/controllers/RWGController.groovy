@@ -559,7 +559,7 @@ class RWGController {
        int solrPort = Integer.parseInt(grailsApplication.config.com.rwg.solr.port)
 	   String solrPath = grailsApplication.config.com.rwg.solr.path
 	   String solrRequestUrl = new URI(solrScheme, "", solrHost, solrPort, solrPath, "", "").toURL()
-	   
+
 	   return solrRequestUrl
    }
 

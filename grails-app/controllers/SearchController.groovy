@@ -26,13 +26,11 @@
 */
 
 import au.com.bytecode.opencsv.CSVWriter
-import grails.converters.*
 
-import org.hibernate.*
+import grails.converters.*
 import org.transmart.GlobalFilter;
 import org.transmart.SearchFilter;
-import org.transmart.SearchResult;
-import org.transmart.biomart.BioDataExternalCode;
+import org.transmart.SearchResult
 import org.transmart.searchapp.AccessLog;
 import org.transmart.searchapp.AuthUser;
 
@@ -42,8 +40,6 @@ import org.transmart.searchapp.SearchKeywordTerm
 
 import org.transmart.biomart.BioAssayAnalysis;
 import org.transmart.biomart.BioDataExternalCode
-
-import com.recomdata.util.*
 
 public class SearchController{
 	def sessionFactory
@@ -55,6 +51,9 @@ public class SearchController{
 	def documentService
 	def searchKeywordService
     def regionSearchService
+    def RModulesFileWritingService
+    def RModulesJobProcessingService
+    def RModulesOutputRenderService
 
 	String authKeyGG = null
 	
@@ -1176,6 +1175,244 @@ public class SearchController{
             csv.writeNext(vals)
         }
         csv.close()
+    }
+
+
+
+    def getQQPlotImage = {
+
+        //We need to determine the data type of this analysis so we know where to pull the data from.
+        def currentAnalysis =  org.transmart.biomart.BioAssayAnalysis.get(params.analysisId)
+
+        def pvalueCutoff = params.pvalueCutoff as double
+        def search = params.search
+
+        if (!pvalueCutoff) {pvalueCutoff = 0}
+        if (!search) {search = ""}
+
+        //Throw an error if we don't find the analysis for some reason.
+        if(!currentAnalysis)
+        {
+            throw new Exception("Analysis not found.")
+        }
+
+        //This will hold the index lookups for deciphering the large text meta-data field.
+        def indexMap = [:]
+
+        //Initiate Data Access object to get to search data.
+        def searchDAO = new SearchDAO()
+
+        //Get the GWAS Data. Call a different class based on the data type.
+        def analysisData
+
+        //Get the data from the index table for GWAS.
+        def analysisIndexData
+
+        def returnedAnalysisData = []
+        def returnJSON = [:]
+
+        //Get list of REGION restrictions from session and translate to regions
+        def regions = getSearchRegions(session['solrSearchFilter'])
+        def geneNames = getGeneNames(session['solrSearchFilter'])
+        def analysisIds = [currentAnalysis.id]
+
+        switch(currentAnalysis.assayDataType)
+        {
+            case "GWAS" :
+            case "Metabolic GWAS" :
+                analysisData = regionSearchService.getAnalysisData(analysisIds, regions, 0, 0, pvalueCutoff, "null", "asc", search, "gwas", geneNames,false).results
+                analysisIndexData = searchDAO.getGwasIndexData()
+                break;
+            case "EQTL" :
+                analysisData = regionSearchService.getAnalysisData(analysisIds, regions, 0, 0, pvalueCutoff, "null", "asc", search, "eqtl", geneNames,false).results
+                analysisIndexData = searchDAO.getEqtlIndexData()
+                break;
+            default :
+                throw new Exception("Not Applicable Data Type Found.")
+        }
+
+        analysisIndexData.each()
+                {
+                    //Put the index information into a map so we can look it up later. Only add the GOOD_CLUSTERING column.
+                    if(it.field_name == "GOOD_CLUSTERING")
+                    {
+                        indexMap[it.field_idx] = it.display_idx
+                    }
+                }
+
+        //Create an entry that represents the headers to print to the file.
+        def columnHeaderList = ["PROBEID","pvalue","good_clustering"]
+        returnedAnalysisData.add(columnHeaderList)
+
+        //The returned data needs to have the large text field broken out by delimiter.
+        analysisData.each()
+                {
+                    //This temporary list is used so that we return a list of lists.
+                    def temporaryList = []
+
+                    //This will be used to fill in the data array.
+                    def indexCount = 0;
+
+                    //The third element is our large text field. Split it into an array.
+                    def largeTextField = it[3].split(";", -1)
+
+                    //This will be the array that is reordered according to the meta-data index table.
+                    String[] newLargeTextField = new String[indexMap.size()]
+
+                    //Loop over the elements in the index map.
+                    indexMap.each()
+                            {
+                                //Reorder the array based on the index table.
+                                newLargeTextField[indexCount] = largeTextField[it.key-1]
+
+                                indexCount++;
+                            }
+
+                    //Swap around the data types for easy array addition.
+                    def finalFields = new ArrayList(Arrays.asList(newLargeTextField));
+
+                    //Add the non-dynamic meta data fields to the returned data.
+                    temporaryList.add(it[0])
+                    temporaryList.add(it[1])
+
+                    //Add the dynamic fields to the returned data.
+                    temporaryList+=finalFields
+
+                    returnedAnalysisData.add(temporaryList)
+                }
+
+        println "QQPlot row count = " + returnedAnalysisData.size()
+//		for (int i = 0; i < returnedAnalysisData.size() && i < 10; i++) {
+//			println returnedAnalysisData[i]
+//		}
+
+        //Get a unique key for the image file.
+        def uniqueId = randomUUID() as String
+
+        //Create a unique name using the id.
+        def uniqueName = "QQPlot-" + uniqueId
+
+        //Create the temporary directories for processing the image.
+        def currentTempDirectory = RModulesFileWritingService.createTemporaryDirectory(uniqueName)
+
+        def currentWorkingDirectory =  currentTempDirectory + File.separator + "workingDirectory" + File.separator
+
+        //Write the data file for generating the image.
+        def currentDataFile = RModulesFileWritingService.writeDataFile(currentWorkingDirectory, returnedAnalysisData,"QQPlot.txt")
+
+        //Run the R script to generate the image file.
+        RModulesJobProcessingService.runRScript(currentWorkingDirectory,"/QQ/QQPlot.R","create.qq.plot('QQPlot.txt')")
+
+        //Verify the image file exists.
+        def imagePath = currentWorkingDirectory + File.separator + "QQPlot.png"
+
+        if(!new File(imagePath))
+        {
+            throw new Exception("Image file creation failed!")
+        }
+        else
+        {
+            //Move the image to the web directory so we can render it.
+            def imageURL = RModulesOutputRenderService.moveImageFile(imagePath,uniqueName + ".png","QQPlots")
+
+            returnJSON['imageURL'] = imageURL
+
+            //Delete the working directory.
+            def directoryToDelete = new File(currentTempDirectory)
+
+            //This isn't working. I think something is holding the directory open? We need a way to clear out the temp files.
+            directoryToDelete.deleteDir()
+
+            //Render the image URL in a JSON object so we can reference it later.
+            render returnJSON as JSON
+        }
+
+    }
+
+
+    def getWebserviceCriteria(solrSearch) {
+        def genes = []
+
+        for (s in solrSearch) {
+
+            s = s.replaceAll('::[^:]+\$',''); //Get rid of logical operator
+
+            if (s.startsWith("REGION")) {
+                //Cut off REGION:, split by pipe and interpret chromosomes and genes
+                s = s.substring(7)
+                def regionparams = s.split("\\|")
+                for (r in regionparams) {
+                    //Chromosome
+                    if (r.startsWith("CHROMOSOME")) {
+                        //Do nothing for now
+                    }
+                    //Gene
+                    else {
+                        def region = r.split(";")
+                        def geneId = region[1] as long
+                        def direction = region[2]
+                        def range = region[3] as long
+                        def ver = region[4]
+                        def searchKeyword = SearchKeyword.get(geneId)
+                        def limits
+                        if (searchKeyword.dataCategory.equals("GENE")) {
+                            genes.push([searchKeyword.keyword, range])
+                        }
+                        else if (searchKeyword.dataCategory.equals("SNP")) {
+                            //Get the genes associated with this SNP
+                            def snpGenes = regionSearchService.getGenesForSnp(searchKeyword.keyword)
+                            //Push each gene and the radius
+                            for (snpGene in snpGenes) {
+                                genes.push([snpGene, range])
+                            }
+                        }
+
+                    }
+                }
+            }
+            else if (s.startsWith("GENESIG")) {
+                //Expand regions to genes and get their limits
+                s = s.substring(8)
+                def sigIds = s.split("\\|")
+                for (sigId in sigIds) {
+                    def sigSearchKeyword = SearchKeyword.get(sigId as long)
+                    def sigItems = GeneSignatureItem.createCriteria().list() {
+                        eq('geneSignature', GeneSignature.get(sigSearchKeyword.bioDataId))
+                        like('bioDataUniqueId', 'GENE%')
+                    }
+                    for (sigItem in sigItems) {
+                        def searchGene = SearchKeyword.findByUniqueId(sigItem.bioDataUniqueId)
+                        def geneId = searchGene.id
+                        genes.push([searchGene.keyword, 0]);
+                    }
+                }
+            }
+            else if (s.startsWith("GENE")) {
+                s = s.substring(5)
+                def geneIds = s.split("\\|")
+                for (geneString in geneIds) {
+                    def geneId = geneString as long
+                    def searchKeyword = SearchKeyword.get(geneId)
+                    genes.push([searchKeyword.keyword, 0])
+                }
+            }
+            else if (s.startsWith("SNP")) {
+                //If plain SNPs, as above (default to HG19)
+                s = s.substring(4)
+                def rsIds = s.split("\\|")
+                for (rsId in rsIds) {
+                    //Get the genes associated with this SNP
+                    def searchKeyword = SearchKeyword.get(rsId as long)
+                    def snpGenes = regionSearchService.getGenesForSnp(searchKeyword.keyword)
+                    //Push each gene and the radius
+                    for (snpGene in snpGenes) {
+                        genes.push([snpGene, 0])
+                    }
+                }
+            }
+        }
+
+        return genes
     }
 
 }
