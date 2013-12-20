@@ -24,6 +24,7 @@
 String.prototype.trim = function () {
     return this.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
 }
+
 Ext.layout.BorderLayout.Region.prototype.getCollapsedEl = Ext.layout.BorderLayout.Region.prototype.getCollapsedEl.createSequence(function () {
         if ((this.position == 'north' || this.position == 'south') && !this.collapsedEl.titleEl) {
             this.collapsedEl.titleEl = this.collapsedEl.createChild(
@@ -177,7 +178,6 @@ Ext.onReady(function () {
         // this overrides the above
         Ext.Updater.defaults.timeout = 1800000;
 
-
         // create the main regions of the screen
         westPanel = new Ext.Panel(
             {
@@ -225,6 +225,7 @@ Ext.onReady(function () {
                 }
             );
         }
+
         qphtml = "<div style='margin: 10px'>Query Criteria<br /><select size='8' id='queryCriteriaSelect1' style='width:400px; height:250px;'></select><br />\
 		< button onclick = 'resetQuery()' > Reset < / button > < br / > < div id = 'queryCriteriaDiv1' style = 'font:11pt;width:200px; height:250px; white-space:nowrap;overflow:auto;border:1px solid black' > < / div > < / div > "
 
@@ -284,7 +285,8 @@ Ext.onReady(function () {
                     {
                         text: 'Heatmap',
                         disabled: true,
-                        // when checked has a boolean value, it is assumed to be a CheckItem
+                        // when checked has a boolean value, it is
+                        // assumed to be a CheckItem
                         handler: function () {
                             GLOBAL.HeatmapType = 'Compare';
                             validateHeatmap();
@@ -296,7 +298,8 @@ Ext.onReady(function () {
                     {
                         text: 'Hierarchical Clustering',
                         disabled: true,
-                        // when checked has a boolean value, it is assumed to be a CheckItem
+                        // when checked has a boolean value, it is
+                        // assumed to be a CheckItem
                         handler: function () {
                             GLOBAL.HeatmapType = 'Cluster';
                             validateHeatmap();
@@ -308,7 +311,8 @@ Ext.onReady(function () {
                     {
                         text: 'K-Means Clustering',
                         disabled: true,
-                        // when checked has a boolean value, it is assumed to be a CheckItem
+                        // when checked has a boolean value, it is
+                        // assumed to be a CheckItem
                         handler: function () {
                             GLOBAL.HeatmapType = 'KMeans';
                             validateHeatmap();
@@ -320,7 +324,8 @@ Ext.onReady(function () {
                     {
                         text: 'Comparative Marker Selection (Heatmap)',
                         disabled: true,
-                        // when checked has a boolean value, it is assumed to be a CheckItem
+                        // when checked has a boolean value, it is
+                        // assumed to be a CheckItem
                         handler: function () {
                             GLOBAL.HeatmapType = 'Select';
                             validateHeatmap();
@@ -334,7 +339,8 @@ Ext.onReady(function () {
                     {
                         text: 'Principal Component Analysis',
                         disabled: true,
-                        // when checked has a boolean value, it is assumed to be a CheckItem
+                        // when checked has a boolean value, it is
+                        // assumed to be a CheckItem
                         handler: function () {
                             GLOBAL.HeatmapType = 'PCA';
                             validateHeatmap();
@@ -460,157 +466,157 @@ Ext.onReady(function () {
 
 
         var tb2 = new Ext.Toolbar(
-            {
-                id: 'maintoolbar',
+        {
+            id: 'maintoolbar',
                 title: 'maintoolbar',
-                items: [
-                    /*   new Ext.Toolbar.Button(
-                     {
-                     id: 'generatesubsetsbutton',
-                     text: 'Generate Summary Statistics',
-                     iconCls: 'runbutton',
-                     disabled: false,
-                     handler: function () {
-                     // alert('generate');
-                     GLOBAL.CurrentSubsetIDs[1] = null;
-                     GLOBAL.CurrentSubsetIDs[2] = null;
-                     runAllQueries(getSummaryStatistics);
+            items: [
+            /*   new Ext.Toolbar.Button(
+             {
+             id: 'generatesubsetsbutton',
+             text: 'Generate Summary Statistics',
+             iconCls: 'runbutton',
+             disabled: false,
+             handler: function () {
+             // alert('generate');
+             GLOBAL.CurrentSubsetIDs[1] = null;
+             GLOBAL.CurrentSubsetIDs[2] = null;
+             runAllQueries(getSummaryStatistics);
 
-                     }
-                     }
-                     ),
-                     new Ext.Toolbar.Separator(),
-                     new Ext.Toolbar.Button(
-                     {
-                     id: 'showquerysummarybutton',
-                     text: 'Summary',
-                     iconCls: 'summarybutton',
-                     disabled: false,
-                     handler: function () {
-                     // alert('clear');
-                     showQuerySummaryWindow();
-                     }
-                     }
-                     ),
+             }
+             }
+             ),
+             new Ext.Toolbar.Separator(),
+             new Ext.Toolbar.Button(
+             {
+             id: 'showquerysummarybutton',
+             text: 'Summary',
+             iconCls: 'summarybutton',
+             disabled: false,
+             handler: function () {
+             // alert('clear');
+             showQuerySummaryWindow();
+             }
+             }
+             ),
 
-                     new Ext.Toolbar.Separator(),
-                     new Ext.Toolbar.Button(
-                     {
-                     id: 'advancedbutton',
-                     text: 'Advanced',
-                     iconCls: 'comparebutton',
-                     hidden: GLOBAL.EnableGP != 'true',
-                     menu: advmenu,
-                     handler: function () {
-                     // alert('compare');
-                     // showCompareStepPathwaySelection();
-                     }
-                     }
-                     ),
+             new Ext.Toolbar.Separator(),
+             new Ext.Toolbar.Button(
+             {
+             id: 'advancedbutton',
+             text: 'Advanced',
+             iconCls: 'comparebutton',
+             hidden: GLOBAL.EnableGP != 'true',
+             menu: advmenu,
+             handler: function () {
+             // alert('compare');
+             // showCompareStepPathwaySelection();
+             }
+             }
+             ),
 
-                     new Ext.Toolbar.Separator(),
-                     new Ext.Toolbar.Button(
-                     {
-                     id: 'clearsubsetsbutton',
-                     text: 'Clear',
-                     iconCls: 'clearbutton',
-                     disabled: false,
-                     handler: function () {
-                     if (confirm("Are you sure you want to clear your current analysis?")) {
-                     clearAnalysisPanel();
-                     resetQuery();
-                     clearDataAssociation();
-                     }
-                     // clearGrid(); blah
-                     }
-                     }
-                     ),
-                     new Ext.Toolbar.Separator(),
-                     new Ext.Toolbar.Button(
-                     {
-                     id: 'savecomparsionbutton',
-                     text: 'Save',
-                     iconCls: 'savebutton',
-                     disabled: false,
-                     handler: function () {
-                     if (isSubsetEmpty(1) && isSubsetEmpty(2)) {
-                     alert('Empty subsets found, need at least 1 valid subset to save a comparsion');
-                     return;
-                     }
-                     if ((GLOBAL.CurrentSubsetIDs[1] == null && !isSubsetEmpty(1)) || (GLOBAL.CurrentSubsetIDs[2] == null && !isSubsetEmpty(2))) {
-                     runAllQueries(function () {
-                     saveComparison();
-                     });
-                     }
-                     else {
-                     saveComparison();
-                     }
-                     return;
-                     }
-                     }
-                     ),
-                     new Ext.Toolbar.Separator(),
-                     new Ext.Toolbar.Button(
-                     {
-                     id: 'savesubsetsbutton',
-                     text: 'Save Subsets',
-                     iconCls: 'savebutton',
-                     disabled: false,
-                     handler: function () {
-                     if (isSubsetEmpty(1) && isSubsetEmpty(2)) {
-                     alert('Empty subsets found, need at least 1 valid subset to save a comparsion');
-                     return;
-                     }
-                     else {
-                     showSaveSubsetsDialog();
-                     }
-                     }
-                     }
-                     ),
-                     '->',
-                     new Ext.Toolbar.Separator(),
-                     new Ext.Toolbar.Button({
-                     id: 'exportbutton',
-                     text: 'Export',
-                     iconCls: 'exportbutton',
-                     disabled: false,
-                     menu: expmenu,
-                     handler: function () {
-                     // alert('export');
-                     // showExportStepSplitTimeSeries();
-                     // if((typeof(grid)!='undefined') && (grid!=null)){exportGrid();}
-                     // else {alert("Nothing to export");}
-                     }}),
-                     new Ext.Toolbar.Separator(),
-                     new Ext.Toolbar.Button(
-                     {
-                     id: 'printanalysisbutton',
-                     text: 'Print',
-                     iconCls: 'printbutton',
-                     disabled: false,
-                     handler: function () {
-                     // alert('print');
-                     // analysisPanel.iframe.print();
-                     var text = getAnalysisPanelContent();
-                     printPreview(text);
-                     }
-                     }
-                     ),
-                     new Ext.Toolbar.Separator(),
-                     */
-                    new Ext.Toolbar.Button(
-                        {
-                            id: 'dataExplorerHelpButton',
-                            iconCls: 'contextHelpBtn',
-                            qtip: 'Click for Dataset Explorer Help',
-                            disabled: false,
-                            handler: function () {
-                                D2H_ShowHelp("1258", helpURL, "wndExternal", CTXT_DISPLAY_FULLHELP);
-                            }
-                        }
-                    )
-                ]
-            }
+             new Ext.Toolbar.Separator(),
+             new Ext.Toolbar.Button(
+             {
+             id: 'clearsubsetsbutton',
+             text: 'Clear',
+             iconCls: 'clearbutton',
+             disabled: false,
+             handler: function () {
+             if (confirm("Are you sure you want to clear your current analysis?")) {
+             clearAnalysisPanel();
+             resetQuery();
+             clearDataAssociation();
+             }
+             // clearGrid(); blah
+             }
+             }
+             ),
+             new Ext.Toolbar.Separator(),
+             new Ext.Toolbar.Button(
+             {
+             id: 'savecomparsionbutton',
+             text: 'Save',
+             iconCls: 'savebutton',
+             disabled: false,
+             handler: function () {
+             if (isSubsetEmpty(1) && isSubsetEmpty(2)) {
+             alert('Empty subsets found, need at least 1 valid subset to save a comparsion');
+             return;
+             }
+             if ((GLOBAL.CurrentSubsetIDs[1] == null && !isSubsetEmpty(1)) || (GLOBAL.CurrentSubsetIDs[2] == null && !isSubsetEmpty(2))) {
+             runAllQueries(function () {
+             saveComparison();
+             });
+             }
+             else {
+             saveComparison();
+             }
+             return;
+             }
+             }
+             ),
+             new Ext.Toolbar.Separator(),
+             new Ext.Toolbar.Button(
+             {
+             id: 'savesubsetsbutton',
+             text: 'Save Subsets',
+             iconCls: 'savebutton',
+             disabled: false,
+             handler: function () {
+             if (isSubsetEmpty(1) && isSubsetEmpty(2)) {
+             alert('Empty subsets found, need at least 1 valid subset to save a comparsion');
+             return;
+             }
+             else {
+             showSaveSubsetsDialog();
+             }
+             }
+             }
+             ),
+             '->',
+             new Ext.Toolbar.Separator(),
+             new Ext.Toolbar.Button({
+             id: 'exportbutton',
+             text: 'Export',
+             iconCls: 'exportbutton',
+             disabled: false,
+             menu: expmenu,
+             handler: function () {
+             // alert('export');
+             // showExportStepSplitTimeSeries();
+             // if((typeof(grid)!='undefined') && (grid!=null)){exportGrid();}
+             // else {alert("Nothing to export");}
+             }}),
+             new Ext.Toolbar.Separator(),
+             new Ext.Toolbar.Button(
+             {
+             id: 'printanalysisbutton',
+             text: 'Print',
+             iconCls: 'printbutton',
+             disabled: false,
+             handler: function () {
+             // alert('print');
+             // analysisPanel.iframe.print();
+             var text = getAnalysisPanelContent();
+             printPreview(text);
+             }
+             }
+             ),
+             new Ext.Toolbar.Separator(),
+             */
+            new Ext.Toolbar.Button(
+                {
+                    id: 'dataExplorerHelpButton',
+                    iconCls: 'contextHelpBtn',
+                    qtip: 'Click for Dataset Explorer Help',
+                    disabled: false,
+                    handler: function () {
+                        D2H_ShowHelp("1258", helpURL, "wndExternal", CTXT_DISPLAY_FULLHELP);
+                    }
+                }
+            )
+        ]
+        }
         );
 
 
@@ -631,8 +637,8 @@ Ext.onReady(function () {
                 minwidth: 150,
                 split: true,
                 border: true,
-                layout: 'fit',
-                tbar: tb2
+                layout: 'fit'
+                // tbar:tb2
             }
         );
 
@@ -649,7 +655,8 @@ Ext.onReady(function () {
                     scripts: true,
                     nocache: true,
                     discardUrl: true,
-                    method: 'POST'
+                    method: 'POST'// ,
+                    // callback: loadOntPanel
                 },
                 collapsible: true,
                 titleCollapse: false,
@@ -664,7 +671,8 @@ Ext.onReady(function () {
                     }
                 },
                 bbar: new Ext.StatusBar({
-                    // Status bar to show the progress of generating heatmap and other advanced workflows
+                    // Status bar to show the progress of generating heatmap
+                    // and other advanced workflows
                     id: 'asyncjob-statusbar',
                     defaultText: 'Ready',
                     defaultIconCls: 'default-icon',
@@ -724,6 +732,7 @@ Ext.onReady(function () {
                 ]
             }
         );
+
         resultsTabPanel = new Ext.TabPanel(
             {
                 id: 'resultsTabPanel',
@@ -751,7 +760,6 @@ Ext.onReady(function () {
 // }]
             }
         );
-
 
         analysisGridPanel = new Ext.Panel(
             {
@@ -784,6 +792,7 @@ Ext.onReady(function () {
                 }
             }
         );
+
         analysisPanel = new Ext.Panel(
             {
                 id: 'analysisPanel',
@@ -814,6 +823,7 @@ Ext.onReady(function () {
                 height: 90
             }
         );
+
         /*
          * Commented out the Jobs panel to hide as it isn't used without Gene Pattern
          * 
@@ -838,6 +848,7 @@ Ext.onReady(function () {
          collapsible : true						
          }
          );*/
+
         analysisDataExportPanel = new Ext.Panel(
             {
                 id: 'analysisDataExportPanel',
@@ -1386,13 +1397,10 @@ Ext.onReady(function () {
             setregionwin.hide();
         }
 
-
         showLoginDialog();
         var h = queryPanel.header;
         //alert(h);
     }
-
-
 );
 
 /*
@@ -1441,23 +1449,33 @@ function createOntPanel() {
                 hideMode: 'offsets'
             },
             collapsible: false,
-            height: 300,
+            height: 600,
             width: 316,
             deferredRender: false,
             split: true,
             listeners: {
                 tabchange: function (tp, newTab) {
-
-
                     if (newTab.id == "acrossTrialTreePanel") {
                         GLOBAL.codeType = "Modifier"
                     }
                     else {
                         GLOBAL.codeType = "Concept"
                     }
-
                 }
             }
+        }
+    );
+
+    var searchPanel = new Ext.Panel(
+        {
+            id: 'searchPanel',
+            region: 'north',
+            collapsible: false,
+            height: 135,
+            width: 316,
+            deferredRender: false,
+            split: false,
+            contentEl: "box-search"
         }
     );
 
@@ -1467,7 +1485,6 @@ function createOntPanel() {
      region : 'center',
      deferredRender : false,
      border : true}); */
-
 
     ontSearchByCodePanel = new Ext.Panel(
         {
@@ -1563,6 +1580,7 @@ function createOntPanel() {
         Ext.tree.TreePanel.superclass.onShow.call(this);
         //Ext.get('advancedbutton').dom.style.display='';
     }
+
     ontFilterPanel = new Ext.Panel(
         {
             title: 'Search Terms',
@@ -1656,11 +1674,114 @@ function createOntPanel() {
     );
 
     ontFilterTree.setRootNode(ontFilterTreeRoot);
-    ontFilterPanel.add(ontFilterForm);
+//    ontFilterPanel.add(ontFilterForm);
     ontFilterPanel.add(ontFilterTree);
     // ontTabPanel.add(ontSearchByCodePanel);
 
+    //Create a panel to hold the search criteria
+   westPanel.add(searchPanel);
+
+//    setupOntTree('navigateTermsPanel', 'Navigate By Study');
+
     return ontTabPanel;
+}
+
+
+function setupOntTree(id_in, title_in) {
+
+    var Tree = Ext.tree;
+
+    var showFn = function (node, e) {
+        Ext.tree.TreePanel.superclass.onShow.call(this);
+    }
+
+    var ontTree = new Tree.TreePanel(
+        {
+            id: id_in,
+            title: title_in,
+            animate: false,
+            autoScroll: true,
+            loader: new Ext.ux.OntologyTreeLoader(
+                {
+                    dataUrl: 'none'
+                }
+            ),
+            enableDrag: true,
+            ddGroup: 'makeQuery',
+            containerScroll: true,
+            enableDrop: false,
+            region: 'center',
+            rootVisible: false,
+            expanded: true,
+            onShow: showFn
+        }
+    );
+
+    ontTree.on('startdrag', function (panel, node, event) {
+            Ext.ux.ManagedIFrame.Manager.showShims()
+
+        }
+    );
+
+    ontTree.on('enddrag', function (panel, node, event) {
+            Ext.ux.ManagedIFrame.Manager.hideShims()
+
+        }
+    );
+
+    var treeRoot = new Tree.TreeNode(
+        {
+            text: 'root',
+            draggable: false,
+            id: 'treeRoot',
+            qtip: 'root'
+        }
+    );
+
+    // add a tree sorter in folder mode
+    new Tree.TreeSorter(ontTree,
+        {
+            folderSort: true
+        }
+    );
+
+
+    ontTree.setRootNode(treeRoot);
+    ontTabPanel.add(ontTree);
+    ontTabPanel.doLayout();
+
+    onWindowResize();
+
+}
+
+function onWindowResize() {
+    //Assorted hackery for accounting for the presence of the toolbar
+    var windowHeight = jQuery(window).height();
+
+    jQuery('#centerMainPanel').css('top', jQuery('#header-div').height());
+
+    //var boxHeight = jQuery('#box-search').height();
+    //jQuery('#navigateTermsPanel .x-panel-body').height(windowHeight - boxHeight - 110);
+
+    jQuery('#analysisPanel .x-panel-body').height(jQuery(window).height() - 65);
+
+    if (jQuery('#dataTypesGridPanel .x-panel-body').size() > 0) {
+        var exportPanelTop = jQuery('#dataTypesGridPanel .x-panel-body').offset()['top'];
+        jQuery('#dataTypesGridPanel .x-panel-body').height(jQuery(window).height() - exportPanelTop - 40);
+    }
+    if (jQuery('#dataAssociationPanel .x-panel-body').size() > 0) {
+        var panelTop = jQuery('#dataAssociationPanel .x-panel-body').offset()['top'];
+        jQuery('#dataAssociationPanel .x-panel-body').height(jQuery(window).height() - panelTop);
+    }
+    if (jQuery('#resultsTabPanel .x-tab-panel-body').size() > 0) {
+        var panelTop = jQuery('#resultsTabPanel .x-tab-panel-body').offset()['top'];
+        jQuery('#resultsTabPanel .x-tab-panel-body').height(jQuery(window).height() - panelTop);
+    }
+    if (jQuery('#dataAssociationBody').size() > 0) {
+        var panelTop = jQuery('#dataAssociationBody').offset()['top'];
+        jQuery('#dataAssociationBody').height(jQuery(window).height() - 50);
+    }
+    jQuery('#noAnalyzeResults').prependTo(jQuery('#navigateTermsPanel .x-panel-body'));
 }
 
 function closeBrowser() {
@@ -1932,11 +2053,20 @@ function getPreviousQueriesComplete(response) {
     }
 }
 
+
+function getCategoriesComplete_NEW(ontresponse) {
+    getSubCategories('navigateTermsPanel', 'Navigate By Study', ontresponse);
+    drawAcrossTrialTree();
+    setActiveTab();
+}
+
+
 function getCategoriesComplete(ontresponse) {
 
-    ontTabPanel.add(ontFilterPanel);
-    ontFilterTree.dragZone.addToGroup("analysis");
-    getSubCategories('navigateTermsPanel', 'Navigate Terms', ontresponse);
+    //ontTabPanel.add(ontFilterPanel);
+    //ontFilterTree.dragZone.addToGroup("analysis");
+//    getSubCategories('navigateTermsPanel', 'Navigate Terms', ontresponse);
+    getSubCategories('navigateTermsPanel', 'Navigate By Study', ontresponse);
     /*if(GLOBAL.hideAcrossTrialsPanel != 'true') {
      getSubCategories('crossTrialsPanel', 'Across Trials', ontresponse);
      }*/
@@ -1957,6 +2087,7 @@ function setActiveTab() {
     }
     ontTabPanel.setActiveTab(activeTab);
 }
+
 
 /*If includeExcludeFlag is
  * -"include": Across Trials is the only concept included
@@ -2017,6 +2148,7 @@ function createTree(includeExcludeFlag, ontresponse) {
     }
     return treeRoot;
 }
+
 
 /*
  * the id_in drives which off these tabs is created
@@ -4646,6 +4778,38 @@ function searchByTagComplete(response) {
     }
 }
 
+
+function searchByTagComplete2(response) {
+    // shorthand
+    var Tree = Ext.tree;
+    // ontFilterPanel.el.unmask();
+    viewport.el.unmask();
+    var robj = response.responseText.evalJSON();
+    var rtext = robj.resulttext;
+    var concepts = robj.concepts;
+    // concept = concepts[4];
+    // test = concept.selectSingleNode('name').firstChild.nodeValue;
+    // alert(response.responseText);
+    var length;
+    var leaf = false;
+    var draggable = false;
+    if (concepts != undefined) {
+        if (concepts.length < GLOBAL.MaxSearchResults) {
+            length = concepts.length;
+        }
+        else {
+            length = GLOBAL.MaxSearchResults;
+        }
+        for (var c = 0; c < length; c++) {
+            var newnode = getTreeNodeFromJSON(concepts[c])
+            ontFilterTreeRoot.appendChild(newnode);
+            setTreeNodeSecurity(newnode, concepts[c].access);
+        }
+        var t = document.getElementById("searchresultstext");
+        t.innerHTML = rtext;
+    }
+}
+
 function showHaploviewGeneSelection() {
     //genePatternReplacement();
     //if(!this.compareStepPathwaySelection)
@@ -4912,3 +5076,33 @@ function ontFilterLoaded(el, success, response, options) {
         Ext.get("ontSearchButton").dom.click();
     }
 }
+
+function clearQuery() {
+    if (confirm("Are you sure you want to clear your current analysis?")) {
+        clearAnalysisPanel();
+        resetQuery();
+        clearDataAssociation();
+        GLOBAL.AnalysisHasBeenRun = false;
+    }
+}
+
+function addHelpIcons() {
+
+    jQuery('#analysisPanel').append(getHelpIconHTML(1074, 20, 25));
+    jQuery('#resultsTabPanel .x-tab-panel-header').append(getHelpIconHTML(1061));
+    jQuery('#ontPanel .x-tab-panel-header').append(getHelpIconHTML(1064));
+
+    jQuery('#ontFilterPanel').append(getHelpIconHTML(1065, 4, 28));
+
+}
+
+function getHelpIconHTML(id, right, top) {
+    if (right == null) {
+        right = 4;
+    }
+    if (top == null) {
+        top = 2;
+    }
+    return ('<div style="z-index: 999; cursor: pointer; height: 18px; width: 18px; position: absolute; right: ' + right + 'px; top: ' + top + 'px" class="contextHelpBtn" onclick="D2H_ShowHelp(\'' + id + '\',helpURL,\'wndExternal\',CTXT_DISPLAY_FULLHELP);">&nbsp;</div>')
+}
+

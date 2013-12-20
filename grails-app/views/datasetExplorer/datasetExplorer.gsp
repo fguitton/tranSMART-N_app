@@ -247,13 +247,14 @@
     }
 </script>
 
-<div id="header-div"><g:render template="/layouts/commonheader" model="['app': 'datasetExplorer']"/></div>
+<div id="header-div"> <g:render template="/layouts/commonheader" model="['app': 'datasetExplorer']"/>
+</div>
 
-<div id="main"></div>
 
 <h3 id="test">Loading....</h3>
 <g:form name="exportdsform" controller="export" action="exportDataset"/>
 <g:form name="exportgridform" controller="chart" action="exportGrid"/>
+
 <g:if test="${'true' == grailsApplication.config.com.recomdata.datasetExplorer.enableGenePattern}">
     <g:set var="gplogout" value="${grailsApplication.config.com.recomdata.datasetExplorer.genePatternURL}/gp/logout"/>
 </g:if>
@@ -295,8 +296,10 @@
 </script>
 <!-- ************************************** -->
 
+
 <tmpl:/RWG/boxSearch/>
 <div id="noAnalyzeResults" style="display: none;">No subject-level results found.</div>
+
 
 </body>
 </html>
