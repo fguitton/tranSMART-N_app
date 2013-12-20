@@ -24,17 +24,22 @@
  * @param divId
  */
 function gatherHighDimensionalData(divId){
+	var spinnerMask = new Ext.LoadMask(Ext.getBody(), {msg:"Please wait..."});
+	spinnerMask.show();
+
 	if(!variableDivEmpty(divId)
 			&& ((GLOBAL.CurrentSubsetIDs[1]	== null) ||	(multipleSubsets() && GLOBAL.CurrentSubsetIDs[2]== null))){
 		runAllQueriesForSubsetId(function(){gatherHighDimensionalData(divId);}, divId);
 		return;
 	}
 	if(variableDivEmpty(divId)){
+		spinnerMask.hide();
 		Ext.Msg.alert("No cohort selected!", "Please select a cohort first.");
 		return;
 	}
 	//genePatternReplacement();
 	//Send a request to generate the heatmapdata that we use to populate the dropdowns in the popup.
+
 	Ext.Ajax.request(
 			{
 				url : pageInfo.basePath+"/analysis/heatmapvalidate",
@@ -49,11 +54,13 @@ function gatherHighDimensionalData(divId){
 				),
 				success : function(result, request)
 				{
+					spinnerMask.hide();
 					determineHighDimVariableType(result);
 					readCohortData(result,divId);
 				},
 				failure : function(result, request)
 				{
+					spinnerMask.hide();
 					determineHighDimVariableType(result);
 					readCohortData(result,divId);
 				}
@@ -62,16 +69,22 @@ function gatherHighDimensionalData(divId){
 }
 
 function gatherHighDimensionalDataSingleSubset(divId, currentSubsetId){
+	var spinnerMask = new Ext.LoadMask(Ext.getBody(), {msg:"Please wait..."});
+	spinnerMask.show();
+
 	if((!variableDivEmpty(divId) && currentSubsetId== null)){
+		spinnerMask.hide();
 		runQueryForSubsetidSingleSubset(function(sId){gatherHighDimensionalDataSingleSubset(divId, sId);}, divId);
 		return;
 	}
 	if(variableDivEmpty(divId)){
+		spinnerMask.hide();
 		Ext.Msg.alert("No cohort selected!", "Please select a cohort first.");
 		return;
 	}
 	//genePatternReplacement();
 	//Send a request to generate the heatmapdata that we use to populate the dropdowns in the popup.
+
 	Ext.Ajax.request(
 			{
 				url : pageInfo.basePath+"/analysis/heatmapvalidate",
@@ -86,11 +99,13 @@ function gatherHighDimensionalDataSingleSubset(divId, currentSubsetId){
 				),
 				success : function(result, request)
 				{
+					spinnerMask.hide();
 					determineHighDimVariableType(result);
 					readCohortData(result,divId);
 				},
 				failure : function(result, request)
 				{
+					spinnerMask.hide();
 					determineHighDimVariableType(result);
 					readCohortData(result,divId);
 				}
@@ -109,7 +124,7 @@ function determineHighDimVariableType(result){
 /**
  * read the result from heatmapvalidate call.
  * @param result
- * @param completedFunction
+ * @param divId
  */
 function readCohortData(result, divId)
 {
@@ -205,7 +220,7 @@ function runQueryForSubsetId(subset, callback, divId)
 	queryPanel.el.mask('Getting subset ' + subset + '...', 'x-mask-loading');
 	Ext.Ajax.request(
 			{
-				url : pageInfo.basePath+"/proxy?url=" + GLOBAL.CRCUrl + "request",
+                url : pageInfo.basePath + "/queryTool/runQueryFromDefinition",
 				method : 'POST',
 				xmlData : query,
 				// callback : callback,
@@ -233,7 +248,7 @@ function runQueryForSubsetidSingleSubset(callback, divId){
 	var query = getCRCRequestSingleSubset(divId);
 	Ext.Ajax.request(
 			{
-				url : pageInfo.basePath+"/proxy?url=" + GLOBAL.CRCUrl + "request",
+				url : pageInfo.basePath + "/queryTool/runQueryFromDefinition",
 				method : 'POST',
 				xmlData : query,
 				// callback : callback,
@@ -271,13 +286,7 @@ function getCRCRequest(subset, queryname, divId){
 		var d=new Date();
 		queryname=GLOBAL.Username+"'s Query at "+ d.toString();
 		}
-	var query=getCRCRequestHeader()+ '<user group="'+GLOBAL.ProjectID+'" login="'+GLOBAL.Username+'">'+GLOBAL.Username+'</user>\
-	            <patient_set_limit>0</patient_set_limit>\
-	            <estimated_time>0</estimated_time>\
-	            <request_type>CRC_QRY_runQueryInstance_fromQueryDefinition</request_type>\
-	        </ns4:psmheader>\
-	        <ns4:request xsi:type="ns4:query_definition_requestType" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">\
-					<query_definition>\
+	var query= '<ns4:query_definition xmlns:ns4="http://www.i2b2.org/xsd/cell/crc/psm/1.1/">\
 	                <query_name>'+queryname+'</query_name>\
 	                <specificity_scale>0</specificity_scale>';
 	
@@ -297,7 +306,7 @@ function getCRCRequest(subset, queryname, divId){
 		}
 	}
 	
-	query=query+getSecurityPanel()+"</query_definition>"+getCRCRequestFooter();
+	query=query+getSecurityPanel()+"</ns4:query_definition>";
 	//query=query+"</query_definition>"+getCRCRequestFooter();
 	return query;
 }
@@ -307,15 +316,9 @@ function getCRCRequestSingleSubset(divId, queryname){
 		var d=new Date();
 		queryname=GLOBAL.Username+"'s Query at "+ d.toString();
 		}
-	var query=getCRCRequestHeader()+ '<user group="'+GLOBAL.ProjectID+'" login="'+GLOBAL.Username+'">'+GLOBAL.Username+'</user>\
-	            <patient_set_limit>0</patient_set_limit>\
-	            <estimated_time>0</estimated_time>\
-	            <request_type>CRC_QRY_runQueryInstance_fromQueryDefinition</request_type>\
-	        </ns4:psmheader>\
-	        <ns4:request xsi:type="ns4:query_definition_requestType" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">\
-					<query_definition>\
-	                <query_name>'+queryname+'</query_name>\
-	                <specificity_scale>0</specificity_scale>';
+	var query= '<ns4:query_definition xmlns:ns4="http://www.i2b2.org/xsd/cell/crc/psm/1.1/">\
+        <query_name>'+queryname+'</query_name>\
+        <specificity_scale>0</specificity_scale>';
 	
 	var qcd=Ext.get(divId);
 	
@@ -324,7 +327,7 @@ function getCRCRequestSingleSubset(divId, queryname){
 		query=query+getCRCRequestPanel(qcd.dom, 1);
 	}
 	
-	query=query+getSecurityPanel()+"</query_definition>"+getCRCRequestFooter();
+	query=query+getSecurityPanel()+"</ns4:query_definition>";
 	//query=query+"</query_definition>"+getCRCRequestFooter();
 	return query;
 }
@@ -515,15 +518,14 @@ function toggleDataAssociationFields(extEle){
 		}
 	}
 
-
-    //display the appropriate submit button
-    if(GLOBAL.Analysis=="dataAssociation" || GLOBAL.Analysis=='MetaCoreEnrichment'){
-        document.getElementById("compareStepPathwaySelectionOKButton").style.display="none";
-        document.getElementById("dataAssociationApplyButton").style.display="";
-    }else if(GLOBAL.Analysis=='Advanced'){
-        document.getElementById("compareStepPathwaySelectionOKButton").style.display="";
-        document.getElementById("dataAssociationApplyButton").style.display="none";
-    }
+	//display the appropriate submit button
+	if(GLOBAL.Analysis=="dataAssociation" || GLOBAL.Analysis=='MetaCoreEnrichment'){
+		document.getElementById("compareStepPathwaySelectionOKButton").style.display="none";
+		document.getElementById("dataAssociationApplyButton").style.display="";
+	}else if(GLOBAL.Analysis=='Advanced'){
+		document.getElementById("compareStepPathwaySelectionOKButton").style.display="";
+		document.getElementById("dataAssociationApplyButton").style.display="none";
+	}
 }
 
 function isProbesAggregationSupported(){
