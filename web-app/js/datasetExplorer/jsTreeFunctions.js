@@ -115,7 +115,7 @@ function drawHardcodedJQueryTree()
 
 
 
-function drawAcrossTrialTree_OLD()
+function drawAcrossTrialTree()
 {
 	//Create a toolbar that has a text field to search with and a context specific help link.
     var helpToolBar = new Ext.Toolbar([

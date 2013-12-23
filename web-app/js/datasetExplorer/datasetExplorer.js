@@ -2054,14 +2054,14 @@ function getPreviousQueriesComplete(response) {
 }
 
 
-function getCategoriesComplete_NEW(ontresponse) {
+function getCategoriesComplete(ontresponse) {
     getSubCategories('navigateTermsPanel', 'Navigate By Study', ontresponse);
     drawAcrossTrialTree();
     setActiveTab();
 }
 
 
-function getCategoriesComplete(ontresponse) {
+function getCategoriesComplete_OLD(ontresponse) {
 
     //ontTabPanel.add(ontFilterPanel);
     //ontFilterTree.dragZone.addToGroup("analysis");
@@ -2088,7 +2088,6 @@ function setActiveTab() {
     ontTabPanel.setActiveTab(activeTab);
 }
 
-
 /*If includeExcludeFlag is
  * -"include": Across Trials is the only concept included
  * -"exclude": Across Trials concept is the only concept excluded 
@@ -2096,7 +2095,7 @@ function setActiveTab() {
 function createTree(includeExcludeFlag, ontresponse) {
     // shorthand
     var Tree = Ext.tree;
-
+	
     var treeRoot = new Tree.TreeNode(
         {
             text: 'root',
@@ -2106,6 +2105,7 @@ function createTree(includeExcludeFlag, ontresponse) {
         }
     );
     for (var c = 0; c < ontresponse.length; c++) {
+		var level = ontresponse[c].level;
         var key = ontresponse[c].key;
         var name = ontresponse[c].name;
         var tooltip = ontresponse[c].tooltip;
@@ -2116,6 +2116,7 @@ function createTree(includeExcludeFlag, ontresponse) {
         // set the root node
         var autoExpand = false;
         if (GLOBAL.PathToExpand.indexOf(key) > -1) autoExpand = true;
+		 if(GLOBAL.PathToExpand != '' && GLOBAL.PathToExpand.indexOf(key) == -1) { continue; }
         var ontRoot = new Tree.AsyncTreeNode(
             {
                 text: name,
@@ -2148,7 +2149,6 @@ function createTree(includeExcludeFlag, ontresponse) {
     }
     return treeRoot;
 }
-
 
 /*
  * the id_in drives which off these tabs is created
@@ -2255,7 +2255,7 @@ function getSubCategories(id_in, title_in, ontresponse) {
 
     // ontTabPanel.add(ontSearchTermsPanel);
     ontTabPanel.doLayout();
-    ontTree.dragZone.addToGroup("analysis");
+ //   ontTree.dragZone.addToGroup("analysis");
     sizeNavigateTreePanel("navigateTermsPanel");
     /*if(GLOBAL.IsAdmin)
      {
@@ -4747,7 +4747,75 @@ function searchByTagBefore() {
     viewport.el.mask("Searching...")
     return true;
 }
-function searchByTagComplete(response) {
+
+function searchByTagComplete(response)
+{
+    // shorthand
+    var Tree = Ext.tree;
+ //   var treeRoot = Ext.getCmp('navigateTermsPanel').getRootNode();
+
+    viewport.el.unmask();
+    var concepts = response.searchResults; //Response is an array of concept paths
+    var uniqueLeaves = response.uniqueLeaves;
+
+    var length;
+    var leaf = false;
+    var draggable = false;
+/*
+    for(c = treeRoot.childNodes.length - 1;
+        c >= 0;
+        c -- )
+    {
+        treeRoot.childNodes[c].remove();
+    }
+*/
+    jQuery('#noAnalyzeResults').hide();
+
+    //Clear path to expand and unique leaves
+    GLOBAL.PathToExpand = '';
+    GLOBAL.UniqueLeaves = '';
+
+    if (GLOBAL.DefaultPathToExpand != "") {
+        GLOBAL.PathToExpand += GLOBAL.DefaultPathToExpand + ",";
+    }
+
+    if(concepts != undefined)
+    {
+        if(concepts.length < GLOBAL.MaxSearchResults)
+        {
+            length = concepts.length;
+        }
+        else
+        {
+            length = GLOBAL.MaxSearchResults;
+        }
+        for(var c = 0; c < length; c ++ )
+        {
+            //var newnode=getTreeNodeFromJSON(concepts[c])
+            GLOBAL.PathToExpand += concepts[c] + ",";
+            //treeRoot.appendChild(newnode);
+            //setTreeNodeSecurity(newnode, concepts[c].access);
+        }
+
+        for(var c = 0; c < uniqueLeaves.length; c++) {
+            GLOBAL.UniqueLeaves += uniqueLeaves[c] + ",";
+        }
+
+        if (concepts.length == 0) {
+            jQuery('#noAnalyzeResults').show();
+            Ext.getCmp('navigateTermsPanel').render();
+            onWindowResize();
+        }
+        else {
+            //Get the categories with the new path to expand
+            getCategories();
+        }
+
+    }
+}
+
+
+function searchByTagComplete2(response) {
     // shorthand
     var Tree = Ext.tree;
     //ontFilterPanel.el.unmask();

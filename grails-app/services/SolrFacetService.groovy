@@ -656,18 +656,20 @@ class SolrFacetService {
 			 
 	  String solrScheme = ConfigurationHolder.config.com.rwg.solr.scheme
 	  String solrHost = ConfigurationHolder.config.com.rwg.solr.host
+      int solrPort = Integer.parseInt(ConfigurationHolder.config.com.rwg.solr.port)
 	  String solrPath = ConfigurationHolder.config.com.rwg.solr.path
-	  String solrRequestUrl = new URI(solrScheme, solrHost, solrPath, "", "").toURL()
+      String solrRequestUrl = new URI(solrScheme, "", solrHost, solrPort, solrPath, "", "").toURL()
 	  
 	  return solrRequestUrl
   }
   
   def createSOLRUpdatePath = {
 	  
-		String solrScheme = ConfigurationHolder.config.com.rwg.solr.scheme
-		String solrHost = ConfigurationHolder.config.com.rwg.solr.host
-		String solrPath = ConfigurationHolder.config.com.rwg.solr.update.path
-		String solrRequestUrl = new URI(solrScheme, solrHost, solrPath, "", "").toURL()
+    String solrScheme = ConfigurationHolder.config.com.rwg.solr.scheme
+    String solrHost = ConfigurationHolder.config.com.rwg.solr.host
+    int solrPort = Integer.parseInt(ConfigurationHolder.config.com.rwg.solr.port)
+	String solrPath = ConfigurationHolder.config.com.rwg.solr.update.path
+    String solrRequestUrl = new URI(solrScheme, "", solrHost, solrPort, solrPath, "", "").toURL()
 		
 		return solrRequestUrl
   }
