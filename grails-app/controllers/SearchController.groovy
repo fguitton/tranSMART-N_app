@@ -40,6 +40,7 @@ import org.transmart.searchapp.SearchKeywordTerm
 
 import org.transmart.biomart.BioAssayAnalysis;
 import org.transmart.biomart.BioDataExternalCode
+import static java.util.UUID.randomUUID
 
 public class SearchController{
 	def sessionFactory

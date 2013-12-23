@@ -1026,6 +1026,7 @@ class RWGController {
 			   studyWithResultsFound = true
 		   
 			   Long expNumber= Long.parseLong(studyId)
+               //Long expNumber = 1087509
 
 			   def exp = Experiment.createCriteria()
 			   def experiment = exp.get	{

@@ -458,6 +458,8 @@ class TrialQueryService {
             analysisIds.add(analysisId)
         }
 
+        //analysisIds.add(1087626)
+        //analysisIds.add(7788842)
         return analysisIds
     }
 
