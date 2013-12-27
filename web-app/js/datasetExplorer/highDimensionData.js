@@ -274,8 +274,13 @@ function runQueryForSubsetidSingleSubset(callback, divId){
 
 function runQueryCompleteForSubsetId(result, callback)
 {
-	var numOfPatientsFound = result.responseXML.selectSingleNode("//set_size").firstChild.nodeValue;
-	var patientsetid = result.responseXML.selectSingleNode("//result_instance_id").firstChild.nodeValue;
+	//var numOfPatientsFound = result.responseXML.selectSingleNode("//set_size").firstChild.nodeValue;
+	//var patientsetid = result.responseXML.selectSingleNode("//result_instance_id").firstChild.nodeValue;
+
+    var mobj=result.responseText.evalJSON();
+    var numOfPatientsFound = mobj.setSize;
+    var patientsetid = mobj.id;
+
 	var currentSubsetId = patientsetid;
 	callback(currentSubsetId);
 
