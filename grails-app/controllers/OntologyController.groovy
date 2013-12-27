@@ -23,7 +23,6 @@ import grails.converters.*
 import org.json.*;
 import org.transmart.searchapp.AuthUser;
 
-
 class OntologyController {
 
     def index = { }
