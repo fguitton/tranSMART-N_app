@@ -2255,7 +2255,7 @@ function getSubCategories(id_in, title_in, ontresponse) {
 
     // ontTabPanel.add(ontSearchTermsPanel);
     ontTabPanel.doLayout();
- //   ontTree.dragZone.addToGroup("analysis");
+    ontTree.dragZone.addToGroup("analysis");
     sizeNavigateTreePanel("navigateTermsPanel");
     /*if(GLOBAL.IsAdmin)
      {

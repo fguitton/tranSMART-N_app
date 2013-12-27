@@ -5598,4 +5598,25 @@ return sb.toString();
         })
         return ls;
     }
+
+/**
+ * Gets whether a platform has associated VCF data
+ */
+    def boolean hasVCFData(String platform) {
+        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
+        String sqlt =
+            """
+		SELECT COUNT(*) FROM DE_GPL_INFO gpl
+		JOIN DE_SUBJECT_SAMPLE_MAPPING ssm
+		ON gpl.platform = ssm.platform
+		WHERE gpl.marker_type = 'NGS'
+		AND gpl.platform = ?
+		"""
+        def value = 0
+        sql.eachRow(sqlt, [platform], {row ->
+            value = row[0]
+        });
+        return (value > 0)
+    }
+
 }
