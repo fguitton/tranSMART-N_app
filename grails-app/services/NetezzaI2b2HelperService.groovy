@@ -461,28 +461,6 @@ class NetezzaI2b2HelperService {
     }*/
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /**
      *  Gets the count of a a patient set fromt he result instance id
      */

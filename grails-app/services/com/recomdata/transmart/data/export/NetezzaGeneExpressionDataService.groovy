@@ -19,21 +19,14 @@
 
 
 package com.recomdata.transmart.data.export
-
-import java.io.File
-import java.sql.ResultSetMetaData
-import java.util.List;
-import java.util.Map
-
+import com.recomdata.transmart.data.export.util.FileWriterUtil
 import org.apache.commons.lang.StringUtils
-import org.apache.commons.lang.math.NumberUtils;
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.rosuda.REngine.REXP
 import org.rosuda.REngine.Rserve.RConnection
-
 import org.transmart.searchapp.SearchKeyword
 
-import com.recomdata.transmart.data.export.util.FileWriterUtil
+import java.sql.ResultSetMetaData
 
 class NetezzaGeneExpressionDataService {
 
@@ -201,7 +194,7 @@ class NetezzaGeneExpressionDataService {
 
             //Include the tables we join on to get the unique_id.
             sTables.append("""
-			   INNER JOIN bio_marker bm ON bm.PRIMARY_EXTERNAL_ID = b.GENE_ID::varchar
+			   INNER JOIN bio_marker bm ON bm.PRIMARY_EXTERNAL_ID = cast(b.GENE_ID as varchar(15))
 			   INNER JOIN bio_marker_correl_mv sbm ON sbm.asso_bio_marker_id = bm.bio_marker_id
 			   INNER JOIN search_keyword sk ON sk.bio_data_id = sbm.bio_marker_id
 		   """)
@@ -217,7 +210,7 @@ class NetezzaGeneExpressionDataService {
 
             //Include the tables we join on to filter by the pathway.
             sTables.append("""
-		   INNER JOIN bio_marker bm ON bm.PRIMARY_EXTERNAL_ID = b.GENE_ID::varchar
+		   INNER JOIN bio_marker bm ON bm.PRIMARY_EXTERNAL_ID = cast(b.GENE_ID as varchar(15))
 		   INNER JOIN SEARCHAPP.SEARCH_BIO_MKR_CORREL_VIEW sbm ON sbm.asso_bio_marker_id = bm.bio_marker_id
 		   INNER JOIN search_keyword sk ON sk.bio_data_id = sbm.domain_object_id
 		   """)
@@ -581,7 +574,7 @@ class NetezzaGeneExpressionDataService {
                     metaData.getColumnName(i).toUpperCase(Locale.ENGLISH), i);
         }
 
-        def rawIntensityRSIdx = nameIndexMap.get("RAW_INTENSITY");
+        def rawIntensityRSIdx = 8;
         def zScoreRSIdx = nameIndexMap.get("ZSCORE");
         def ptIDIdx = nameIndexMap.get("PATIENT_ID");
         def sourceSystemCodeIdx = nameIndexMap.get("SOURCESYSTEM_CD")

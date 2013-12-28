@@ -19,26 +19,18 @@
 
 
 package com.recomdata.transmart.data.export
-
-import java.io.File
-import java.sql.Clob
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.HashMap
-import java.util.List
-import java.util.Map
-
+import com.recomdata.snp.SnpDataObject
+import com.recomdata.transmart.data.export.util.FileWriterUtil
 import org.apache.commons.lang.StringUtils
-import org.apache.commons.logging.LogFactory
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.rosuda.REngine.REXP
 import org.rosuda.REngine.Rserve.RConnection
+import org.transmart.searchapp.SearchKeyword
 
-import org.transmart.searchapp.SearchKeyword;
-
-import com.recomdata.snp.SnpDataObject;
-import com.recomdata.transmart.data.export.util.FileWriterUtil
+import java.sql.Clob
+import java.sql.Connection
+import java.sql.PreparedStatement
+import java.sql.ResultSet
 
 class NetezzaSnpDataService {
 
@@ -477,7 +469,7 @@ class NetezzaSnpDataService {
 							LEFT JOIN DE_SNP_CALLS_BY_GSM SNP_GENO ON DSM.OMIC_PATIENT_ID = SNP_GENO.PATIENT_NUM AND DSM.SAMPLE_CD = SNP_GENO.GSM_NUM
 							LEFT JOIN DE_SNP_COPY_NUMBER SNP_COPY ON DSM.OMIC_PATIENT_ID = SNP_COPY.PATIENT_NUM AND SNP_GENO.snp_name = SNP_COPY.snp_name
 							INNER JOIN DE_SNP_GENE_MAP D2 ON D2.SNP_NAME = SNP_GENO.SNP_NAME
-							INNER JOIN bio_marker bm ON bm.PRIMARY_EXTERNAL_ID = to_char(D2.ENTREZ_GENE_ID)
+							INNER JOIN bio_marker bm ON bm.PRIMARY_EXTERNAL_ID = cast(D2.ENTREZ_GENE_ID as varchar(15))
 						""")
 
         //If a list of genes was entered, look up the gene ids and add them to the query. If a gene signature or list was supplied then we modify the query to join on the tables that link the list to the gene ids.
