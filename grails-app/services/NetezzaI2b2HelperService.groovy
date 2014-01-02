@@ -589,7 +589,7 @@ class NetezzaI2b2HelperService {
      * Gets the distribution of data for a concept
      */
     def HashMap<String,Integer> getConceptDistributionDataForConceptOld(String concept_key, String result_instance_id) throws SQLException {
-        String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length()).replaceAll((/\\${''}/), "\\\\\\\\");
+        String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length());
         HashMap<String,Integer> results = new LinkedHashMap<String, Integer>();
         int i=getLevelFromKey(concept_key)+1;
 
@@ -621,7 +621,7 @@ class NetezzaI2b2HelperService {
      */
     def  HashMap<String,Integer> getConceptDistributionDataForConcept(String concept_key, String result_instance_id) throws SQLException {
 //        String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length()).replaceAll((/\\${''}/), "\\\\\\\\");
-        String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length())
+        String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length());
         HashMap<String,Integer> results = new LinkedHashMap<String, Integer>();
 
         // check to see if there is a mapping from this concept_key to a concept_key for the results
@@ -775,7 +775,7 @@ class NetezzaI2b2HelperService {
      *  Returns the patient count for a concept key
      */
     def  Integer getPatientCountForConcept(String concept_key) {
-        String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length()).replaceAll((/\\${''}/), "\\\\\\\\");
+        String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length());
         int i=0;
         groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
         String sqlt = """select count (distinct patient_num) as patcount
@@ -794,12 +794,12 @@ class NetezzaI2b2HelperService {
      */
     def Integer getObservationCountForConceptForSubset(String concept_key, String result_instance_id) {
         log.trace("Getting observation count for concept:"+concept_key+" and instance:"+result_instance_id);
-        String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length()).replaceAll((/\\${''}/), "\\\\\\\\");
-        int i=0;
+        String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length());
+       int i=0;
         groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
         String sqlt = """select count (*) as obscount FROM i2b2demodata.observation_fact
 		    WHERE (((concept_cd IN (select concept_cd from i2b2demodata.concept_dimension c
-			where concept_path LIKE ?)))) AND PATIENT_NUM IN (select distinct patient_num from qt_patient_set_collection where result_instance_id = CAST(? AS numeric))""";
+			where concept_path LIKE ?  ESCAPE '@')))) AND PATIENT_NUM IN (select distinct patient_num from qt_patient_set_collection where result_instance_id = CAST(? AS numeric))""";
         sql.eachRow(sqlt, [
                 fullname+"%",
                 result_instance_id
@@ -1336,7 +1336,7 @@ class NetezzaI2b2HelperService {
         //String slash="\\";
         //logMessage("Here is slash: "+slash);
 
-        String path=key.substring(key.indexOf("\\",2), key.length()).replaceAll((/\\${''}/), "\\\\\\\\");
+        String path=key.substring(key.indexOf("\\",2), key.length());//replaceAll((/\\${''}/), "\\\\\\\\");
         //path=path.replace("@", slash);
         StringBuilder concepts = new StringBuilder();
 
@@ -1358,7 +1358,7 @@ class NetezzaI2b2HelperService {
         //String slash="\\";
         //logMessage("Here is slash: "+slash);
 
-        String path=key.substring(key.indexOf("\\",2), key.length()).replaceAll((/\\${''}/), "\\\\\\\\");
+        String path=key.substring(key.indexOf("\\",2), key.length());//replaceAll((/\\${''}/), "\\\\\\\\");
         //path=path.replace("@", slash);
         List<String> concepts = new ArrayList<String>();
 
@@ -4408,7 +4408,7 @@ class NetezzaI2b2HelperService {
     def getChildrenWithAccessForUser(String concept_key, AuthUser user) {
         def List<String> children=getChildPathsFromParentKey(concept_key)
         def access = [:]
-        def path=keyToPath(concept_key).replaceAll((/\\${''}/), "\\\\\\\\");
+        def path=keyToPath(concept_key);//replaceAll((/\\${''}/), "\\\\\\\\");
 
         //1)put all the children into the access list with default unlocked
         for(e in children)
@@ -4775,7 +4775,7 @@ class NetezzaI2b2HelperService {
     def  getChildPathsWithTokensFromParentKey(String concept_key) {
         String prefix=concept_key.substring(0, concept_key.indexOf("\\",2)); //get the prefix to put on to the fullname to make a key
 //        String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length()).replaceAll((/\\${''}/), "\\\\\\\\");
-        String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length())//.replaceAll((/\\${''}/), "\\\\\\\\");
+        String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length());//replaceAll((/\\${''}/), "\\\\\\\\");
 
         String xml;
         def ls=[:];
