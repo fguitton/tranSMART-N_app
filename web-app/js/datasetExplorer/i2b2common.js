@@ -325,12 +325,7 @@ var li=document.createElement('div'); //was li
 	new Ext.ToolTip({ target:li, html:key, dismissDelay:10000 });
 	invalidateSubset(subset);
 	return li;
-}	
-
-
-
-
-
+}
 
 function getSetValueText(mode, operator, highlowselect, highvalue, lowvalue, units)
 {
@@ -401,6 +396,7 @@ function resetQuery()
 	}
 	hideCriteriaGroups();
 }
+
 function resetSelected()
 {
 	for(var s=1;s<=GLOBAL.NumOfSubsets;s++)
@@ -420,10 +416,6 @@ function clearSelected(subset, panel)
   		sdiv.dom.childNodes[i].className="conceptUnselected";
 	}
 }
-
-
-
-
 
 function clearGroup(subset, panel)
 {
@@ -501,7 +493,6 @@ function conceptRightClick(event)
                                         GLOBAL.CurrentSubsetIDs[1]=null;
                                         GLOBAL.CurrentSubsetIDs[2]=null;
                                         GLOBAL.AnalysisHasBeenRun = false;
-
 										}
 	},{id: 'setvaluemenu', text: 'Set Value', handler:function(){showSetValueDialog();}},
 	{
@@ -612,6 +603,106 @@ if(STATE.Dragging==true){
 	STATE.Dragging=false;
 	moveSelectedConceptFromHoldingToTarget();
 	}
+}
+
+function showSetRegionDialog()
+{		
+		var conceptnode=selectedConcept; //not dragging so selected concept is what im updating
+        setregionwin.show(viewport);
+        
+		jQuery('#filterGeneRange').val('');
+		jQuery('#filterGeneBasePairs').val('');
+		jQuery('#filterGeneUse').val('');
+		jQuery('#filterChromosomeRange').val('');
+		jQuery('#filterChromosomeBasePairs').val('');
+		jQuery('#filterChromosomeUse').val('');
+		jQuery('#filterChromosomeNumber').val('');
+		jQuery('#filterChromosomePosition').val('');
+		jQuery('#filterInclusionCriteriaMutant').attr('checked', 'checked');
+		jQuery('[name=\'regionFilter\'][value=\'gene\']').attr('checked', 'checked');
+		changeField('filterGeneId-combobox', 'filterGeneId');
+}
+
+
+function setRegionDialogComplete(regionData)
+{
+var conceptnode=selectedConcept;
+setRegion(conceptnode, regionData);
+if(STATE.Dragging==true){
+	STATE.Dragging=false;
+	moveSelectedConceptFromHoldingToTarget();
+	}
+}
+
+function setRegion(conceptnode, regionData)
+{
+	conceptnode.setAttribute('setregionmode', regionData.mode);
+	conceptnode.setAttribute('setregionrange', regionData.range);
+	conceptnode.setAttribute('setregionbasepairs', regionData.basePairs);
+	conceptnode.setAttribute('setregiongeneid', regionData.geneId);
+	conceptnode.setAttribute('setregiongenename', regionData.geneName);
+	conceptnode.setAttribute('setregionchromosome', regionData.chromosome);
+	conceptnode.setAttribute('setregionposition', regionData.position);
+	conceptnode.setAttribute('setregionversion', regionData.use);
+	conceptnode.setAttribute('setregioninclusioncriteria', regionData.inclusionCriteria);
+	var regiontext="";
+	regiontext=getSetRegionText(regionData);
+	conceptnode.setAttribute('conceptsetregiontext', regiontext);
+	var conceptshortname=conceptnode.getAttribute("conceptshortname");
+	//alert(conceptshortname+" "+valuetext);
+	Ext.get(conceptnode.id).update(conceptshortname+" "+regiontext);
+	//conceptnode.update(conceptshortname+" "+valuetext);
+	var subset=getSubsetFromPanel(conceptnode.parentNode);
+	invalidateSubset(subset);
+}
+
+function getRegionParams(subset)
+{
+	var result = new Array();
+	
+	for (var i = 1; i <= GLOBAL.NumOfQueryCriteriaGroups;i++) {
+		var div = Ext.get("queryCriteriaDiv" + subset +  '_' + i.toString());
+		for(var j = 0; j < div.dom.childNodes.length; j++) {
+			var el = div.dom.childNodes[j];
+			if (el.getAttribute('setregionmode') != null) {
+				result[result.length] = {
+						mode: el.getAttribute('setregionmode'),
+						range: el.getAttribute('setregionrange'),
+						basepairs: el.getAttribute('setregionbasepairs'),
+						geneid: el.getAttribute('setregiongeneid'),
+						genename: el.getAttribute('setregiongenename'),
+						chromosome: el.getAttribute('setregionchromosome'),
+						position: el.getAttribute('setregionposition'),
+						version: el.getAttribute('setregionversion'),
+						inclusionCriteria: el.getAttribute('setregioninclusioncriteria')
+					};
+			}
+		}
+	}
+	
+	return result;
+	
+}
+
+function getSetRegionText(regionData) {
+	var regionString = '';
+	var range;
+	if (regionData.range == 'both') {
+		range = '+/-';
+	}
+	else if (regionData.range == 'plus') {
+		range = '+';
+	}
+	else {
+		range = '-';
+	}
+	if (regionData.mode == 'gene') {
+		regionString += 'Gene: ' + regionData.geneName + ' ' + range + ' ' + regionData.basePairs + ' base pairs (HG' + regionData.use + '): ' + regionData.inclusionCriteria;
+	}
+	else {
+		regionString += 'Chromosome: ' + regionData.chromosome + ', ' + regionData.position + ' ' + range + ' ' + regionData.basePairs + ' base pairs (HG' + regionData.use + '): ' + regionData.inclusionCriteria;
+	}
+	return regionString;
 }
 
 function moveSelectedConceptFromHoldingToTarget()
