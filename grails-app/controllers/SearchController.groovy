@@ -87,7 +87,8 @@ public class SearchController{
 		def keywords = new LinkedHashSet()
 		// don't execute query if category is All and the term is empty
 		if (!("ALL".equals(category) && values.length() == 0)) {
-			def queryStr = "SELECT distinct t.searchKeyword, t.keywordTerm, t.rank, t.termLength FROM org.transmart.searchapp.SearchKeywordTerm t WHERE t.keywordTerm LIKE :term || '%' "
+//			def queryStr = "SELECT distinct t.searchKeyword, t.keywordTerm, t.rank, t.termLength FROM org.transmart.searchapp.SearchKeywordTerm t WHERE t.keywordTerm LIKE :term || '%' "
+			def queryStr = "SELECT distinct t.searchKeyword, t.keywordTerm, t.rank, t.termLength FROM org.transmart.searchapp.SearchKeywordTerm t WHERE t.keywordTerm = upper(:term) "
 			def queryParams = ["term":values]
 			// filter by category if specified
 			if (!"ALL".equals(category)) {
