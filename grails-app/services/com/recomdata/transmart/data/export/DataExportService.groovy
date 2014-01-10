@@ -19,15 +19,10 @@
   
 
 package com.recomdata.transmart.data.export
-
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.Callable;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.recomdata.snp.SnpData;
-import com.recomdata.transmart.data.export.exception.DataNotFoundException;
+import com.recomdata.snp.SnpData
+import com.recomdata.transmart.data.export.exception.DataNotFoundException
+import org.apache.commons.lang.StringUtils
+import org.springframework.transaction.annotation.Transactional
 
 class DataExportService {
 
@@ -174,7 +169,8 @@ class DataExportService {
 								//This is the exact path of the file to write.
 								def fileLocation = jobTmpDirectory + File.separator + "subset1_${study}" + File.separator + "SNP" + File.separator + "snp.trans"
 								//Call our service which writes the SNP data to a file.
-								Boolean gotData = snpDataService.getSnpDataByResultInstanceAndGene(resultInstanceIdMap[subset],study,pathway,sampleType,timepoint,tissueType,snpData, fileLocation,true,true)
+								//Boolean gotData = snpDataService.getSnpDataByResultInstanceAndGene(resultInstanceIdMap[subset],study,pathway,sampleType,timepoint,tissueType,snpData, fileLocation,true,true)
+								Boolean gotData = snpDataService.getSnpDataByResultInstanceAndGene(resultInstanceIdMap[subset],study,pathway,sampleType,timepoint,tissueType,snpData, fileLocation,true,true, jobDataMap.get("jobName"))
 								if(jobDataMap.get("analysis") != "DataExport") {
 									//if SNPDataService was not able to find data throw an exception.
 									if(!gotData) {

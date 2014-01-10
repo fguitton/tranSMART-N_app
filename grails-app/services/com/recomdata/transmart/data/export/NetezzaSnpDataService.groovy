@@ -431,7 +431,13 @@ class NetezzaSnpDataService {
     //This tells us whether we need to include the pathway information or not.
     private Boolean includePathwayInfo = false
 
+
     def getSnpDataByResultInstanceAndGene(resultInstanceId,study,pathway,sampleType,timepoint,tissueType,rowProcessor,fileLocation,genotype,copyNumber)
+    {
+        getSnpDataByResultInstanceAndGene(resultInstanceId,study,pathway,sampleType,timepoint,tissueType,rowProcessor,fileLocation,genotype,copyNumber,"")
+    }
+
+    def getSnpDataByResultInstanceAndGene(resultInstanceId,study,pathway,sampleType,timepoint,tissueType,rowProcessor,fileLocation,genotype,copyNumber,jobName)
     {
         //This boolean tells us whether we retrieved data or not.
         Boolean retrievedData = false;
@@ -551,6 +557,13 @@ class NetezzaSnpDataService {
             }catch(Exception exs){
                 log.warn("com.recomdata.plugins.resultSize is not set!");
             }
+        }
+
+        // added to create clinical data view for nzr  by HX  01/10/2014
+        if(!jobName.equals(null) || jobName.size() > 0){
+            String tableName = jobName.replaceAll("-", "_") + "_SNP"
+            groovy.sql.Sql nzrSql = utilService.getNetezzaConnection()
+            nzrSql.execute("create table " + tableName + " as " + sSelect.toString(), [resultInstanceId, study])
         }
 
         //Prepare the SQL statement.
