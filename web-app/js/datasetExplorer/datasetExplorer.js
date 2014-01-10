@@ -466,157 +466,157 @@ Ext.onReady(function () {
 
 
         var tb2 = new Ext.Toolbar(
-        {
-            id: 'maintoolbar',
+            {
+                id: 'maintoolbar',
                 title: 'maintoolbar',
-            items: [
-            /*   new Ext.Toolbar.Button(
-             {
-             id: 'generatesubsetsbutton',
-             text: 'Generate Summary Statistics',
-             iconCls: 'runbutton',
-             disabled: false,
-             handler: function () {
-             // alert('generate');
-             GLOBAL.CurrentSubsetIDs[1] = null;
-             GLOBAL.CurrentSubsetIDs[2] = null;
-             runAllQueries(getSummaryStatistics);
+                items: [
+                    /*   new Ext.Toolbar.Button(
+                     {
+                     id: 'generatesubsetsbutton',
+                     text: 'Generate Summary Statistics',
+                     iconCls: 'runbutton',
+                     disabled: false,
+                     handler: function () {
+                     // alert('generate');
+                     GLOBAL.CurrentSubsetIDs[1] = null;
+                     GLOBAL.CurrentSubsetIDs[2] = null;
+                     runAllQueries(getSummaryStatistics);
 
-             }
-             }
-             ),
-             new Ext.Toolbar.Separator(),
-             new Ext.Toolbar.Button(
-             {
-             id: 'showquerysummarybutton',
-             text: 'Summary',
-             iconCls: 'summarybutton',
-             disabled: false,
-             handler: function () {
-             // alert('clear');
-             showQuerySummaryWindow();
-             }
-             }
-             ),
+                     }
+                     }
+                     ),
+                     new Ext.Toolbar.Separator(),
+                     new Ext.Toolbar.Button(
+                     {
+                     id: 'showquerysummarybutton',
+                     text: 'Summary',
+                     iconCls: 'summarybutton',
+                     disabled: false,
+                     handler: function () {
+                     // alert('clear');
+                     showQuerySummaryWindow();
+                     }
+                     }
+                     ),
 
-             new Ext.Toolbar.Separator(),
-             new Ext.Toolbar.Button(
-             {
-             id: 'advancedbutton',
-             text: 'Advanced',
-             iconCls: 'comparebutton',
-             hidden: GLOBAL.EnableGP != 'true',
-             menu: advmenu,
-             handler: function () {
-             // alert('compare');
-             // showCompareStepPathwaySelection();
-             }
-             }
-             ),
+                     new Ext.Toolbar.Separator(),
+                     new Ext.Toolbar.Button(
+                     {
+                     id: 'advancedbutton',
+                     text: 'Advanced',
+                     iconCls: 'comparebutton',
+                     hidden: GLOBAL.EnableGP != 'true',
+                     menu: advmenu,
+                     handler: function () {
+                     // alert('compare');
+                     // showCompareStepPathwaySelection();
+                     }
+                     }
+                     ),
 
-             new Ext.Toolbar.Separator(),
-             new Ext.Toolbar.Button(
-             {
-             id: 'clearsubsetsbutton',
-             text: 'Clear',
-             iconCls: 'clearbutton',
-             disabled: false,
-             handler: function () {
-             if (confirm("Are you sure you want to clear your current analysis?")) {
-             clearAnalysisPanel();
-             resetQuery();
-             clearDataAssociation();
-             }
-             // clearGrid(); blah
-             }
-             }
-             ),
-             new Ext.Toolbar.Separator(),
-             new Ext.Toolbar.Button(
-             {
-             id: 'savecomparsionbutton',
-             text: 'Save',
-             iconCls: 'savebutton',
-             disabled: false,
-             handler: function () {
-             if (isSubsetEmpty(1) && isSubsetEmpty(2)) {
-             alert('Empty subsets found, need at least 1 valid subset to save a comparsion');
-             return;
-             }
-             if ((GLOBAL.CurrentSubsetIDs[1] == null && !isSubsetEmpty(1)) || (GLOBAL.CurrentSubsetIDs[2] == null && !isSubsetEmpty(2))) {
-             runAllQueries(function () {
-             saveComparison();
-             });
-             }
-             else {
-             saveComparison();
-             }
-             return;
-             }
-             }
-             ),
-             new Ext.Toolbar.Separator(),
-             new Ext.Toolbar.Button(
-             {
-             id: 'savesubsetsbutton',
-             text: 'Save Subsets',
-             iconCls: 'savebutton',
-             disabled: false,
-             handler: function () {
-             if (isSubsetEmpty(1) && isSubsetEmpty(2)) {
-             alert('Empty subsets found, need at least 1 valid subset to save a comparsion');
-             return;
-             }
-             else {
-             showSaveSubsetsDialog();
-             }
-             }
-             }
-             ),
-             '->',
-             new Ext.Toolbar.Separator(),
-             new Ext.Toolbar.Button({
-             id: 'exportbutton',
-             text: 'Export',
-             iconCls: 'exportbutton',
-             disabled: false,
-             menu: expmenu,
-             handler: function () {
-             // alert('export');
-             // showExportStepSplitTimeSeries();
-             // if((typeof(grid)!='undefined') && (grid!=null)){exportGrid();}
-             // else {alert("Nothing to export");}
-             }}),
-             new Ext.Toolbar.Separator(),
-             new Ext.Toolbar.Button(
-             {
-             id: 'printanalysisbutton',
-             text: 'Print',
-             iconCls: 'printbutton',
-             disabled: false,
-             handler: function () {
-             // alert('print');
-             // analysisPanel.iframe.print();
-             var text = getAnalysisPanelContent();
-             printPreview(text);
-             }
-             }
-             ),
-             new Ext.Toolbar.Separator(),
-             */
-            new Ext.Toolbar.Button(
-                {
-                    id: 'dataExplorerHelpButton',
-                    iconCls: 'contextHelpBtn',
-                    qtip: 'Click for Dataset Explorer Help',
-                    disabled: false,
-                    handler: function () {
-                        D2H_ShowHelp("1258", helpURL, "wndExternal", CTXT_DISPLAY_FULLHELP);
-                    }
-                }
-            )
-        ]
-        }
+                     new Ext.Toolbar.Separator(),
+                     new Ext.Toolbar.Button(
+                     {
+                     id: 'clearsubsetsbutton',
+                     text: 'Clear',
+                     iconCls: 'clearbutton',
+                     disabled: false,
+                     handler: function () {
+                     if (confirm("Are you sure you want to clear your current analysis?")) {
+                     clearAnalysisPanel();
+                     resetQuery();
+                     clearDataAssociation();
+                     }
+                     // clearGrid(); blah
+                     }
+                     }
+                     ),
+                     new Ext.Toolbar.Separator(),
+                     new Ext.Toolbar.Button(
+                     {
+                     id: 'savecomparsionbutton',
+                     text: 'Save',
+                     iconCls: 'savebutton',
+                     disabled: false,
+                     handler: function () {
+                     if (isSubsetEmpty(1) && isSubsetEmpty(2)) {
+                     alert('Empty subsets found, need at least 1 valid subset to save a comparsion');
+                     return;
+                     }
+                     if ((GLOBAL.CurrentSubsetIDs[1] == null && !isSubsetEmpty(1)) || (GLOBAL.CurrentSubsetIDs[2] == null && !isSubsetEmpty(2))) {
+                     runAllQueries(function () {
+                     saveComparison();
+                     });
+                     }
+                     else {
+                     saveComparison();
+                     }
+                     return;
+                     }
+                     }
+                     ),
+                     new Ext.Toolbar.Separator(),
+                     new Ext.Toolbar.Button(
+                     {
+                     id: 'savesubsetsbutton',
+                     text: 'Save Subsets',
+                     iconCls: 'savebutton',
+                     disabled: false,
+                     handler: function () {
+                     if (isSubsetEmpty(1) && isSubsetEmpty(2)) {
+                     alert('Empty subsets found, need at least 1 valid subset to save a comparsion');
+                     return;
+                     }
+                     else {
+                     showSaveSubsetsDialog();
+                     }
+                     }
+                     }
+                     ),
+                     '->',
+                     new Ext.Toolbar.Separator(),
+                     new Ext.Toolbar.Button({
+                     id: 'exportbutton',
+                     text: 'Export',
+                     iconCls: 'exportbutton',
+                     disabled: false,
+                     menu: expmenu,
+                     handler: function () {
+                     // alert('export');
+                     // showExportStepSplitTimeSeries();
+                     // if((typeof(grid)!='undefined') && (grid!=null)){exportGrid();}
+                     // else {alert("Nothing to export");}
+                     }}),
+                     new Ext.Toolbar.Separator(),
+                     new Ext.Toolbar.Button(
+                     {
+                     id: 'printanalysisbutton',
+                     text: 'Print',
+                     iconCls: 'printbutton',
+                     disabled: false,
+                     handler: function () {
+                     // alert('print');
+                     // analysisPanel.iframe.print();
+                     var text = getAnalysisPanelContent();
+                     printPreview(text);
+                     }
+                     }
+                     ),
+                     new Ext.Toolbar.Separator(),
+                     */
+                    new Ext.Toolbar.Button(
+                        {
+                            id: 'dataExplorerHelpButton',
+                            iconCls: 'contextHelpBtn',
+                            qtip: 'Click for Dataset Explorer Help',
+                            disabled: false,
+                            handler: function () {
+                                D2H_ShowHelp("1258", helpURL, "wndExternal", CTXT_DISPLAY_FULLHELP);
+                            }
+                        }
+                    )
+                ]
+            }
         );
 
 
@@ -826,7 +826,7 @@ Ext.onReady(function () {
 
         /*
          * Commented out the Jobs panel to hide as it isn't used without Gene Pattern
-         * 
+         *
          * analysisJobsPanel = new Ext.Panel(
          {
          id : 'analysisJobsPanel',
@@ -845,7 +845,7 @@ Ext.onReady(function () {
          //resultsTabPanel.tools['help help-resana-panel'].dom.style.display="none";
          }
          },
-         collapsible : true						
+         collapsible : true
          }
          );*/
 
@@ -913,7 +913,7 @@ Ext.onReady(function () {
                  Ext.Msg.alert('Analysis required!!!', 'Please select an Analysis from the \'Analysis\' menu.')
                  }
                  }
-                 }      	
+                 }
                  }],
                  buttonAlign:'center',*/
                 listeners: {
@@ -1220,7 +1220,7 @@ Ext.onReady(function () {
 
                                 if (!isSubsetEmpty(subset)) {
 
-                                    //AccrossTrial Changes 
+                                    //AccrossTrial Changes
                                     if (GLOBAL.codeType == "Modifier") {
                                         runQueryAcrossTrial(subset, showConceptDistributionHistogramForSubset);
                                     }
@@ -1679,9 +1679,9 @@ function createOntPanel() {
     // ontTabPanel.add(ontSearchByCodePanel);
 
     //Create a panel to hold the search criteria
-   westPanel.add(searchPanel);
+    westPanel.add(searchPanel);
 
-//    setupOntTree('navigateTermsPanel', 'Navigate By Study');
+    setupOntTree('navigateTermsPanel', 'Navigate By Study');
 
     return ontTabPanel;
 }
@@ -2088,181 +2088,7 @@ function setActiveTab() {
     ontTabPanel.setActiveTab(activeTab);
 }
 
-/*If includeExcludeFlag is
- * -"include": Across Trials is the only concept included
- * -"exclude": Across Trials concept is the only concept excluded 
- */
-function createTree(includeExcludeFlag, ontresponse) {
-    // shorthand
-    var Tree = Ext.tree;
-	
-    var treeRoot = new Tree.TreeNode(
-        {
-            text: 'root',
-            draggable: false,
-            id: 'root',
-            qtip: 'root'
-        }
-    );
-    for (var c = 0; c < ontresponse.length; c++) {
-		var level = ontresponse[c].level;
-        var key = ontresponse[c].key;
-        var name = ontresponse[c].name;
-        var tooltip = ontresponse[c].tooltip;
-        var dimcode = ontresponse[c].dimcode;
 
-        if (includeExcludeFlag === "include" && name !== "Across Trials") continue;
-        if (includeExcludeFlag === "exclude" && name === "Across Trials") continue;
-        // set the root node
-        var autoExpand = false;
-        if (GLOBAL.PathToExpand.indexOf(key) > -1) autoExpand = true;
-		 if(GLOBAL.PathToExpand != '' && GLOBAL.PathToExpand.indexOf(key) == -1) { continue; }
-        var ontRoot = new Tree.AsyncTreeNode(
-            {
-                text: name,
-                draggable: false,
-                id: key,
-                qtip: tooltip,
-                expanded: autoExpand
-            }
-        );
-
-        treeRoot.appendChild(ontRoot);
-        /*****************************************/
-        var fullname = key.substr(key.indexOf("\\", 2), key.length);
-        var access = GLOBAL.InitialSecurity[fullname];
-
-        if ((access != undefined && access != 'Locked') || GLOBAL.IsAdmin) //if im an admin or there is an access level other than locked leave node unlocked
-        {
-            //leave node unlocked must have some read access
-        }
-        else {
-            //default node to locked
-            //child.setText(child.text+" <b>Locked</b>");
-            ontRoot.attributes.access = 'locked';
-            ontRoot.disable();
-            ontRoot.on('beforeload', function (node) {
-                alert("Access to this node has been restricted. Please contact your administrator for access.");
-                return false
-            });
-        }
-    }
-    return treeRoot;
-}
-
-/*
- * the id_in drives which off these tabs is created
- * 
- */
-function getSubCategories(id_in, title_in, ontresponse) {
-    // shorthand
-    var Tree = Ext.tree;
-
-    var treeRoot;
-
-    var showFn;
-
-    if (id_in === 'crossTrialsPanel') {
-        showFn = function (node, e) {
-            Ext.tree.TreePanel.superclass.onShow.call(this);
-            //Ext.get('advancedbutton').dom.style.display='none';
-        }
-        treeRoot = createTree('include', ontresponse);
-    } else {
-        showFn = function (node, e) {
-            Ext.tree.TreePanel.superclass.onShow.call(this);
-            //Ext.get('advancedbutton').dom.style.display='';
-        }
-        treeRoot = createTree('exclude', ontresponse);
-    }
-
-    var toolbar = new Ext.Toolbar([
-        {
-            id: 'contextHelp-button',
-            handler: function (event, toolEl, panel) {
-                D2H_ShowHelp((id_in == "navigateTermsPanel") ? "1066" : "1091", helpURL, "wndExternal", CTXT_DISPLAY_FULLHELP);
-            },
-            iconCls: "contextHelpBtn"
-        }
-    ]);
-
-    var ontTree = new Tree.TreePanel(
-        {
-            id: id_in,
-            title: title_in,
-            animate: false,
-            autoScroll: true,
-            loader: new Ext.ux.OntologyTreeLoader(
-                {
-                    dataUrl: 'none'
-                }
-            ),
-            enableDrag: true,
-            ddGroup: 'makeQuery',
-            containerScroll: true,
-            enableDrop: false,
-            region: 'center',
-            rootVisible: false,
-            expanded: true,
-            onShow: showFn,
-
-            listeners: {
-                activate: function (p) {
-
-                    sizeNavigateTreePanel("navigateTermsPanel");
-
-                    $j(window).resize(function () {
-                        ontTabPanel.doLayout();
-                        sizeNavigateTreePanel("navigateTermsPanel");
-                    });
-
-                }
-            }
-        }
-    );
-
-    ontTree.on('startdrag', function (panel, node, event) {
-            Ext.ux.ManagedIFrame.Manager.showShims()
-
-        }
-    );
-
-    ontTree.on('enddrag', function (panel, node, event) {
-            Ext.ux.ManagedIFrame.Manager.hideShims()
-
-        }
-    );
-
-
-    // add a tree sorter in folder mode
-    new Tree.TreeSorter(ontTree,
-        {
-            folderSort: true
-        }
-    );
-    ontTree.setRootNode(treeRoot);
-    ontTree.add(toolbar);
-    ontTabPanel.add(ontTree);
-    /*if(GLOBAL.IsAdmin)
-     {
-     ontTabPanel.add(searchByNamePanel);
-     ontTabPanel.setActiveTab('searchByNamePanel');
-     }*/
-
-    if (GLOBAL.Debug) {
-        alert(ontresponse.responseText);
-    }
-
-    // ontTabPanel.add(ontSearchTermsPanel);
-    ontTabPanel.doLayout();
-    ontTree.dragZone.addToGroup("analysis");
-    sizeNavigateTreePanel("navigateTermsPanel");
-    /*if(GLOBAL.IsAdmin)
-     {
-     searchByNameTree.dragZone.addToGroup("analysis");
-     }*/
-
-}
 
 //Setup the navigate tree for scrolling. We need to wrap the UL element in a DIV and setup scrolling and height
 function sizeNavigateTreePanel(panelId) {
@@ -2660,7 +2486,7 @@ function showConceptInfoDialog(conceptKey, conceptid, conceptcomment) {
         //url: pageInfo.basePath+"/trial/trialDetailByTrialNumber",
         url: pageInfo.basePath + "/ontology/showConceptDefinition",
         //params: {id: conceptcomment.substring(6,conceptcomment.length), conceptType: conceptType}, // or a URL encoded string
-        params: {conceptKey: conceptKey}, // or a URL encoded string		
+        params: {conceptKey: conceptKey}, // or a URL encoded string
         //callback: yourFunction,
         //scope: yourObject, // optional scope for the callback
         discardUrl: true,
@@ -3868,7 +3694,7 @@ function showGwas() {
     }
 
     genePatternReplacement();
-    /*Ext.Ajax.request({						
+    /*Ext.Ajax.request({
      url: pageInfo.basePath+"/asyncJob/createnewjob",
      method: 'POST',
      success: function(result, request){
@@ -3889,10 +3715,10 @@ function runGwas(result, result_instance_id1, result_instance_id2, querySummary1
     var jobName = jobNameInfo.jobName;
 
     genePatternReplacement();
-    /*showJobStatusWindow(result);	
+    /*showJobStatusWindow(result);
 
      Ext.Ajax.request(
-     {						
+     {
      url: pageInfo.basePath+"/genePattern/runGwas",
      method: 'POST',
      timeout: '1800000',
@@ -4067,7 +3893,7 @@ function jsonToDataTable(jsontext) {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 // START: Advanced Heatmap Workflow methods
-// Called from Run Workflow button in the Heatmap Validation window 
+// Called from Run Workflow button in the Heatmap Validation window
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 // Once, we get a job created by GPController, we run the heatmap
 function RunHeatMap(result, setid1, setid2, pathway, datatype, analysis, resulttype, nclusters, timepoints1, timepoints2, sample1, sample2, rbmPanels1, rbmPanels2) {
@@ -4104,14 +3930,14 @@ function RunHeatMap(result, setid1, setid2, pathway, datatype, analysis, resultt
 //END: Advanced Heatmap Workflow methods
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// This is the new popup window for Survival Analysis. 
+// This is the new popup window for Survival Analysis.
 function showSurvivalAnalysisWindow(results) {
     var resultWin = window.open('', 'Survival_Analysis_View_' + (new Date()).getTime(),
         'width=600,height=800,scrollbars=yes,resizable=yes,location=no,toolbar=no,status=no,menubar=no,directories=no');
     resultWin.document.write(results);
 }
 
-//This is the new popup window for GWAS. 
+//This is the new popup window for GWAS.
 function showGwasWindow(results) {
     var resultWin = window.open('', 'Gwas_View_' + (new Date()).getTime());
     resultWin.document.write(results);
@@ -4319,15 +4145,15 @@ function getExportButtonSecurityComplete(result) {
     var mobj = result.responseText.evalJSON();
     var canExport = mobj.canExport;
     if (canExport || GLOBAL.IsAdmin) {
-        Ext.getCmp("exportbutton").enable();
+        //Ext.getCmp("exportbutton").enable();
     }
     else {
-        Ext.getCmp("exportbutton").disable();
+        //Ext.getCmp("exportbutton").disable();
     }
 }
 
 function activateTab(tab) {
-    resultsTabPanel.tools['help help-resana-panel'].dom.style.display = "";
+    //resultsTabPanel.tools['help help-resana-panel'].dom.style.display = "";
 }
 
 /*function getSummaryGridData()
@@ -4752,7 +4578,7 @@ function searchByTagComplete(response)
 {
     // shorthand
     var Tree = Ext.tree;
- //   var treeRoot = Ext.getCmp('navigateTermsPanel').getRootNode();
+    var treeRoot = Ext.getCmp('navigateTermsPanel').getRootNode();
 
     viewport.el.unmask();
     var concepts = response.searchResults; //Response is an array of concept paths
@@ -4761,14 +4587,14 @@ function searchByTagComplete(response)
     var length;
     var leaf = false;
     var draggable = false;
-/*
-    for(c = treeRoot.childNodes.length - 1;
+
+    for(c = treeRoot.length - 1;
         c >= 0;
         c -- )
     {
-        treeRoot.childNodes[c].remove();
+        treeRoot[c].remove();
     }
-*/
+
     jQuery('#noAnalyzeResults').hide();
 
     //Clear path to expand and unique leaves
@@ -4809,6 +4635,7 @@ function searchByTagComplete(response)
         else {
             //Get the categories with the new path to expand
             getCategories();
+
         }
 
     }
@@ -5174,3 +5001,148 @@ function getHelpIconHTML(id, right, top) {
     return ('<div style="z-index: 999; cursor: pointer; height: 18px; width: 18px; position: absolute; right: ' + right + 'px; top: ' + top + 'px" class="contextHelpBtn" onclick="D2H_ShowHelp(\'' + id + '\',helpURL,\'wndExternal\',CTXT_DISPLAY_FULLHELP);">&nbsp;</div>')
 }
 
+
+
+
+/*If includeExcludeFlag is
+ * -"include": Across Trials is the only concept included
+ * -"exclude": Across Trials concept is the only concept excluded
+ */
+function createTree(includeExcludeFlag, ontresponse) {
+    // shorthand
+    var Tree = Ext.tree;
+    var treelist = [];
+    var treeRoot = new Tree.TreeNode(
+        {
+            text: 'root',
+            draggable: false,
+            id: 'root',
+            qtip: 'root'
+        }
+    );
+
+
+    for (var c = 0; c < ontresponse.length; c++) {
+        var level = ontresponse[c].level;
+        var key = ontresponse[c].key;
+        var name = ontresponse[c].name;
+        var tooltip = ontresponse[c].tooltip;
+        var dimcode = ontresponse[c].dimcode;
+
+        if (includeExcludeFlag === "include" && name !== "Across Trials") continue;
+        if (includeExcludeFlag === "exclude" && name === "Across Trials") continue;
+        // set the root node
+        var autoExpand = false;
+        if (GLOBAL.PathToExpand.indexOf(key) > -1) autoExpand = true;
+        if(GLOBAL.PathToExpand != '' && GLOBAL.PathToExpand.indexOf(key) == -1) { continue; }
+        var ontRoot = new Tree.AsyncTreeNode(
+            {
+                text: name,
+                draggable: false,
+                id: key,
+                qtip: tooltip,
+                expanded: autoExpand
+            }
+        );
+
+        //treeRoot.appendChild(ontRoot);
+        treelist.push(ontRoot)  ;
+
+        /***************************************/
+        var fullname = key.substr(key.indexOf("\\", 2), key.length);
+        var access = GLOBAL.InitialSecurity[fullname];
+
+        if ((access != undefined && access != 'Locked') || GLOBAL.IsAdmin) //if im an admin or there is an access level other than locked leave node unlocked
+        {
+            //leave node unlocked must have some read access
+        }
+        else {
+            //default node to locked
+            //child.setText(child.text+" <b>Locked</b>");
+            ontRoot.attributes.access = 'locked';
+            ontRoot.disable();
+            ontRoot.on('beforeload', function (node) {
+                alert("Access to this node has been restricted. Please contact your administrator for access.");
+                return false
+            });
+        }
+    }
+
+    //return treeRoot;
+    return treelist;
+}
+
+/*
+ * the id_in drives which off these tabs is created
+ *
+ */
+
+
+function getSubCategories(id_in, title_in, ontresponse)
+{
+    // shorthand
+    var Tree = Ext.tree;
+    var ontRoots;
+    var panel;
+
+    var showFn;
+
+    if (id_in==='crossTrialsPanel'){
+        showFn = function(node, e){
+            Ext.tree.TreePanel.superclass.onShow.call(this);
+            // Ext.get('advancedbutton').dom.style.display='none';
+        }
+        ontRoots = createTree('include', ontresponse);
+        panel = Ext.getCmp('crossTrialsPanel');
+    }
+    else {
+        showFn = function(node, e){
+            Ext.tree.TreePanel.superclass.onShow.call(this);
+            // Ext.get('advancedbutton').dom.style.display='';
+        }
+        ontRoots = createTree('exclude', ontresponse);
+        panel = Ext.getCmp('navigateTermsPanel');
+    }
+
+    /*var toolbar = new Ext.Toolbar([
+     {
+     id:'contextHelp-button',
+     handler: function(event, toolEl, panel){
+     D2H_ShowHelp((id_in=="navigateTermsPanel")?"1066":"1091",helpURL,"wndExternal",CTXT_DISPLAY_FULLHELP );
+     },
+     iconCls: "contextHelpBtn"
+     }
+     ]); */
+
+    var treeRoot = panel.getRootNode();
+    for(c = treeRoot.childNodes.length - 1; c >= 0; c -- ) {
+        treeRoot.childNodes[c].remove();
+    }
+
+    jQuery('#noAnalyzeResults').hide();
+
+    for(var c = 0; c < ontRoots.length; c ++ )
+    {
+        var newnode=ontRoots[c];
+        treeRoot.appendChild(newnode);
+    }
+
+    if (ontRoots.length == 0) { //This shouldn't happen!
+        jQuery('#noAnalyzeResults').show();
+    }
+
+    if(GLOBAL.Debug)
+    {
+        alert(ontresponse.responseText);
+    }
+
+    onWindowResize();
+
+    panel.render();
+    panel.dragZone.addToGroup("analysis");
+
+    /*if(GLOBAL.IsAdmin)
+     {
+     searchByNameTree.dragZone.addToGroup("analysis");
+     }*/
+}

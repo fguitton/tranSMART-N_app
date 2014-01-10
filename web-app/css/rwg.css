@@ -215,7 +215,7 @@ top: 58px;
 }
 
 .term
-{
+{       font-family: verdana, arial, helvetica, sans-serif;
 		margin-top:0.3em;
 		white-space:nowrap;
 		line-height: 1.4em;
@@ -1048,4 +1048,13 @@ select.multiselect {
     display: inline-block;
     height: 13px;
     width: 37px;
+}
+
+#noAnalyzeResults {
+    font-family: verdana, arial, helvetica, sans-serif;
+    color:#868686;
+    padding-bottom: 0.2em;
+    margin-left: -10px;
+    font-weight: bold;
+    white-space:nowrap;
 }

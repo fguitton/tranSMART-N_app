@@ -336,7 +336,7 @@ function showFacetResults()	{
 	
 	var globalLogicOperator = "AND";
 	if (jQuery('#globaloperator').hasClass("or")) { globalLogicOperator = "OR" }
-	
+    GLOBAL.PathToExpand = '';
 	var savedSearchTermsArray;
 	var savedSearchTerms;
 	
