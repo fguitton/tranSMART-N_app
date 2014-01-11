@@ -481,6 +481,9 @@ class NetezzaGeneExpressionDataService {
         groovy.sql.Sql nzrSql = utilService.getNetezzaConnection()
         nzrSql.execute("create table " + tableName + " as " + sqlQuery.toString(), [resultInstanceId])
 
+        String sampleTableName = jobName.replaceAll("-", "_") + "_MRNA_SAMPLE"
+        nzrSql.execute("create table " + sampleTableName + " as " + sampleQuery.toString(), [resultInstanceId])
+
         //Prepare the SQL statement.
         stmt = con.prepareStatement(sqlQuery);
         stmt.setString(1, resultInstanceId);
