@@ -479,10 +479,15 @@ class NetezzaGeneExpressionDataService {
         // added to create clinical data view for nzr  by HX  01/10/2014
         String tableName = jobName.replaceAll("-", "_") + "_MRNA"
         groovy.sql.Sql nzrSql = utilService.getNetezzaConnection()
-        nzrSql.execute("create table " + tableName + " as " + sqlQuery.toString(), [resultInstanceId])
+        if(!utilService.isTableExist(nzrSql, tableName)){
+            nzrSql.execute("create table " + tableName + " as " + sqlQuery.toString(), [resultInstanceId])
+        }
 
         String sampleTableName = jobName.replaceAll("-", "_") + "_MRNA_SAMPLE"
-        nzrSql.execute("create table " + sampleTableName + " as " + sampleQuery.toString(), [resultInstanceId])
+        if(!utilService.isTableExist(nzrSql, sampleTableName)){
+            nzrSql.execute("create table " + sampleTableName + " as " + sampleQuery.toString(), [resultInstanceId])
+        }
+
 
         //Prepare the SQL statement.
         stmt = con.prepareStatement(sqlQuery);
