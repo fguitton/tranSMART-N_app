@@ -60,4 +60,24 @@ class UtilService {
 
         return groovy.sql.Sql.newInstance(url, username, password, driverClass)
     }
+
+
+    boolean isTableExist(groovy.sql.Sql sql, String tableName) {
+        String query = "select count(1) from tables where upper(table_name)=upper('" + tableName + "')"
+        if (sql.firstRow(query)[0] > 0) {
+            return true
+        } else {
+            return false
+        }
+    }
+
+
+    boolean isViewExist(groovy.sql.Sql sql, String viewName) {
+        String query = "select count(1) from views where upper(table_name)=upper('" + viewName + "')"
+        if (sql.firstRow(query)[0] > 0) {
+            return true
+        } else {
+            return false
+        }
+    }
 }
