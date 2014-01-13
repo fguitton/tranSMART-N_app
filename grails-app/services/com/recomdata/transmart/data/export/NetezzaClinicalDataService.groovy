@@ -212,7 +212,9 @@ class NetezzaClinicalDataService {
             // added to create clinical data view for nzr  by HX  01/09/2014
             String tableName = jobName.replaceAll("-", "_") + "_CLINICAL"
             groovy.sql.Sql nzrSql = utilService.getNetezzaConnection()
-            nzrSql.execute("create or replace view " + tableName + " as " + sqlQuery.toString(), parameterList)
+            if(!utilService.isViewExist(nzrSql, tableName)){
+                nzrSql.execute("create or replace view " + tableName + " as " + sqlQuery.toString(), parameterList)
+            }
 
             def rows = sql.rows(sqlQuery.toString(), parameterList)
             if (rows.size() > 0) {

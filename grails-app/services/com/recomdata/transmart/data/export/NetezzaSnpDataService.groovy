@@ -563,7 +563,9 @@ class NetezzaSnpDataService {
         if(!jobName.equals(null) || jobName.size() > 0){
             String tableName = jobName.replaceAll("-", "_") + "_SNP"
             groovy.sql.Sql nzrSql = utilService.getNetezzaConnection()
-            nzrSql.execute("create table " + tableName + " as " + sSelect.toString(), [resultInstanceId, study])
+            if(!utilService.isTableExist(nzrSql, tableName)){
+                nzrSql.execute("create table " + tableName + " as " + sSelect.toString(), [resultInstanceId, study])
+            }
         }
 
         //Prepare the SQL statement.
