@@ -12,9 +12,9 @@ class SearchTaxonomy {
 	List parents = []
 	
 	static mapping = {
-		table 'SEARCH_TAXONOMY'
+		table 'SEARCHAPP.SEARCH_TAXONOMY'
 		version false
-		id generator:'sequence', params:[sequence:'SEQ_SEARCH_TAXONOMY_TERM_ID']
+		id generator:'sequence', params:[sequence:'SEARCHAPP.SEQ_SEARCH_TAXONOMY_TERM_ID']
 		columns {
 		   id column:'TERM_ID'
 		   searchKeywordId column: 'SEARCH_KEYWORD_ID'

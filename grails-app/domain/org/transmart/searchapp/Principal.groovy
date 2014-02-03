@@ -31,7 +31,7 @@ class Principal {
 	String principalNameWithType
 
 	static mapping = {
-		table 'SEARCH_AUTH_PRINCIPAL'
+		table 'SEARCHAPP.SEARCH_AUTH_PRINCIPAL'
 		tablePerHierarchy false
 		version false
 		id generator:'assigned'

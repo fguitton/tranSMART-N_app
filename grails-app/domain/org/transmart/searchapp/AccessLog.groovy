@@ -32,7 +32,7 @@ public class AccessLog {
 
 	static mapping = {
         datasource 'tx'
-		table 'SEARCH_APP_ACCESS_LOG'        
+		table 'SEARCHAPP.SEARCH_APP_ACCESS_LOG'
 	    id generator:'sequence', params:[sequence:'SEARCHAPP.SEQ_SEARCH_DATA_ID']
 		version false
 		id column:'id'

@@ -70,7 +70,7 @@ class I2b2ModifierHelperService {
         levelCount+=1
 
         groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
-        String sqlt = "SELECT DISTINCT NAME_CHAR, MODIFIER_PATH, VISIT_IND FROM i2b2demodata.modifier_dimension MD INNER JOIN MODIFIER_METADATA MM ON MM.MODIFIER_CD = MD.MODIFIER_CD WHERE MODIFIER_PATH LIKE ? AND length(MODIFIER_PATH) - length(translate(MODIFIER_PATH, '\\', '')) = ? ORDER BY MODIFIER_PATH";
+        String sqlt = "SELECT DISTINCT NAME_CHAR, MODIFIER_PATH, VISIT_IND FROM i2b2demodata.modifier_dimension MD INNER JOIN I2B2DEMODATA.MODIFIER_METADATA MM ON MM.MODIFIER_CD = MD.MODIFIER_CD WHERE MODIFIER_PATH LIKE ? AND length(MODIFIER_PATH) - length(translate(MODIFIER_PATH, '\\', '')) = ? ORDER BY MODIFIER_PATH";
 
         log.debug("Running following SQL in getModifierDistributionDataForModifier - " + sqlt)
         log.debug("Parameters - " + modifierPath + "%")
@@ -123,9 +123,9 @@ class I2b2ModifierHelperService {
         groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
 
         String sqlt = """select VD.INOUT_CD, count (*) as obscount FROM i2b2demodata.observation_fact obsf
-            INNER JOIN VISIT_DIMENSION VD ON VD.ENCOUNTER_NUM = obsf.ENCOUNTER_NUM
+            INNER JOIN I2B2DEMODATA.VISIT_DIMENSION VD ON VD.ENCOUNTER_NUM = obsf.ENCOUNTER_NUM
            WHERE (((MODIFIER_CD IN (select MODIFIER_CD from i2b2demodata.MODIFIER_DIMENSION MD
-           where MODIFIER_PATH LIKE ?)))) AND obsf.PATIENT_NUM IN (select distinct patient_num from qt_patient_set_collection where result_instance_id = ?) GROUP BY VD.INOUT_CD""";
+           where MODIFIER_PATH LIKE ?)))) AND obsf.PATIENT_NUM IN (select distinct patient_num from I2B2DEMODATA.qt_patient_set_collection where result_instance_id = ?) GROUP BY VD.INOUT_CD""";
 
         log.debug("Running following SQL in retrieveVisitCountsByModifier - " + sqlt)
         log.debug("Parameters - " + modifier.name+"%")
@@ -157,9 +157,9 @@ class I2b2ModifierHelperService {
        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
 
        String sqlt = """select count (*) as obscount FROM i2b2demodata.observation_fact f
-       LEFT JOIN VISIT_DIMENSION VD ON VD.ENCOUNTER_NUM = f.ENCOUNTER_NUM
+       LEFT JOIN I2B2DEMODATA.VISIT_DIMENSION VD ON VD.ENCOUNTER_NUM = f.ENCOUNTER_NUM
        WHERE (((MODIFIER_CD IN (select MODIFIER_CD from i2b2demodata.MODIFIER_DIMENSION MD
-       where MODIFIER_PATH LIKE ?)))) AND f.PATIENT_NUM IN (select distinct patient_num from qt_patient_set_collection where result_instance_id = ?)""";
+       where MODIFIER_PATH LIKE ?)))) AND f.PATIENT_NUM IN (select distinct patient_num from I2B2DEMODATA.qt_patient_set_collection where result_instance_id = ?)""";
 
        parameterList.push(fullname+"%")
        parameterList.push(result_instance_id)
@@ -186,10 +186,10 @@ class I2b2ModifierHelperService {
 
            groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
 
-           String sqlt="""SELECT 'All Studies' TRIAL, NVAL_NUM FROM OBSERVATION_FACT f  INNER JOIN PATIENT_TRIAL t
+           String sqlt="""SELECT 'All Studies' TRIAL, NVAL_NUM FROM I2B2DEMODATA.OBSERVATION_FACT f  INNER JOIN I2B2DEMODATA.PATIENT_TRIAL t
            ON f.PATIENT_NUM=t.PATIENT_NUM WHERE MODIFIER_CD IN ("""+i2b2HelperService.listToIN(childConcepts.asList())+""") AND
             f.PATIENT_NUM IN (select distinct patient_num
-                    from qt_patient_set_collection) """;
+                    from I2B2DEMODATA.qt_patient_set_collection) """;
 
            log.debug("Running following SQL in getModifierDistributionDataForValueModifierByTrialByConcepts - " + sqlt)
 
@@ -217,12 +217,12 @@ class I2b2ModifierHelperService {
 
            groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
 
-           String sqlt="""SELECT 'All Studies' TRIAL, NVAL_NUM FROM OBSERVATION_FACT f  INNER JOIN PATIENT_TRIAL t
+           String sqlt="""SELECT 'All Studies' TRIAL, NVAL_NUM FROM I2B2DEMODATA.OBSERVATION_FACT f  INNER JOIN I2B2DEMODATA.PATIENT_TRIAL t
            ON f.PATIENT_NUM=t.PATIENT_NUM
-           LEFT JOIN VISIT_DIMENSION VD ON VD.ENCOUNTER_NUM = f.ENCOUNTER_NUM
+           LEFT JOIN I2B2DEMODATA.VISIT_DIMENSION VD ON VD.ENCOUNTER_NUM = f.ENCOUNTER_NUM
            WHERE f.MODIFIER_CD = ? AND
            f.PATIENT_NUM IN (select distinct patient_num
-           from qt_patient_set_collection
+           from I2B2DEMODATA.qt_patient_set_collection
            where result_instance_id= ? ) """;
 
            parameterList.push(modifier.modifierCode)
@@ -264,8 +264,8 @@ class I2b2ModifierHelperService {
 
         //Construct our SQL objects.
         groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-        String sqlt = """SELECT REQUEST_XML FROM QT_QUERY_MASTER c INNER JOIN QT_QUERY_INSTANCE a
-           ON a.QUERY_MASTER_ID=c.QUERY_MASTER_ID INNER JOIN QT_QUERY_RESULT_INSTANCE b
+        String sqlt = """SELECT REQUEST_XML FROM I2B2DEMODATA.QT_QUERY_MASTER c INNER JOIN I2B2DEMODATA.QT_QUERY_INSTANCE a
+           ON a.QUERY_MASTER_ID=c.QUERY_MASTER_ID INNER JOIN I2B2DEMODATA.QT_QUERY_RESULT_INSTANCE b
            ON a.QUERY_INSTANCE_ID=b.QUERY_INSTANCE_ID WHERE RESULT_INSTANCE_ID IN (CAST (? AS numeric),CAST (? AS numeric))""";
 
         String xmlrequest="";
@@ -324,8 +324,8 @@ class I2b2ModifierHelperService {
         //Netezza
         //Construct our SQL objects.
         groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-        String sqlt = """SELECT REQUEST_XML FROM QT_QUERY_MASTER c INNER JOIN QT_QUERY_INSTANCE a
-           ON a.QUERY_MASTER_ID=c.QUERY_MASTER_ID INNER JOIN QT_QUERY_RESULT_INSTANCE b
+        String sqlt = """SELECT REQUEST_XML FROM I2B2DEMODATA.QT_QUERY_MASTER c INNER JOIN I2B2DEMODATA.QT_QUERY_INSTANCE a
+           ON a.QUERY_MASTER_ID=c.QUERY_MASTER_ID INNER JOIN I2B2DEMODATA.QT_QUERY_RESULT_INSTANCE b
            ON a.QUERY_INSTANCE_ID=b.QUERY_INSTANCE_ID WHERE RESULT_INSTANCE_ID IN ( CAST(? AS numeric), CAST(? AS numeric))""";
 
         def xmlrequest;
@@ -384,7 +384,7 @@ class I2b2ModifierHelperService {
 
        //Now we need to look up the MODIFIER_CD for this path.
        def sqlObject = new Sql(dataSource)
-       def modifierCode = sqlObject.firstRow('SELECT MODIFIER_CD FROM MODIFIER_DIMENSION WHERE MODIFIER_PATH = ?', [lookupName])
+       def modifierCode = sqlObject.firstRow('SELECT MODIFIER_CD FROM I2B2DEMODATA.MODIFIER_DIMENSION WHERE MODIFIER_PATH = ?', [lookupName])
        modifierObject["modifierCode"] = modifierCode.MODIFIER_CD;
 
        //Set the level property.
@@ -413,9 +413,9 @@ class I2b2ModifierHelperService {
 
         groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
         log.trace("preparing query");
-        String sqlt="""SELECT NVAL_NUM FROM OBSERVATION_FACT LEFT JOIN VISIT_DIMENSION VD ON VD.ENCOUNTER_NUM = OBSERVATION_FACT.ENCOUNTER_NUM WHERE OBSERVATION_FACT.MODIFIER_CD = ? AND
+        String sqlt="""SELECT NVAL_NUM FROM I2B2DEMODATA.OBSERVATION_FACT LEFT JOIN I2B2DEMODATA.VISIT_DIMENSION VD ON VD.ENCOUNTER_NUM = OBSERVATION_FACT.ENCOUNTER_NUM WHERE OBSERVATION_FACT.MODIFIER_CD = ? AND
            OBSERVATION_FACT.PATIENT_NUM IN (select distinct patient_num
-           from qt_patient_set_collection
+           from I2B2DEMODATA.qt_patient_set_collection
            where result_instance_id = ?)""";
 
            parameterList.push(modifierCd)
@@ -606,17 +606,17 @@ class I2b2ModifierHelperService {
 
                //Get the actual Modifier data.
                groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-               String sqlt = """SELECT f.PATIENT_NUM, f.NVAL_NUM, f.START_DATE FROM OBSERVATION_FACT f """
+               String sqlt = """SELECT f.PATIENT_NUM, f.NVAL_NUM, f.START_DATE FROM I2B2DEMODATA.OBSERVATION_FACT f """
 
                if(modifierObject["inOutCode"])
                {
-                   sqlt += " INNER JOIN VISIT_DIMENSION VD ON VD.ENCOUNTER_NUM = f.ENCOUNTER_NUM AND VD.INOUT_CD = ? "
+                   sqlt += " INNER JOIN I2B2DEMODATA.VISIT_DIMENSION VD ON VD.ENCOUNTER_NUM = f.ENCOUNTER_NUM AND VD.INOUT_CD = ? "
                    parameterList.push(modifierObject["inOutCode"])
                }
 
                 sqlt += """WHERE f.MODIFIER_CD = ? AND
                f.PATIENT_NUM IN (select  patient_num
-               from qt_patient_set_collection
+               from I2B2DEMODATA.qt_patient_set_collection
                where result_instance_id = ?)""";
 
                parameterList.push(modifierObject["modifierCode"])
@@ -645,17 +645,17 @@ class I2b2ModifierHelperService {
                 thisColumn.setType("String");
 
                 groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-                String sqlt = """SELECT f.PATIENT_NUM, f.TVAL_CHAR, f.START_DATE FROM OBSERVATION_FACT f """
+                String sqlt = """SELECT f.PATIENT_NUM, f.TVAL_CHAR, f.START_DATE FROM I2B2DEMODATA.OBSERVATION_FACT f """
 
                        if(modifierObject["inOutCode"])
                        {
-                           sqlt += " INNER JOIN VISIT_DIMENSION VD ON VD.ENCOUNTER_NUM = f.ENCOUNTER_NUM AND VD.INOUT_CD = ? "
+                           sqlt += " INNER JOIN I2B2DEMODATA.VISIT_DIMENSION VD ON VD.ENCOUNTER_NUM = f.ENCOUNTER_NUM AND VD.INOUT_CD = ? "
                            parameterList.push(modifierObject["inOutCode"])
                        }
 
                         sqlt += """WHERE f.MODIFIER_CD = ? AND
                        f.PATIENT_NUM IN (select  patient_num
-                       from qt_patient_set_collection
+                       from I2B2DEMODATA.qt_patient_set_collection
                        where result_instance_id = ?)""";
 
                        parameterList.push(modifierObject["modifierCode"])
@@ -718,10 +718,10 @@ class I2b2ModifierHelperService {
         String sqlt = """SELECT	DISTINCT MD.MODIFIER_LEVEL,
                                    substr(MD.MODIFIER_PATH,1,instr(MD.MODIFIER_PATH,'\\',-1,2)) || VD.INOUT_CD || '\\' AS MODIFIER_PATH,
                                    VD.INOUT_CD
-           FROM		MODIFIER_DIMENSION MD
-           INNER JOIN MODIFIER_METADATA MM ON MM.MODIFIER_CD = MD.MODIFIER_CD
-           INNER JOIN OBSERVATION_FACT OBSF ON OBSF.MODIFIER_CD = MD.MODIFIER_CD
-           INNER JOIN VISIT_DIMENSION VD ON VD.ENCOUNTER_NUM = OBSF.ENCOUNTER_NUM
+           FROM		I2B2DEMODATA.MODIFIER_DIMENSION MD
+           INNER JOIN I2B2DEMODATA.MODIFIER_METADATA MM ON MM.MODIFIER_CD = MD.MODIFIER_CD
+           INNER JOIN I2B2DEMODATA.OBSERVATION_FACT OBSF ON OBSF.MODIFIER_CD = MD.MODIFIER_CD
+           INNER JOIN I2B2DEMODATA.VISIT_DIMENSION VD ON VD.ENCOUNTER_NUM = OBSF.ENCOUNTER_NUM
            WHERE	MD.MODIFIER_PATH LIKE ?""";
 
         log.debug("Running following SQL in retrieveVisitModifiersByModifierPath - " + sqlt)

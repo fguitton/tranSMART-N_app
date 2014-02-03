@@ -37,7 +37,7 @@ class AuthUser extends Principal {
 	boolean passwordExpired
 	
 	static mapping = {
-		table 'SEARCH_AUTH_USER'
+		table 'SEARCHAPP.SEARCH_AUTH_USER'
 		version false
 		columns{
 			id column:'ID'
@@ -46,7 +46,7 @@ class AuthUser extends Principal {
 			passwd column:'PASSWD'
 			email column:'EMAIL'
 		    emailShow column:'EMAIL_SHOW'
-            authorities joinTable:[name:'SEARCH_ROLE_AUTH_USER', key:'AUTHORITIES_ID', column:'PEOPLE_ID']
+            authorities joinTable:[name:'SEARCH_ROLE_AUTH_USER', key:'AUTHORITIES_ID', column:'PEOPLE_ID', schema:'SEARCHAPP']
 			groups joinTable: [name:'SEARCH_AUTH_GROUP_MEMBER', column:'AUTH_GROUP_ID', key: 'AUTH_USER_ID']
 		}
 	}

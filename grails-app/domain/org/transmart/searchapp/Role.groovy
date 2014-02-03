@@ -33,8 +33,8 @@ class Role {
 	String authority
 
 	static mapping = {
-		table 'SEARCH_ROLE'
-		people joinTable:[name:'SEARCH_ROLE_AUTH_USER', key:'PEOPLE_ID',column:'AUTHORITIES_ID']
+		table 'SEARCHAPP.SEARCH_ROLE'
+		people joinTable:[name:'SEARCH_ROLE_AUTH_USER', key:'PEOPLE_ID',column:'AUTHORITIES_ID', schema:'SEARCHAPP']
 	}
 	
 	static constraints = {

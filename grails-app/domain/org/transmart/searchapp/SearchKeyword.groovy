@@ -32,9 +32,9 @@ class SearchKeyword {
 		static hasMany = [terms:SearchKeywordTerm]
 
  static mapping = {
-	 table 'SEARCH_KEYWORD'
+	 table 'SEARCHAPP.SEARCH_KEYWORD'
 	 version false
-	 id generator:'sequence', params:[sequence:'SEQ_SEARCH_DATA_ID']
+	 id generator:'sequence', params:[sequence:'SEARCHAPP.SEQ_SEARCH_DATA_ID']
 	 columns {
 		keyword column:'KEYWORD'
 		bioDataId column:'BIO_DATA_ID'

@@ -6,9 +6,9 @@ class SearchTaxonomyRels {
 	SearchTaxonomy parent
 	
 	static mapping = {
-		table 'SEARCH_TAXONOMY_RELS'
+		table 'SEARCHAPP.SEARCH_TAXONOMY_RELS'
 		version false
-		id generator:'sequence', params:[sequence:'SEQ_SEARCH_TAXONOMY_RELS_ID']
+		id generator:'sequence', params:[sequence:'SEARCHAPP.SEQ_SEARCH_TAXONOMY_RELS_ID']
 		columns {
 		   id column:'SEARCH_TAXONOMY_RELS_ID'
 		   child column:'CHILD_ID'

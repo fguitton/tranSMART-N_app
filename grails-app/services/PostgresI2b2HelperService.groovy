@@ -158,7 +158,7 @@ class PostgresI2b2HelperService {
 		}
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
 		String sqlt =
-				sql.eachRow("SELECT CONCEPT_CD FROM CONCEPT_DIMENSION c WHERE CONCEPT_PATH = ?", [path], {row ->
+				sql.eachRow("SELECT CONCEPT_CD FROM i2b2demodata.CONCEPT_DIMENSION c WHERE CONCEPT_PATH = ?", [path], {row ->
 					log.trace("Found code:"+row.CONCEPT_CD);
 					concepts.append(row.CONCEPT_CD);
 				});
@@ -1131,7 +1131,7 @@ class PostgresI2b2HelperService {
 		StringBuilder concepts = new StringBuilder();
 		
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-		String sqlt = "SELECT CONCEPT_CD FROM CONCEPT_DIMENSION c WHERE CONCEPT_PATH LIKE ?";
+		String sqlt = "SELECT CONCEPT_CD FROM i2b2demodata.CONCEPT_DIMENSION c WHERE CONCEPT_PATH LIKE ?";
 		sql.eachRow(sqlt, [path+"%"], {row ->
 			if(concepts.length() >0) {
 				concepts.append(",");
@@ -1154,7 +1154,7 @@ class PostgresI2b2HelperService {
 		
 		
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-		String sqlt = "SELECT CONCEPT_CD FROM CONCEPT_DIMENSION c WHERE CONCEPT_PATH LIKE ?";
+		String sqlt = "SELECT CONCEPT_CD FROM i2b2demodata.CONCEPT_DIMENSION c WHERE CONCEPT_PATH LIKE ?";
 		sql.eachRow(sqlt, [path+"%"], {row ->
 			concepts.add(row.CONCEPT_CD)
 		})

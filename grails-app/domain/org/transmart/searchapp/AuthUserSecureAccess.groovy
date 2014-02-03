@@ -28,7 +28,7 @@ class AuthUserSecureAccess {
 	String principalAccessName
 
 	static mapping = {
-		table 'SEARCH_AUTH_USER_SEC_ACCESS_V'
+		table 'SEARCHAPP.SEARCH_AUTH_USER_SEC_ACCESS_V'
 		version false
 		columns {
 			id column:'SEARCH_AUTH_USER_SEC_ACCESS_ID'
