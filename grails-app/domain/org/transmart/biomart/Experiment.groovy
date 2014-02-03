@@ -53,7 +53,7 @@ class Experiment implements IExcelProfile {
 
 	static mapping = {
 		tablePerHierarchy false
-		table 'BIO_EXPERIMENT'
+		table 'biomart.BIO_EXPERIMENT'
 		version false
 		cache usage:'read-only'
 		//	 id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
