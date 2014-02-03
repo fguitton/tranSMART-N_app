@@ -52,7 +52,7 @@ class SubjectSnpDataset {
 
 
 	static mapping = {
-		table 'DE_SUBJECT_SNP_DATASET'
+		table 'DEAPP.DE_SUBJECT_SNP_DATASET'
 		version false
 		columns{
 			id column:'SUBJECT_SNP_DATASET_ID'

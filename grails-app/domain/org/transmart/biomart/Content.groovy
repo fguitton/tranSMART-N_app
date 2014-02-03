@@ -40,10 +40,10 @@ def getLocationType() {
 }
 
 static mapping = {
- table 'BIO_CONTENT'
+ table 'biomart.BIO_CONTENT'
  version false
  cache usage:'read-only'
- id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+ id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
  columns {
 	id column:'BIO_FILE_CONTENT_ID'
 	name column:'FILE_NAME'

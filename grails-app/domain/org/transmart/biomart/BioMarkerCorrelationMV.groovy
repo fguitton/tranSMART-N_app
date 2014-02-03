@@ -26,7 +26,7 @@ class BioMarkerCorrelationMV {
 		Long id
 		String correlType
 		static mapping = {
-            table 'BIO_MARKER_CORREL_MV'  
+            table 'biomart.BIO_MARKER_CORREL_MV'  
             version false
             columns {
                 id column:'MV_ID'

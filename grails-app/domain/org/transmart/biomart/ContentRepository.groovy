@@ -26,10 +26,10 @@ class ContentRepository {
 		String repositoryType
 		String locationType
  static mapping = {
-	 table 'BIO_CONTENT_REPOSITORY'
+	 table 'biomart.BIO_CONTENT_REPOSITORY'
 	 version false
 	 cache usage:'read-only'
-	 id generator:'sequence', params:[sequence:'SEQ_BIO_CONTENT_REPOSITORY_ID']
+	 id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_CONTENT_REPOSITORY_ID']
 	 columns {
 		id column:'BIO_CONTENT_REPO_ID'
 		location column:'LOCATION'

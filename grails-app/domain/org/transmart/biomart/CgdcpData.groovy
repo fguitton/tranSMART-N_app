@@ -28,9 +28,9 @@ class CgdcpData extends Literature {
 		String nciDrugConceptCode
 
  static mapping = {
-	 table 'BIO_CGDCP_DATA'
+	 table 'biomart.BIO_CGDCP_DATA'
 	 version false
-	 id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+	 id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 	 columns {
 		evidenceCode column:'EVIDENCE_CODE'
 		negationIndicator column:'NEGATION_INDICATOR'

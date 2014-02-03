@@ -54,10 +54,10 @@ class BioMarker implements IExcelProfile {
 		}
 
  static mapping = {
-	 table 'BIO_MARKER'
+	 table 'biomart.BIO_MARKER'
 	 version false
 
-//	 id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+//	 id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 	 columns {
 		id column:'BIO_MARKER_ID'
 		name column:'BIO_MARKER_NAME'
@@ -66,11 +66,11 @@ class BioMarker implements IExcelProfile {
 		primarySourceCode column:'PRIMARY_SOURCE_CODE'
 		primaryExternalId column:'PRIMARY_EXTERNAL_ID'
 		bioMarkerType column:'BIO_MARKER_TYPE'
-		correlations joinTable:[name:'BIO_DATA_CORRELATION', key:'BIO_DATA_ID',column:'BIO_DATA_CORREL_ID']
-		associatedCorrels joinTable:[name:'BIO_DATA_CORRELATION', key:'ASSO_BIO_DATA_ID', column:'BIO_DATA_CORREL_ID']
-		assayAnalysisData joinTable:[name:'BIO_DATA_OMIC_MARKER', key:'BIO_MARKER_ID']
-		literatures joinTable:[name:'BIO_DATA_OMIC_MARKER', key:'BIO_MARKER_ID']
-		assayDataStats joinTable:[name:'BIO_DATA_OMIC_MARKER', key:'BIO_MARKER_ID']
+		correlations joinTable:[name:'BIO_DATA_CORRELATION', key:'BIO_DATA_ID',column:'BIO_DATA_CORREL_ID',schema:'BIOMART']
+		associatedCorrels joinTable:[name:'BIO_DATA_CORRELATION', key:'ASSO_BIO_DATA_ID', column:'BIO_DATA_CORREL_ID',schema:'BIOMART']
+		assayAnalysisData joinTable:[name:'BIO_DATA_OMIC_MARKER', key:'BIO_MARKER_ID',schema:'BIOMART']
+		literatures joinTable:[name:'BIO_DATA_OMIC_MARKER', key:'BIO_MARKER_ID',schema:'BIOMART']
+		assayDataStats joinTable:[name:'BIO_DATA_OMIC_MARKER', key:'BIO_MARKER_ID',schema:'BIOMART']
  }
 	}
 		static constraints = {

@@ -35,9 +35,9 @@ class DeVariantSubjectDetail {
 	
 
  static mapping = {
-	 table 'DE_VARIANT_SUBJECT_DETAIL'
+	 table 'DEAPP.DE_VARIANT_SUBJECT_DETAIL'
 	 version false	
-	 id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+	 id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 	 columns {
 		id column:'VARIANT_SUBJECT_DETAIL_ID'
 		dataset column:'DATASET_ID'

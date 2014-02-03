@@ -103,15 +103,15 @@ class LiteratureAlterationData extends Literature {
 	String epigeneticType
 	static hasMany = [assocMoleculeDetails:LiteratureAssocMoleculeDetailsData]
 	static mapping = {
-		table 'BIO_LIT_ALT_DATA'
+		table 'biomart.BIO_LIT_ALT_DATA'
 		version false
 		id column:'BIO_LIT_ALT_DATA_ID'
-		id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+		id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 		columns {
 			reference column:'BIO_LIT_REF_DATA_ID'
 			inVivoModel column:'IN_VIVO_MODEL_ID'
 			inVitroModel column:'IN_VITRO_MODEL_ID'
-			assocMoleculeDetails joinTable:[name:'BIO_LIT_AMD_DATA', key:'BIO_LIT_ALT_DATA_ID', column:'BIO_LIT_AMD_DATA_ID']	
+			assocMoleculeDetails joinTable:[name:'BIO_LIT_AMD_DATA', key:'BIO_LIT_ALT_DATA_ID', column:'BIO_LIT_AMD_DATA_ID',schema:'BIOMART']	
 			etlId column:'ETL_ID'
 			alterationType column:'ALTERATION_TYPE'
 			control column:'CONTROL'

@@ -54,9 +54,9 @@ class ClinicalTrial extends Experiment {
 	String secondaryIds
 	//Long id
 	static mapping = {
-		table 'BIO_CLINICAL_TRIAL'
+		table 'biomart.BIO_CLINICAL_TRIAL'
 		version false
-		//id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+		//id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 		cache usage:'read-only'
 		columns {
 			id 	column:'BIO_EXPERIMENT_ID'

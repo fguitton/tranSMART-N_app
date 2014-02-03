@@ -52,10 +52,10 @@ class BioAssayAnalysis implements IExcelProfile {
 	static belongsTo=[ContentReference, Disease, Observation, BioAssayPlatform]
 
 	static mapping = {
-		table 'BIO_ASSAY_ANALYSIS'
+		table 'biomart.BIO_ASSAY_ANALYSIS'
 		version false
 		cache usage:'read-only'
-		id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+		id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 		columns {
 			name column:'ANALYSIS_NAME'
 			shortDescription column:'SHORT_DESCRIPTION'
@@ -73,8 +73,8 @@ class BioAssayAnalysis implements IExcelProfile {
 			teaDataCount column:'TEA_DATA_COUNT'
 			assayDataType column:'BIO_ASSAY_DATA_TYPE'
 			analysisMethodCode column:'ANALYSIS_METHOD_CD'
-			datasets joinTable:[name:'BIO_ASY_ANALYSIS_DATASET',key:'BIO_ASSAY_ANALYSIS_ID']
-			files joinTable:[name:'BIO_CONTENT_REFERENCE', key:'BIO_DATA_ID', column:'BIO_CONTENT_REFERENCE_ID'], cache:true
+			datasets joinTable:[name:'BIO_ASY_ANALYSIS_DATASET',key:'BIO_ASSAY_ANALYSIS_ID',schema:'BIOMART']
+			files joinTable:[name:'BIO_CONTENT_REFERENCE', key:'BIO_DATA_ID', column:'BIO_CONTENT_REFERENCE_ID',schema:'BIOMART'], cache:true
 
 
 		}

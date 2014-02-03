@@ -35,9 +35,9 @@ class Patient {
 		Long bioExperimentId
 		Long bioClinicalTrialPGroupId
  static mapping = {
-	 table 'biomart.BIO_PATIENT'
+	 table 'BIOMART.biomart.BIO_PATIENT'
 	 version false
-	 id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+	 id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 	 columns {
 		id column:'BIO_PATIENT_ID'
 		firstName column:'FIRST_NAME'

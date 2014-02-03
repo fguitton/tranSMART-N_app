@@ -39,7 +39,7 @@ class SampleInfo {
 	Long patientId;
 
 	static mapping = {
-		table 'de_subject_sample_mapping'
+		table 'DEAPP.de_subject_sample_mapping'
 		version false
 		id column: 'sample_id'
 		

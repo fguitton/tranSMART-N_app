@@ -43,9 +43,9 @@ class BioAssayDataStatistics {
 		//static belongsTo=[BioMarker]
 
  static mapping = {
-	 table 'BIO_ASSAY_DATA_STATS'
+	 table 'biomart.BIO_ASSAY_DATA_STATS'
 	 version false
-	 id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_FACT_ID']
+	 id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_FACT_ID']
 	 columns {
 		id column:'BIO_ASSAY_DATA_STATS_ID'
 		sampleCount column:'BIO_SAMPLE_COUNT'
@@ -62,7 +62,7 @@ class BioAssayDataStatistics {
 		experiment column:'BIO_EXPERIMENT_ID'
 		dataset column:'BIO_ASSAY_DATASET_ID'
 		featureGroup column:'BIO_ASSAY_FEATURE_GROUP_ID'
-	//	markers joinTable:[name:'BIO_DATA_OMIC_MARKER', key:'BIO_DATA_ID']
+	//	markers joinTable:[name:'BIO_DATA_OMIC_MARKER', key:'BIO_DATA_ID',schema:'BIOMART']
 
 		}
 	}

@@ -54,9 +54,9 @@ class BioAssayAnalysisData implements IExcelProfile {
 		static belongsTo=[BioMarker]
 
 	static mapping = {
-	 table 'BIO_ASSAY_ANALYSIS_DATA'
+	 table 'biomart.BIO_ASSAY_ANALYSIS_DATA'
 	 version false
-	 id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+	 id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 	 columns {
 		featureGroupName column:'FEATURE_GROUP_NAME'
 		experiment column:'BIO_EXPERIMENT_ID'
@@ -76,7 +76,7 @@ class BioAssayAnalysisData implements IExcelProfile {
 		numericValue column:'NUMERIC_VALUE'
 		numericValueCode column:'NUMERIC_VALUE_CODE'
 		teaNormalizedPValue column:'TEA_NORMALIZED_PVALUE'
-		markers joinTable:[name:'BIO_DATA_OMIC_MARKER', key:'BIO_DATA_ID']
+		markers joinTable:[name:'BIO_DATA_OMIC_MARKER', key:'BIO_DATA_ID',schema:'BIOMART']
 		}
 	}
 

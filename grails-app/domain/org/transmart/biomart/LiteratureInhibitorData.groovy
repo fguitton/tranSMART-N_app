@@ -63,10 +63,10 @@ class LiteratureInhibitorData extends Literature {
 	String effectSd
 	String effectUnit
 	static mapping = {
-		table 'BIO_LIT_INH_DATA'
+		table 'biomart.BIO_LIT_INH_DATA'
 		version false
 		id column:'BIO_LIT_INH_DATA_ID'
-		id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+		id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 		columns {
 			reference column:'BIO_LIT_REF_DATA_ID'
 			etlId column:'ETL_ID'

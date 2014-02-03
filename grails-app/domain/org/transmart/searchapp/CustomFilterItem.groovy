@@ -28,9 +28,9 @@ class CustomFilterItem {
 	String bioDataType
 	static belongsTo = [customFilter: CustomFilter]
 	static mapping = {
-		table 'SEARCH_CUSTOM_FILTER_ITEM'
+		table 'SEARCHAPP.SEARCH_CUSTOM_FILTER_ITEM'
 		version false
-		id generator:'sequence', params:[sequence:'SEQ_SEARCH_DATA_ID']
+		id generator:'sequence', params:[sequence:'SEARCHAPP.SEQ_SEARCH_DATA_ID']
 	 	columns {
 			id column:'SEARCH_CUSTOM_FILTER_ITEM_ID'
 			customFilter column:'SEARCH_CUSTOM_FILTER_ID'

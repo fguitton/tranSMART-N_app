@@ -36,10 +36,10 @@ class LiteratureSummaryData {
 	String totalAffectedCases
 	String summary
 	static mapping = {
-		table 'BIO_LIT_SUM_DATA'
+		table 'BIOMART.BIO_LIT_SUM_DATA'
 		version false
 		id column:'BIO_LIT_SUM_DATA_ID'
-		id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+		id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 		columns {
 			etlId column:'ETL_ID'
 			diseaseSite column:'DISEASE_SITE'

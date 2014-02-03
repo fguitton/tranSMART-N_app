@@ -41,7 +41,7 @@ class BioAssayAnalysisGwas implements IExcelProfile {
 	static mapping = {
 	 table name:'BIO_ASSAY_ANALYSIS_GWAS', schema:'BIOMART'
 	 version false
-	 id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+	 id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 	 columns {
 		 id column:'BIO_ASY_ANALYSIS_GWAS_ID'
 		 analysis column:'BIO_ASSAY_ANALYSIS_ID'

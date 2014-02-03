@@ -31,10 +31,10 @@ class BioAssayPlatform {
 		String vendor
  
 static mapping = {
-	 table 'BIO_ASSAY_PLATFORM'
+	 table 'biomart.BIO_ASSAY_PLATFORM'
 	 version false
 	 cache true
-	 id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+	 id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 	 columns {
 		id column:'BIO_ASSAY_PLATFORM_ID'
 		name column:'PLATFORM_NAME'

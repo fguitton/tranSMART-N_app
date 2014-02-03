@@ -29,10 +29,10 @@ class Disease {
 		String preferredName
 		static hasMany=[experiments:Experiment,literatures:Literature]
  static mapping = {
-	 table 'BIO_DISEASE'
+	 table 'biomart.BIO_DISEASE'
 	 version false
 	 cache usage:'read-only'
-	 id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+	 id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 	 columns {
 		id column:'BIO_DISEASE_ID'
 		disease column:'DISEASE'
@@ -41,8 +41,8 @@ class Disease {
 		meshCode column:'MESH_CODE'
 		icd9Code column:'ICD9_CODE'
 		preferredName column:'PREFERED_NAME'
-		experiments joinTable:[name:'BIO_DATA_DISEASE', key:'BIO_DISEASE_ID']
-		literatures joinTable:[name:'BIO_DATA_DISEASE', key:'BIO_DISEASE_ID']
+		experiments joinTable:[name:'BIO_DATA_DISEASE', key:'BIO_DISEASE_ID',schema:'BIOMART']
+		literatures joinTable:[name:'BIO_DATA_DISEASE', key:'BIO_DISEASE_ID',schema:'BIOMART']
 		}
 	}
 

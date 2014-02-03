@@ -30,7 +30,7 @@ class DeVariantDataSet {
 	
 
  static mapping = {
-	 table 'DE_VARIANT_DATASET'
+	 table 'DEAPP.DE_VARIANT_DATASET'
 	 version false
 	 id generator:'assigned'
 	 columns {

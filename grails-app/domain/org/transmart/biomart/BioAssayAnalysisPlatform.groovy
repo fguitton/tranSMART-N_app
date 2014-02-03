@@ -25,10 +25,10 @@ class BioAssayAnalysisPlatform {
 		String platformVersion
 		String platformDescription
  static mapping = {
-	 table 'BIO_ASY_ANALYSIS_PLTFM'
+	 table 'biomart.BIO_ASY_ANALYSIS_PLTFM'
 	 version false
 	 cache usage:'read-only'
-	 id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+	 id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 	 columns {
 		id column:'BIO_ASY_ANALYSIS_PLTFM_ID'
 		platformName column:'PLATFORM_NAME'

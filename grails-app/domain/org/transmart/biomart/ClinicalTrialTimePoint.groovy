@@ -27,9 +27,9 @@ class ClinicalTrialTimePoint {
 		Date endDate
 		ClinicalTrial clinicalTrial
  static mapping = {
-	 table 'BIO_CLINICAL_TRIAL_TIME_POINT'
+	 table 'biomart.BIO_CLINICAL_TRIAL_TIME_POINT'
 	 version false
-	 id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+	 id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 	 columns {
 		id column:'BIO_CLINIC_TRIAL_TIMEPOINT_ID'
 		timePoint column:'TIME_POINT'

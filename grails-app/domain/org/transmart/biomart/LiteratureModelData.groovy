@@ -43,10 +43,10 @@ class LiteratureModelData {
 	String component
 	String geneId
 	static mapping = {
-		table 'BIO_LIT_MODEL_DATA'
+		table 'biomart.BIO_LIT_MODEL_DATA'
 		version false
 		id column:'BIO_LIT_MODEL_DATA_ID'
-		id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+		id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 		columns {
 			etlId column:'ETL_ID'
 			modelType column:'MODEL_TYPE'

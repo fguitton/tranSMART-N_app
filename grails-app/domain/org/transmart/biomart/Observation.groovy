@@ -30,10 +30,10 @@ class Observation {
 		String codeSource
 		static hasMany=[experiments:Experiment,literatures:Literature,analyses:BioAssayAnalysis]
  static mapping = {
-	 table 'BIO_OBSERVATION'
+	 table 'BIOMART.BIO_OBSERVATION'
 	 version false
 	 cache usage:'read-only'
-	 id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+	 id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 	 columns {
 		id column:'BIO_OBSERVATION_ID'
 		name column:'OBS_NAME'
@@ -43,9 +43,9 @@ class Observation {
 		type column: 'OBS_TYPE'
 		codeSource column: 'OBS_CODE_SOURCE'
 		
-		experiments joinTable:[name:'BIO_DATA_OBS', key:'BIO_OBSERVATION_ID']
-		literatures joinTable:[name:'BIO_DATA_OBS', key:'BIO_OBSERVATION_ID']
-		analyses joinTable:[name:'BIO_DATA_OBS', key:'BIO_OBSERVATION_ID']
+		experiments joinTable:[name:'BIO_DATA_OBS', key:'BIO_OBSERVATION_ID',schema:'BIOMART']
+		literatures joinTable:[name:'BIO_DATA_OBS', key:'BIO_OBSERVATION_ID',schema:'BIOMART']
+		analyses joinTable:[name:'BIO_DATA_OBS', key:'BIO_OBSERVATION_ID',schema:'BIOMART']
 		}
 	}
 

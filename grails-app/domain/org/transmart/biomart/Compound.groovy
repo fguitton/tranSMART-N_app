@@ -48,10 +48,10 @@ class Compound {
 	}
 	
 	static mapping = {
-		table 'BIO_COMPOUND'
+		table 'biomart.BIO_COMPOUND'
 		version false
 		cache usage:'read-only'
-		id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+		id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 		columns {
 			id column:'BIO_COMPOUND_ID'
 			cntoNumber column:'CNTO_NUMBER'
@@ -65,8 +65,8 @@ class Compound {
 			productCategory column:'PRODUCT_CATEGORY'
 			description column:'DESCRIPTION'
 			sourceCode column:'SOURCE_CD'
-			experiments joinTable:[name:'BIO_DATA_COMPOUND', key:'BIO_COMPOUND_ID']
-			literatures joinTable:[name:'BIO_DATA_COMPOUND', key:'BIO_COMPOUND_ID']
+			experiments joinTable:[name:'BIO_DATA_COMPOUND', key:'BIO_COMPOUND_ID',schema:'BIOMART',schema:'BIOMART']
+			literatures joinTable:[name:'BIO_DATA_COMPOUND', key:'BIO_COMPOUND_ID',schema:'BIOMART',schema:'BIOMART']
 		}
 	}
 	

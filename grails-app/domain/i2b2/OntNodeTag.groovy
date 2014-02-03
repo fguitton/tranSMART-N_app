@@ -26,7 +26,7 @@ class OntNodeTag {
 		String tagtype
 static belongsTo=[ontnode:OntNode]
 static mapping = {
-	 table 'I2B2_TAGS'
+	 table 'I2B2METADATA.I2B2_TAGS'
 	 version false
 	 id column:'TAG_ID'
 	 id generator:'sequence', params:[sequence:'SEQ_I2B2_DATA_ID']		

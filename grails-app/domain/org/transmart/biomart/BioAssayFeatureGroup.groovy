@@ -31,15 +31,15 @@ class BioAssayFeatureGroup {
 
 
  static mapping = {
-	 table 'BIO_ASSAY_FEATURE_GROUP'
+	 table 'biomart.BIO_ASSAY_FEATURE_GROUP'
 	 version false
 	 cache usage:'read-only'
-	 id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+	 id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 	 columns {
 		id column:'BIO_ASSAY_FEATURE_GROUP_ID'
 		name column:'FEATURE_GROUP_NAME'
 		type column:'FEATURE_GROUP_TYPE'
-		markers joinTable:[name:'BIO_ASSAY_DATA_ANNOTATION', key:'BIO_ASSAY_FEATURE_GROUP_ID']
+		markers joinTable:[name:'BIO_ASSAY_DATA_ANNOTATION', key:'BIO_ASSAY_FEATURE_GROUP_ID',schema:'BIOMART']
 	 }
 	}
 

@@ -25,10 +25,10 @@ class ContentReference {
 		Content content
 		Long bioDataId
  static mapping = {
-	 table 'BIO_CONTENT_REFERENCE'
+	 table 'biomart.BIO_CONTENT_REFERENCE'
 	 version false
 	cache usage:'read-only'
-	 id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+	 id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 	 columns {
 		id column:'BIO_CONTENT_REFERENCE_ID'
 		type column:'CONTENT_REFERENCE_TYPE'

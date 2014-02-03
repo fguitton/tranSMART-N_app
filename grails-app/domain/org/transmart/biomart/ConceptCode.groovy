@@ -27,10 +27,10 @@ class ConceptCode {
 		String codeDescription
 		String codeTypeName
  static mapping = {
-	 table 'BIO_CONCEPT_CODE'
+	 table 'biomart.BIO_CONCEPT_CODE'
 	 cache true
 	 version false
-	 id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+	 id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 	 columns {
 		id column:'BIO_CONCEPT_CODE_ID'
 		bioConceptCode column:'BIO_CONCEPT_CODE'

@@ -7,10 +7,10 @@ class BioAnalysisAttribute {
 	String sourceCode
 	
 	static mapping = {
-		table 'BIO_ANALYSIS_ATTRIBUTE'			   
+		table 'biomart.BIO_ANALYSIS_ATTRIBUTE'			   
 		version false
 		id column:'BIO_ANALYSIS_ATTRIBUTE_ID'
-		id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+		id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 		columns {
 		   studyID column:'STUDY_ID'
 		   bioAssayAnalysisID column:'BIO_ASSAY_ANALYSIS_ID'

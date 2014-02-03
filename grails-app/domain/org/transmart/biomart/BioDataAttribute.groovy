@@ -26,9 +26,9 @@ class BioDataAttribute {
 		String propertyUnit
 		Long bioDataId
  static mapping = {
-	 table 'BIO_DATA_ATTRIBUTE'
+	 table 'biomart.BIO_DATA_ATTRIBUTE'
 	 version false
-	 id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+	 id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 	 columns {
 		id column:'BIO_DATA_ATTRIBUTE_ID'
 		propertyCode column:'PROPERTY_CODE'

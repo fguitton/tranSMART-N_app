@@ -28,7 +28,7 @@ class Requestmap {
 	Long version
 	static mapping ={
 		table 'SEARCHAPP.SEARCH_REQUEST_MAP'
-		id generator:'sequence', params:[sequence:'SEQ_SEARCH_DATA_ID']
+		id generator:'sequence', params:[sequence:'SEARCHAPP.SEQ_SEARCH_DATA_ID']
 		columns {
 			id column:'ID'
 			version column:'VERSION'

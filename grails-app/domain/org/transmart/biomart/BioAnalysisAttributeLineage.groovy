@@ -6,7 +6,7 @@ public class BioAnalysisAttributeLineage  {
     org.transmart.searchapp.SearchTaxonomy ancestorTerm
 	
 	static mapping = {
-		table 'BIO_ANALYSIS_ATTRIBUTE_LINEAGE'
+		table 'biomart.BIO_ANALYSIS_ATTRIBUTE_LINEAGE'
 		version false
 		id column:'BIO_ANALYSIS_ATT_LINEAGE_ID'
 		columns {

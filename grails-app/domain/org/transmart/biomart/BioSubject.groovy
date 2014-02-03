@@ -29,9 +29,9 @@ class BioSubject {
 		String organism
 		String type
  static mapping = {
-	 table 'BIO_SUBJECT'
+	 table 'biomart.BIO_SUBJECT'
 	 version false
-	 id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+	 id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 	 columns {
 		id column:'BIO_SUBJECT_ID'
 		siteSubjectId column:'SITE_SUBJECT_ID'

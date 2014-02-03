@@ -34,10 +34,10 @@ class BioAssayAnalysisExt {
 	static belongsTo=[bioAssayAnalysis: BioAssayAnalysis]
 
 	static mapping = {
-		table 'BIO_ASSAY_ANALYSIS_EXT'
+		table 'biomart.BIO_ASSAY_ANALYSIS_EXT'
 		version false
 		cache usage:'read-only'
-		id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+		id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 		columns {
 			id column: 'BIO_ASSAY_ANALYSIS_EXT_ID'
 			bioAssayAnalysis: 'BIO_ASSAY_ANALYSIS_ID'

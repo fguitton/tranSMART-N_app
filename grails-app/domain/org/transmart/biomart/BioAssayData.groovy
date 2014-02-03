@@ -40,10 +40,10 @@ class BioAssayData {
 		static hasMany=[diseases:Disease, compounds:Compound, markers:BioMarker]
 
  static mapping = {
-	 table 'BIO_ASSAY_DATA'
+	 table 'biomart.BIO_ASSAY_DATA'
 	 version false
 	 id column:'BIO_ASSAY_DATA_ID'
-	 id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+	 id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 	 columns {
 		numericValue column:'NUMERIC_VALUE'
 		textValue column:'TEXT_VALUE'
@@ -55,9 +55,9 @@ class BioAssayData {
 		log2Value column:'LOG2_VALUE'
 		log10Value column:'LOG10_VALUE'
 		bioAssayDatasetId column:'BIO_ASSAY_DATASET_ID'
-		diseases joinTable:[name:'BIO_DATA_DISEASE', key:'BIO_DATA_ID', column:'BIO_DISEASE_ID']
-		markers joinTable:[name:'BIO_DATA_OMIC_MARKER', key:'BIO_DATA_ID', column:'BIO_MARKER_ID']
-		compounds joinTable:[name:'BIO_DATA_COMPOUND', key:'BIO_DATA_ID', column:'BIO_COMPOUND_ID']
+		diseases joinTable:[name:'BIO_DATA_DISEASE', key:'BIO_DATA_ID', column:'BIO_DISEASE_ID',schema:'BIOMART']
+		markers joinTable:[name:'BIO_DATA_OMIC_MARKER', key:'BIO_DATA_ID', column:'BIO_MARKER_ID',schema:'BIOMART']
+		compounds joinTable:[name:'BIO_DATA_COMPOUND', key:'BIO_DATA_ID', column:'BIO_COMPOUND_ID',schema:'BIOMART']
 		}
 	}
 

@@ -32,10 +32,10 @@ class LiteratureProteinEffectData extends Literature {
 	String etlId
 	String description
 	static mapping = {
-		table 'BIO_LIT_PE_DATA'
+		table 'biomart.BIO_LIT_PE_DATA'
 		version false
 		id column:'BIO_LIT_PE_DATA_ID'
-		id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+		id generator:'sequence', params:[sequence:'biomart.SEQ_BIO_DATA_ID']
 		columns {
 			reference column:'BIO_LIT_REF_DATA_ID'
 			inVivoModel column:'IN_VIVO_MODEL_ID'

@@ -36,9 +36,9 @@ class BioSample {
 		String name
 
  static mapping = {
-	 table 'BIO_SAMPLE'
+	 table 'biomart.BIO_SAMPLE'
 	 version false
-	 id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+	 id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 	 columns {
 		id column:'BIO_SAMPLE_ID'
 		type column:'BIO_SAMPLE_TYPE'

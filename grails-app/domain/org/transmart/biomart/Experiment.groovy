@@ -56,7 +56,7 @@ class Experiment implements IExcelProfile {
 		table 'biomart.BIO_EXPERIMENT'
 		version false
 		cache usage:'read-only'
-		//	 id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+		//	 id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 		columns {
 			id column:'BIO_EXPERIMENT_ID'
 			type column:'BIO_EXPERIMENT_TYPE'
@@ -73,11 +73,11 @@ class Experiment implements IExcelProfile {
 			target column:'TARGET'
 			bioMarkerType column:'BIOMARKER_TYPE'
 			primaryInvestigator column:'PRIMARY_INVESTIGATOR'
-			compounds joinTable:[name:'BIO_DATA_COMPOUND', key:'BIO_DATA_ID'], cache:true
-			diseases joinTable:[name:'BIO_DATA_DISEASE', key:'BIO_DATA_ID'], cache:true
-			organisms joinTable:[name:'BIO_DATA_TAXONOMY', key:'BIO_DATA_ID'],cache:true
-			files joinTable:[name:'BIO_CONTENT_REFERENCE', key:'BIO_DATA_ID', column:'BIO_CONTENT_REFERENCE_ID'],cache:true
-			uniqueIds joinTable:[name:'BIO_DATA_UID', key:'BIO_DATA_ID']
+			compounds joinTable:[name:'BIO_DATA_COMPOUND', key:'BIO_DATA_ID',schema:'BIOMART'], cache:true
+			diseases joinTable:[name:'BIO_DATA_DISEASE', key:'BIO_DATA_ID',schema:'BIOMART'], cache:true
+			organisms joinTable:[name:'BIO_DATA_TAXONOMY', key:'BIO_DATA_ID',schema:'BIOMART'],cache:true
+			files joinTable:[name:'BIO_CONTENT_REFERENCE', key:'BIO_DATA_ID', column:'BIO_CONTENT_REFERENCE_ID',schema:'BIOMART'],cache:true
+			uniqueIds joinTable:[name:'BIO_DATA_UID', key:'BIO_DATA_ID',schema:'BIOMART']
 		}
 	}
 	

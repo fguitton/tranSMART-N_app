@@ -27,9 +27,9 @@ class CurationDataset {
 		Long id
 		Long bioAnalysisPlatformId
  static mapping = {
-	 table 'BIO_CURATION_DATASET'
+	 table 'biomart.BIO_CURATION_DATASET'
 	 version false
-	 id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+	 id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 	 columns {
 		curationType column:'BIO_CURATION_TYPE'
 		createDate column:'CREATE_DATE'

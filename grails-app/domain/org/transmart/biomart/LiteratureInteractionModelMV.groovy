@@ -23,7 +23,7 @@ class LiteratureInteractionModelMV {
 	Long id
 	String experimentalModel
 	static mapping = {
-		table 'BIO_LIT_INT_MODEL_MV'
+		table 'biomart.BIO_LIT_INT_MODEL_MV'
 		version false
 		columns {
 			id column:'BIO_LIT_INT_DATA_ID'

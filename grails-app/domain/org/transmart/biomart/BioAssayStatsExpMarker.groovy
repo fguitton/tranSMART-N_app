@@ -31,7 +31,7 @@ public class BioAssayStatsExpMarker{
 	BioMarker marker
 	Long id
 	static mapping = {
-		 table 'BIO_STATS_EXP_MARKER'
+		 table 'biomart.BIO_STATS_EXP_MARKER'
 		 version false
 		 columns {
 			id column:'BIO_STATS_EXP_MARKER_ID'

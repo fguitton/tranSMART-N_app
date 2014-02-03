@@ -46,7 +46,7 @@ class OntNode {
 		List tags=[]
 		static hasMany =[tags:OntNodeTag]
  static mapping = {
-	 table 'I2B2_SECURE'
+	 table 'I2B2METADATA.I2B2_SECURE'
 	 version false
 	 id column: 'C_FULLNAME'
 	 columns {

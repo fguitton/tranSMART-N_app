@@ -32,9 +32,9 @@ class CustomFilter {
 	static hasMany = [items:CustomFilterItem]
 	static transients = [ "summary" ]
 	static mapping = {
-		table 'SEARCH_CUSTOM_FILTER'
+		table 'SEARCHAPP.SEARCH_CUSTOM_FILTER'
 		version false
-		id generator:'sequence', params:[sequence:'SEQ_SEARCH_DATA_ID']
+		id generator:'sequence', params:[sequence:'SEARCHAPP.SEQ_SEARCH_DATA_ID']
 	 	columns {
 			id column:'SEARCH_CUSTOM_FILTER_ID'
 			searchUserId column:'SEARCH_USER_ID'

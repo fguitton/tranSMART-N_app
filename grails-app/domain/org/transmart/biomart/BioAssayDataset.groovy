@@ -32,10 +32,10 @@ class BioAssayDataset {
 		Experiment experiment
 
  static mapping = {
-	 table 'BIO_ASSAY_DATASET'
+	 table 'biomart.BIO_ASSAY_DATASET'
 	 version false
 	 cache usage:'read-only'
-	 id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+	 id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 	 columns {
 		id column:'BIO_ASSAY_DATASET_ID'
 		name column:'DATASET_NAME'

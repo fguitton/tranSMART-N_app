@@ -34,10 +34,10 @@ class Literature {
 	static hasMany = [diseases:Disease, compounds:Compound, markers:BioMarker, files:ContentReference]
 	static belongsTo = [Disease, Compound, BioMarker, ContentReference]		
 	static mapping = {
-		table 'BIO_DATA_LITERATURE'
+		table 'biomart.BIO_DATA_LITERATURE'
 		tablePerHierarchy false
 		version false
-		id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+		id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 		columns {
 			id column:'BIO_DATA_ID'
 			reference column: 'BIO_LIT_REF_DATA_ID'
@@ -45,10 +45,10 @@ class Literature {
 			statement column:'STATEMENT'
 			statementStatus column:'STATEMENT_STATUS'
 			dataType column:'DATA_TYPE'
-			diseases joinTable:[name:'BIO_DATA_DISEASE', key:'BIO_DATA_ID']
-			markers joinTable:[name:'BIO_DATA_OMIC_MARKER', key:'BIO_DATA_ID']
-			compounds joinTable:[name:'BIO_DATA_COMPOUND', key:'BIO_DATA_ID']
-			files joinTable:[name:'BIO_CONTENT_REFERENCE', key:'BIO_DATA_ID', column:'BIO_CONTENT_REFERENCE_ID']
+			diseases joinTable:[name:'BIO_DATA_DISEASE', key:'BIO_DATA_ID',schema:'BIOMART']
+			markers joinTable:[name:'BIO_DATA_OMIC_MARKER', key:'BIO_DATA_ID',schema:'BIOMART']
+			compounds joinTable:[name:'BIO_DATA_COMPOUND', key:'BIO_DATA_ID',schema:'BIOMART']
+			files joinTable:[name:'BIO_CONTENT_REFERENCE', key:'BIO_DATA_ID', column:'BIO_CONTENT_REFERENCE_ID',schema:'BIOMART']
 		}
 	}
 }

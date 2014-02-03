@@ -20,7 +20,7 @@ class DeSNPInfo {
 		String effect
 		String exonId
  static mapping = {
-	 table 'DE_RC_SNP_INFO'
+	 table 'DEAPP.DE_RC_SNP_INFO'
 	 version false
 	 id column:'SNP_INFO_ID'
 	 id generator:'sequence', params:[sequence:'SEQ_DE_DATA_ID']

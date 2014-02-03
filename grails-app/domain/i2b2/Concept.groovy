@@ -46,7 +46,7 @@ class Concept {
 	String valueType;
 	
 	static mapping = {
-		table 'i2b2'
+		table 'I2B2METADATA.i2b2'
 		version false
 		
 		id generator: 'sequence', column: "i2b2_id", params:[sequence:'I2B2_ID_SEQ']

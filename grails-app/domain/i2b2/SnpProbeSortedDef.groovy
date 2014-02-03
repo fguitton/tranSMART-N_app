@@ -29,7 +29,7 @@ class SnpProbeSortedDef {
 	String snpIdDef;
 
 	static mapping = {
-		table 'DE_SNP_PROBE_SORTED_DEF'
+		table 'DEAPP.DE_SNP_PROBE_SORTED_DEF'
 		version false
 		columns{
 			id column:'SNP_PROBE_SORTED_DEF_ID'

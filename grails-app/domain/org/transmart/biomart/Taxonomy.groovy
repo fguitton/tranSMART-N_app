@@ -26,16 +26,16 @@ class Taxonomy {
 		String ncbiTaxId
 		static hasMany=[experiments:Experiment]
  static mapping = {
-	 table 'BIO_TAXONOMY'
+	 table 'BIOMART.BIO_TAXONOMY'
 	 version false
 	 cache usage:'read-only'
-	 id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+	 id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 	 columns {
 		id column:'BIO_TAXONOMY_ID'
 		name column:'TAXON_NAME'
 		label column:'TAXON_LABEL'
 		ncbiTaxId column:'NCBI_TAX_ID'
-		experiments joinTable:[name:'BIO_DATA_TAXONOMY', key:'BIO_TAXONOMY_ID']
+		experiments joinTable:[name:'BIO_DATA_TAXONOMY', key:'BIO_TAXONOMY_ID', schema:'BIOMART']
 		}
 	}
 

@@ -28,9 +28,9 @@ class PatientEvent {
 		String site
 		Long bioClinicTrialTimepointId
  static mapping = {
-	 table 'BIO_PATIENT_EVENT'
+	 table 'BIOMART.BIO_PATIENT_EVENT'
 	 version false
-	 id generator:'sequence', params:[sequence:'SEQ_BIO_PATIENT_EVENT_ID']
+	 id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_PATIENT_EVENT_ID']
 	 columns {
 		id column:'BIO_PATIENT_EVENT_ID'
 		bioPatientId column:'BIO_PATIENT_ID'

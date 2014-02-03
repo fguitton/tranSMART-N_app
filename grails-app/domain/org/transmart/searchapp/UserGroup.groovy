@@ -25,7 +25,7 @@ class UserGroup extends Principal{
 	static hasMany = [members:AuthUser]
 
 	static mapping = {
-		table 'SEARCH_AUTH_GROUP'
+		table 'SEARCHAPP.SEARCH_AUTH_GROUP'
 		columns
 		{
 			groupCategory column:'GROUP_CATEGORY'
