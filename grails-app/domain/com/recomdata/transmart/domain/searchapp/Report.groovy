@@ -36,7 +36,7 @@ class Report {
 static mapping = {
 	table 'SEARCHAPP.REPORT'
 	version false
-	id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+	id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
 	columns {
 	   id column:'REPORT_ID'
 	   name column:'NAME'

@@ -43,7 +43,7 @@ static transients = ['emailLink','link', 'displayDate']
 static mapping = {
  table 'SEARCHAPP.SUBSET'
  version false
- id generator:'sequence', params:[sequence:'SEQ_BIO_DATA_ID']
+ id generator:'sequence', params:[sequence:'BIOMART.SEQ_BIO_DATA_ID']
  columns {
 	id column:'SUBSET_ID'
 	description column:'DESCRIPTION'

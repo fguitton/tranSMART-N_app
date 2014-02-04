@@ -25,17 +25,17 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 import org.springframework.security.web.DefaultRedirectStrategy
 
 import com.recomdata.transmart.data.export.ClinicalDataService;
-//import com.recomdata.transmart.data.export.PostgresClinicalDataService;
-//import com.recomdata.transmart.data.export.PostgresDataCountService;
-//import com.recomdata.transmart.data.export.PostgresExportService;
-//import com.recomdata.transmart.data.export.PostgresGeneExpressionDataService;
-//import com.recomdata.transmart.data.export.PostgresSnpDataService;
+import com.recomdata.transmart.data.export.PostgresClinicalDataService;
+import com.recomdata.transmart.data.export.PostgresDataCountService;
+import com.recomdata.transmart.data.export.PostgresExportService;
+import com.recomdata.transmart.data.export.PostgresGeneExpressionDataService;
+import com.recomdata.transmart.data.export.PostgresSnpDataService;
 
-import com.recomdata.transmart.data.export.NetezzaClinicalDataService;
-import com.recomdata.transmart.data.export.NetezzaDataCountService;
-import com.recomdata.transmart.data.export.NetezzaExportService;
-import com.recomdata.transmart.data.export.NetezzaGeneExpressionDataService;
-import com.recomdata.transmart.data.export.NetezzaSnpDataService;
+//import com.recomdata.transmart.data.export.NetezzaClinicalDataService;
+//import com.recomdata.transmart.data.export.NetezzaDataCountService;
+//import com.recomdata.transmart.data.export.NetezzaExportService;
+//import com.recomdata.transmart.data.export.NetezzaGeneExpressionDataService;
+//import com.recomdata.transmart.data.export.NetezzaSnpDataService;
 
 import I2b2HelperService;
 import PostgresI2b2HelperService;
@@ -89,7 +89,7 @@ beans = {
 		sampleInfoService(SampleInfoService)
 	
 		// --
-	    /*
+
 		log.debug("Postgres configured")
 		
 		dataCountService(PostgresDataCountService){bean ->
@@ -136,7 +136,8 @@ beans = {
 			asyncJobService = ref('asyncJobService')
 			dataExportService = ref('dataExportService')
 		}
-		*/
+
+    /*
     log.debug("Netezza configured")
 
     dataCountService(NetezzaDataCountService){bean ->
@@ -183,7 +184,7 @@ beans = {
         asyncJobService = ref('asyncJobService')
         dataExportService = ref('dataExportService')
     }
-
+        */
 	/*}*/
 }
 

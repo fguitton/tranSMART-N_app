@@ -47,58 +47,58 @@ class PostgresDataCountService {
 		StringBuilder subjectsFromBothSubsetsQuery = new StringBuilder()
 		StringBuilder gseaQuery = new StringBuilder()
 		
-		subjectsQuery.append("select omic_patient_id from de_subject_sample_mapping where patient_id in ")
-		subjectsQuery.append("(SELECT DISTINCT patient_num FROM qt_patient_set_collection WHERE result_instance_id = CAST(? AS numeric)")
-		.append(" AND patient_num IN (select patient_num from patient_dimension where sourcesystem_cd not like '%:S:%'))")
+		subjectsQuery.append("select omic_patient_id from DEAPP.de_subject_sample_mapping where patient_id in ")
+		subjectsQuery.append("(SELECT DISTINCT patient_num FROM i2b2demodata.qt_patient_set_collection WHERE result_instance_id = CAST(? AS numeric)")
+		.append(" AND patient_num IN (select patient_num from i2b2demodata.patient_dimension where sourcesystem_cd not like '%:S:%'))")
 		
-		subjectsFromBothSubsetsQuery.append("SELECT DISTINCT patient_num FROM qt_patient_set_collection WHERE result_instance_id IN (")
+		subjectsFromBothSubsetsQuery.append("SELECT DISTINCT patient_num FROM i2b2demodata.qt_patient_set_collection WHERE result_instance_id IN (")
 		.append(resultInstanceIds).append(')')
-		.append(" AND patient_num IN (select patient_num from patient_dimension where sourcesystem_cd not like '%:S:%')")
+		.append(" AND patient_num IN (select patient_num from i2b2demodata.patient_dimension where sourcesystem_cd not like '%:S:%')")
 		
 		//Build the query we use to get MRNA Data. patient_id should be unique to a given study for each patient. 
 		//We count the distinct ID's with MRNA data.
-		mrnaQuery.append("SELECT count(distinct s.patient_id), s.gpl_id FROM de_subject_sample_mapping s WHERE s.patient_id IN (")
+		mrnaQuery.append("SELECT count(distinct s.patient_id), s.gpl_id FROM DEAPP.de_subject_sample_mapping s WHERE s.patient_id IN (")
 		.append(subjectsQuery).append(") AND s.platform='MRNA_AFFYMETRIX' AND s.assay_id IS NOT NULL group by s.gpl_id");
 		
 		//Build the query we use to get MRNA "CEL" Data. patient_id should be unique to a given study for each patient.
 		//We count the distinct ID's with MRNA data.
-		mrnaCelQuery.append("SELECT count(distinct s.patient_id) FROM de_subject_sample_mapping s ")
-		.append("INNER JOIN bio_content b on s.trial_name = b.study_name ")
+		mrnaCelQuery.append("SELECT count(distinct s.patient_id) FROM DEAPP.de_subject_sample_mapping s ")
+		.append("INNER JOIN BIOMART.bio_content b on s.trial_name = b.study_name ")
 		.append("WHERE s.patient_id IN (").append(subjectsQuery).append(") AND s.platform='MRNA_AFFYMETRIX' AND s.assay_id IS NOT NULL ")
 		.append("AND b.cel_location IS NOT NULL AND s.sample_cd IS NOT NULL")
 		
 		//Build the query we use to get the clinical data. patient_num should be unique across all studies.
-		clinicalQuery.append("SELECT count(distinct obsf.patient_num) FROM observation_fact obsf WHERE obsf.patient_num IN (")
+		clinicalQuery.append("SELECT count(distinct obsf.patient_num) FROM i2b2demodata.observation_fact obsf WHERE obsf.patient_num IN (")
 		.append(subjectsQuery).append(")");
 		
 		//Build the query we use to get the RBM data. patient_id should be unique across all studies.
-		rbmQuery.append("SELECT count(distinct rbm.patient_id) FROM DE_SUBJECT_RBM_DATA rbm WHERE rbm.patient_id IN (")
+		rbmQuery.append("SELECT count(distinct rbm.patient_id) FROM DEAPP.DE_SUBJECT_RBM_DATA rbm WHERE rbm.patient_id IN (")
 		.append(subjectsQuery).append(")");
 
 		//Build the query we use to get the SNP data. patient_num should be unique across all studies.
-		snpQuery.append("SELECT count(distinct snp.patient_num) FROM de_subject_snp_dataset snp WHERE snp.patient_num IN (")
+		snpQuery.append("SELECT count(distinct snp.patient_num) FROM DEAPP.de_subject_snp_dataset snp WHERE snp.patient_num IN (")
 		.append(subjectsQuery).append(")");
 	
 		snpCelQuery.append("""SELECT count(DISTINCT ssd.patient_num) 
-							FROM de_subject_snp_dataset ssd 
-							INNER JOIN bio_content b ON b.study_name = ssd.trial_name
+							FROM DEAPP.de_subject_snp_dataset ssd
+							INNER JOIN BIOMART.bio_content b ON b.study_name = ssd.trial_name
 							WHERE ssd.patient_num IN (""").append(subjectsQuery).append(")");
 		
 		//Build the query we use to get Additional Data. patient_id should be unique to a given study for each patient.
 		//We count the distinct ID's with additional data. TODO:change != to "ADDTIONAL" or something like that
 		def additionalDataPlatformSubQuery = """
-		select distinct platform from de_subject_sample_mapping x 
+		select distinct platform from DEAPP.de_subject_sample_mapping x
 		where x.trial_name = s.trial_name and x.platform not in ('MRNA_AFFYMETRIX','SNP','RBM','PROTEIN')""";
 		
-		additionalDataQuery.append("SELECT count(distinct s.patient_id) FROM de_subject_sample_mapping s ")
-		.append("INNER JOIN bio_content b on s.trial_name = b.study_name ")
+		additionalDataQuery.append("SELECT count(distinct s.patient_id) FROM DEAPP.de_subject_sample_mapping s ")
+		.append("INNER JOIN BIOMART.bio_content b on s.trial_name = b.study_name ")
 		.append("WHERE s.patient_id IN (").append(subjectsQuery).append(") AND s.platform IN (")
 		.append(additionalDataPlatformSubQuery).append(") AND s.assay_id IS NOT NULL ")
 		.append("AND b.cel_location IS NOT NULL AND s.sample_cd IS NOT NULL")
 		
 		//Build the query we use to get GSEA Data. patient_id should be unique to a given study for each patient.
 		//We count the distinct ID's with GSEA data.
-		gseaQuery.append("SELECT count(distinct s.patient_id), s.gpl_id FROM de_subject_sample_mapping s WHERE s.patient_id IN (")
+		gseaQuery.append("SELECT count(distinct s.patient_id), s.gpl_id FROM DEAPP.de_subject_sample_mapping s WHERE s.patient_id IN (")
 		.append(subjectsFromBothSubsetsQuery).append(") AND s.platform='MRNA_AFFYMETRIX' AND s.assay_id IS NOT NULL group by s.gpl_id");
 		
 		//Get the count of MRNA Data for the given list of subject IDs.
