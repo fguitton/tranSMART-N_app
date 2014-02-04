@@ -778,7 +778,7 @@ class PostgresI2b2HelperService {
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
 		String sqlt = """SELECT REQUEST_XML FROM I2B2DEMODATA.QT_QUERY_MASTER c INNER JOIN I2B2DEMODATA.QT_QUERY_INSTANCE a
 		    ON a.QUERY_MASTER_ID=c.QUERY_MASTER_ID INNER JOIN I2B2DEMODATA.QT_QUERY_RESULT_INSTANCE b
-		    ON a.QUERY_INSTANCE_ID=b.QUERY_INSTANCE_ID WHERE RESULT_INSTANCE_ID =(SELECT CAST(? AS numeric))""";
+		    ON a.QUERY_INSTANCE_ID=b.QUERY_INSTANCE_ID WHERE RESULT_INSTANCE_ID =?""";
 		
 		String xmlrequest="";
 		sql.eachRow(sqlt, [resultInstanceId], {row ->
@@ -952,7 +952,9 @@ class PostgresI2b2HelperService {
 		
 		log.debug("getDistinctConceptSet called with arguments: "+result_instance_id1+" and "+result_instance_id2)
 		
-		workingSet.addAll(getConceptKeysInSubset(result_instance_id1));
+		if(result_instance_id1!=null && !result_instance_id1.isEmpty())
+        workingSet.addAll(getConceptKeysInSubset(result_instance_id1));
+        if(result_instance_id1!=null && !result_instance_id1.isEmpty())
 		workingSet.addAll(getConceptKeysInSubset(result_instance_id2));
 		
 		for (String k : workingSet) {
@@ -974,8 +976,9 @@ class PostgresI2b2HelperService {
 	/**
 	 * Gets the querymasterid for resultinstanceid
 	 */
-	def String getQIDFromRID(String resultInstanceId) {		
-		String qid=""
+	def String getQIDFromRID(String resultInstanceId) {
+        if(resultInstanceId=='null') resultInstanceId=null
+        String qid=""
 		if (resultInstanceId != null && resultInstanceId.length() > 0)	{
 			groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
 			String sqlt="""select QUERY_MASTER_ID FROM I2B2DEMODATA.QT_QUERY_INSTANCE a
@@ -3477,7 +3480,7 @@ class PostgresI2b2HelperService {
 		else {
 			pathwayS.append(" select  distinct bm.primary_external_id as gene_id from ")
 					.append("SEARCHAPP.search_keyword sk, ")
-					.append(" bio_marker_correl_mv sbm,")
+					.append(" BIOMART.bio_marker_correl_mv sbm,")
 					.append(" BIOMART.bio_marker bm")
 					.append(" where sk.bio_data_id = sbm.bio_marker_id")
 					.append(" and sbm.asso_bio_marker_id = bm.bio_marker_id")
