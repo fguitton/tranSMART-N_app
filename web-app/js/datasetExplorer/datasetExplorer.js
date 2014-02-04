@@ -2007,7 +2007,7 @@ function projectDialogComplete() {
         getPreviousQueryFromID(2, GLOBAL.RestoreQID2);
     }
     if ((!GLOBAL.Tokens.indexOf("EXPORT") > -1) && (!GLOBAL.IsAdmin)) {
-        Ext.getCmp("exportbutton").disable();
+        //Ext.getCmp("exportbutton").disable();
     }
 }
 
