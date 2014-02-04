@@ -68,9 +68,9 @@ class PostgresI2b2HelperService {
 	def double[] getPatientDemographicValueDataForSubset(String col, String result_instance_id) {
 		ArrayList<Double> values=new ArrayList<Double>();
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-		String sqlt = """SELECT """ + col + """ FROM patient_dimension f WHERE
+		String sqlt = """SELECT """ + col + """ FROM I2B2DEMODATA.patient_dimension f WHERE
 		    PATIENT_NUM IN (select distinct patient_num
-			from qt_patient_set_collection
+			from I2B2DEMODATA.qt_patient_set_collection
 			where result_instance_id = CAST(? AS numeric))""";
 		sql.eachRow(sqlt, [result_instance_id], {row ->
 			values.add(row[0])
@@ -170,7 +170,7 @@ class PostgresI2b2HelperService {
 		String path = null;
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
 		String sqlt =
-				sql.eachRow("SELECT CONCEPT_PATH FROM CONCEPT_DIMENSION c WHERE CONCEPT_CD = ?", [code], {row ->
+				sql.eachRow("SELECT CONCEPT_PATH FROM I2B2DEMODATA.CONCEPT_DIMENSION c WHERE CONCEPT_CD = ?", [code], {row ->
 					path = row.CONCEPT_PATH;
 				})
 		return path;
@@ -214,7 +214,7 @@ class PostgresI2b2HelperService {
 		def markerType = ""
 		//def rs = sql.executePreparedQuery("select dgi.marker_type from concept_dimension cd, de_gpl_info dgi where cd.name_char=dgi.title "+
 		//		"and cd.concept_cd = ?",[conceptCd])
-		sql.eachRow("select dgi.marker_type from concept_dimension cd, de_gpl_info dgi where cd.concept_path like('%'||dgi.title||'%') "+
+		sql.eachRow("select dgi.marker_type from I2B2DEMODATA.concept_dimension cd, deapp.de_gpl_info dgi where cd.concept_path like('%'||dgi.title||'%') "+
 				"and cd.concept_cd = ?",[conceptCd], {row ->
 					markerType = row.marker_type
 		})
@@ -250,7 +250,7 @@ class PostgresI2b2HelperService {
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
 		def counts = [:];
 		log.trace("Trying to get counts for parent_concept_path="+keyToPath(concept_key));
-		sql.eachRow("select * from CONCEPT_COUNTS where parent_concept_path = ?", [keyToPath(concept_key)], {row ->
+		sql.eachRow("select * from I2B2DEMODATA.CONCEPT_COUNTS where parent_concept_path = ?", [keyToPath(concept_key)], {row ->
 			log.trace "Found " << row.concept_path
 			counts.put(row.concept_path, row.patient_count)
 		});
@@ -266,7 +266,7 @@ class PostgresI2b2HelperService {
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
 		String concept_cd=getConceptCodeFromKey(concept_key);
 		ArrayList<Double> values=new ArrayList<Double>();
-		sql.eachRow("SELECT NVAL_NUM FROM OBSERVATION_FACT f WHERE CONCEPT_CD = ?", [concept_cd], {row ->
+		sql.eachRow("SELECT NVAL_NUM FROM I2B2DEMODATA.OBSERVATION_FACT f WHERE CONCEPT_CD = ?", [concept_cd], {row ->
 			if(row.NVAL_NUM!=null)	{
 				values.add(row.NVAL_NUM);
 				log.trace("adding"+row.NVAL_NUM);
@@ -299,9 +299,9 @@ class PostgresI2b2HelperService {
 		//String sqlt=""""SELECT NVAL_NUM FROM OBSERVATION_FACT f WHERE CONCEPT_CD = ? AND PATIENT_NUM IN (select distinct patient_num
 		//        from qt_patient_set_collection where result_instance_id = ?)""";
 		
-		String sqlt="SELECT NVAL_NUM FROM OBSERVATION_FACT f WHERE CONCEPT_CD = '" +
+		String sqlt="SELECT NVAL_NUM FROM I2B2DEMODATA.OBSERVATION_FACT f WHERE CONCEPT_CD = '" +
 				concept_cd + "' AND PATIENT_NUM IN (select distinct patient_num " +
-				"from qt_patient_set_collection where result_instance_id = CAST(" + result_instance_id + " AS numeric))";
+				"from I2B2DEMODATA.qt_patient_set_collection where result_instance_id = CAST(" + result_instance_id + " AS numeric))";
 		
 		log.debug("executing query: sqlt=" + sqlt);
 		try {
@@ -332,9 +332,9 @@ class PostgresI2b2HelperService {
 		log.trace("Getting concept distribution data for value concept code:"+concept_cd);
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
 		log.trace("preparing query");
-		String sqlt="""SELECT NVAL_NUM FROM OBSERVATION_FACT f WHERE CONCEPT_CD = ? AND
+		String sqlt="""SELECT NVAL_NUM FROM I2B2DEMODATA.OBSERVATION_FACT f WHERE CONCEPT_CD = ? AND
 		    PATIENT_NUM IN (select distinct patient_num
-			from qt_patient_set_collection
+			from I2B2DEMODATA.qt_patient_set_collection
 			where result_instance_id = CAST (? AS numeric))""";
 		log.debug("executing query: "+sqlt);
 		sql.eachRow(sqlt, [
@@ -360,7 +360,7 @@ class PostgresI2b2HelperService {
 		Integer i=0;
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
 		String sqlt = """select count(distinct(patient_num)) as patcount 
-						 FROM qt_patient_set_collection
+						 FROM I2B2DEMODATA.qt_patient_set_collection
 						 WHERE result_instance_id = CAST(? AS numeric)""";
 
 		log.trace(sqlt);
@@ -379,8 +379,8 @@ class PostgresI2b2HelperService {
 		log.trace("Getting patient set intersection");
 		Integer i=0;
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
-		String sqlt = """Select count(*) as patcount FROM ((select distinct patient_num from qt_patient_set_collection
-		        where result_instance_id = CAST(? AS numeric)) a inner join (select distinct patient_num from qt_patient_set_collection
+		String sqlt = """Select count(*) as patcount FROM ((select distinct patient_num from I2B2DEMODATA.qt_patient_set_collection
+		        where result_instance_id = CAST(? AS numeric)) a inner join (select distinct patient_num from I2B2DEMODATA.qt_patient_set_collection
 		        where result_instance_id = CAST(? AS numeric)) b ON a.patient_num=b.patient_num)""";
 		log.trace(sqlt);
 		sql.eachRow(sqlt, [
@@ -464,8 +464,8 @@ class PostgresI2b2HelperService {
 		    LEFT OUTER JOIN
 		    (Select c_name, count(c_basecode) as obscount FROM
 			(SELECT c_name, c_basecode FROM i2b2metadata.i2b2 WHERE C_FULLNAME LIKE ? AND c_hlevel = ?) c
-			INNER JOIN observation_fact f ON f.concept_cd=c.c_basecode
-			WHERE PATIENT_NUM IN (select distinct patient_num from qt_patient_set_collection where result_instance_id = CAST(? AS numeric))
+			INNER JOIN I2B2DEMODATA.observation_fact f ON f.concept_cd=c.c_basecode
+			WHERE PATIENT_NUM IN (select distinct patient_num from I2B2DEMODATA.qt_patient_set_collection where result_instance_id = CAST(? AS numeric))
 		    GROUP BY c_name) i
 		    ON i.c_name=m.c_name
 		    ORDER BY c_name""";
@@ -596,7 +596,7 @@ class PostgresI2b2HelperService {
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
 		String sqlt = """select count (*) as obscount FROM i2b2demodata.observation_fact
 		    WHERE (((concept_cd IN (select concept_cd from i2b2demodata.concept_dimension c
-			where concept_path LIKE ?)))) AND PATIENT_NUM IN (select distinct patient_num from qt_patient_set_collection where result_instance_id = CAST(? AS numeric))""";
+			where concept_path LIKE ?)))) AND PATIENT_NUM IN (select distinct patient_num from I2B2DEMODATA.qt_patient_set_collection where result_instance_id = CAST(? AS numeric))""";
 		sql.eachRow(sqlt, [
 			fullname+"%",
 			result_instance_id
@@ -612,8 +612,8 @@ class PostgresI2b2HelperService {
 	def ExportTableNew addAllPatientDemographicDataForSubsetToTable(ExportTableNew tablein, String result_instance_id, String subset) {
 		log.trace("Adding patient demographic data to grid with result instance id:" +result_instance_id+" and subset: "+subset)
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-		String sqlt = """SELECT * FROM patient_dimension p INNER JOIN patient_trial t ON p.patient_num=t.patient_num
-		    WHERE p.PATIENT_NUM IN (select distinct patient_num from qt_patient_set_collection where result_instance_id = CAST(? AS numeric))
+		String sqlt = """SELECT * FROM patient_dimension p INNER JOIN I2B2DEMODATA.patient_trial t ON p.patient_num=t.patient_num
+		    WHERE p.PATIENT_NUM IN (select distinct patient_num from I2B2DEMODATA.qt_patient_set_collection where result_instance_id = CAST(? AS numeric))
 		    ORDER BY p.PATIENT_NUM""";
 		
 		//if i have an empty table structure so far
@@ -682,9 +682,9 @@ class PostgresI2b2HelperService {
 				/*get the data*/
 				String concept_cd=getConceptCodeFromKey(concept_key);
 				groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-				String sqlt = """SELECT PATIENT_NUM, NVAL_NUM, START_DATE FROM OBSERVATION_FACT f WHERE CONCEPT_CD = ? AND
+				String sqlt = """SELECT PATIENT_NUM, NVAL_NUM, START_DATE FROM I2B2DEMODATA.OBSERVATION_FACT f WHERE CONCEPT_CD = ? AND
 				        PATIENT_NUM IN (select distinct patient_num
-						from qt_patient_set_collection
+						from I2B2DEMODATA.qt_patient_set_collection
 						where result_instance_id = CAST(? AS numeric))""";
 				
 				sql.eachRow(sqlt, [
@@ -708,9 +708,9 @@ class PostgresI2b2HelperService {
 			else {
 				String concept_cd=getConceptCodeFromKey(concept_key);
 				groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-				String sqlt = """SELECT PATIENT_NUM, TVAL_CHAR, START_DATE FROM OBSERVATION_FACT f WHERE CONCEPT_CD = ? AND
+				String sqlt = """SELECT PATIENT_NUM, TVAL_CHAR, START_DATE FROM I2B2DEMODATA.OBSERVATION_FACT f WHERE CONCEPT_CD = ? AND
 				        PATIENT_NUM IN (select distinct patient_num
-				        from qt_patient_set_collection
+				        from I2B2DEMODATA.qt_patient_set_collection
 						where result_instance_id = CAST(? AS numeric))""";
 				
 				sql.eachRow(sqlt, [
@@ -754,10 +754,10 @@ class PostgresI2b2HelperService {
 		HashMap<String,Integer> results = new LinkedHashMap<String, Integer>();
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
 		String sqlt = """SELECT a.cat as demcategory, nvl(b.demcount,0) as demcount FROM
-		(SELECT DISTINCT UPPER("""+col+""") as cat FROM patient_dimension) a
+		(SELECT DISTINCT UPPER("""+col+""") as cat FROM I2B2DEMODATA.patient_dimension) a
 		LEFT OUTER JOIN
-		(SELECT UPPER("""+col+""") as cat,COUNT(*) as demcount FROM patient_dimension
-		WHERE PATIENT_NUM IN (select distinct patient_num from qt_patient_set_collection where result_instance_id = CAST(? AS numeric))
+		(SELECT UPPER("""+col+""") as cat,COUNT(*) as demcount FROM I2B2DEMODATA.patient_dimension
+		WHERE PATIENT_NUM IN (select distinct patient_num from I2B2DEMODATA.qt_patient_set_collection where result_instance_id = CAST(? AS numeric))
 		Group by UPPER("""+col+""")) b
 		ON a.cat=b.cat ORDER BY a.cat""";
 		sql.eachRow(sqlt, [result_instance_id], {row ->
@@ -776,9 +776,9 @@ class PostgresI2b2HelperService {
 		
 		ArrayList<String> concepts = new ArrayList<String>();
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-		String sqlt = """SELECT REQUEST_XML FROM QT_QUERY_MASTER c INNER JOIN QT_QUERY_INSTANCE a
-		    ON a.QUERY_MASTER_ID=c.QUERY_MASTER_ID INNER JOIN QT_QUERY_RESULT_INSTANCE b
-		    ON a.QUERY_INSTANCE_ID=b.QUERY_INSTANCE_ID WHERE RESULT_INSTANCE_ID = CAST(? AS numeric)""";
+		String sqlt = """SELECT REQUEST_XML FROM I2B2DEMODATA.QT_QUERY_MASTER c INNER JOIN I2B2DEMODATA.QT_QUERY_INSTANCE a
+		    ON a.QUERY_MASTER_ID=c.QUERY_MASTER_ID INNER JOIN I2B2DEMODATA.QT_QUERY_RESULT_INSTANCE b
+		    ON a.QUERY_INSTANCE_ID=b.QUERY_INSTANCE_ID WHERE RESULT_INSTANCE_ID =(SELECT CAST(? AS numeric))""";
 		
 		String xmlrequest="";
 		sql.eachRow(sqlt, [resultInstanceId], {row ->
@@ -852,7 +852,7 @@ class PostgresI2b2HelperService {
 		try {
 			groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
 			String sqlQuery = """select parent_cd from deapp.de_xtrial_child_map xcm
-				inner join concept_dimension cd
+				inner join I2B2DEMODATA.concept_dimension cd
 				on xcm.concept_cd=cd.concept_cd
 				where concept_path = ?""";
 			log.debug("\ncalled with conceptPath:"+conceptPath);
@@ -901,13 +901,13 @@ class PostgresI2b2HelperService {
 				FROM deapp.de_xtrial_child_map x
 				WHERE x.study_id IN (
 						select distinct p.trial
-						from qt_patient_set_collection q
-						inner join patient_trial p
+						from I2B2DEMODATA.qt_patient_set_collection q
+						inner join I2B2DEMODATA.patient_trial p
 						on q.patient_num=p.patient_num
-						where q.result_instance_id=CAST(""";
+						where q.result_instance_id=(SELECT CAST(""";
 		
-		String sqlTemplate2 = """ AS numeric) or result_instance_id=CAST(""";
-		String sqlTemplate3 = """ AS numeric)) and x.parent_cd=""";
+		String sqlTemplate2 = """ AS numeric)) or result_instance_id=(SELECT CAST(""";
+		String sqlTemplate3 = """ AS numeric))) and x.parent_cd=""";
 		
 		
 		
@@ -978,9 +978,9 @@ class PostgresI2b2HelperService {
 		String qid=""
 		if (resultInstanceId != null && resultInstanceId.length() > 0)	{
 			groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-			String sqlt="""select QUERY_MASTER_ID FROM QT_QUERY_INSTANCE a
-		    	INNER JOIN QT_QUERY_RESULT_INSTANCE b
-		    	ON a.QUERY_INSTANCE_ID=b.QUERY_INSTANCE_ID WHERE RESULT_INSTANCE_ID = CAST(? AS numeric)"""
+			String sqlt="""select QUERY_MASTER_ID FROM I2B2DEMODATA.QT_QUERY_INSTANCE a
+		    	INNER JOIN I2B2DEMODATA.QT_QUERY_RESULT_INSTANCE b
+		    	ON a.QUERY_INSTANCE_ID=b.QUERY_INSTANCE_ID WHERE RESULT_INSTANCE_ID = (SELECT CAST(? AS numeric))"""
 			sql.eachRow(sqlt, [resultInstanceId], {row ->qid=row.QUERY_MASTER_ID;})
 		}
 		return qid
@@ -993,7 +993,7 @@ class PostgresI2b2HelperService {
 		String xmlrequest="";
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
 		
-		String sqlt="""select REQUEST_XML from QT_QUERY_MASTER WHERE QUERY_MASTER_ID = CAST(? AS numeric)""";
+		String sqlt="""select REQUEST_XML from I2B2DEMODATA.QT_QUERY_MASTER WHERE QUERY_MASTER_ID =(SELECT CAST(? AS numeric))""";
 		log.trace(sqlt);
 		sql.eachRow(sqlt, [qid], {row ->
 			log.trace("in xml query")
@@ -1006,14 +1006,17 @@ class PostgresI2b2HelperService {
 	/**
 	 * Gets the request xml for a result instance id
 	 */
+
+
+
 	def String getQueryDefinitionXML(String resultInstanceId) {
 		log.trace("Called getQueryDefinitionXML")
 		String xmlrequest="";
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
 		
-		String sqlt="""select REQUEST_XML from QT_QUERY_MASTER c INNER JOIN QT_QUERY_INSTANCE a
-		    ON a.QUERY_MASTER_ID=c.QUERY_MASTER_ID INNER JOIN QT_QUERY_RESULT_INSTANCE b
-		    ON a.QUERY_INSTANCE_ID=b.QUERY_INSTANCE_ID WHERE RESULT_INSTANCE_ID = CAST(? AS numeric)""";
+		String sqlt="""select REQUEST_XML from I2B2DEMODATA.QT_QUERY_MASTER c INNER JOIN I2B2DEMODATA.QT_QUERY_INSTANCE a
+		    ON a.QUERY_MASTER_ID=c.QUERY_MASTER_ID INNER JOIN I2B2DEMODATA.QT_QUERY_RESULT_INSTANCE b
+		    ON a.QUERY_INSTANCE_ID=b.QUERY_INSTANCE_ID WHERE RESULT_INSTANCE_ID =(SELECT CAST(? AS numeric))""";
 		log.trace(sqlt);
 		sql.eachRow(sqlt, [resultInstanceId], {row ->
 			log.trace("in xml query");
@@ -1034,8 +1037,8 @@ class PostgresI2b2HelperService {
 		StringBuilder subjectIds = new StringBuilder();
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
 		
-		String sqlt = """select distinct patient_num from qt_patient_set_collection where result_instance_id = CAST(? AS numeric) 
-		AND patient_num IN (select patient_num from patient_dimension where sourcesystem_cd not like '%:S:%')""";
+		String sqlt = """select distinct patient_num from I2B2DEMODATA.qt_patient_set_collection where result_instance_id =( SELECT CAST(? AS numeric))
+		AND patient_num IN (select patient_num from I2B2DEMODATA.patient_dimension where sourcesystem_cd not like '%:S:%')""";
 		log.trace("before sql call")
 		sql.eachRow(sqlt, [resultInstanceId], {row ->
 			log.trace("in iterator")
@@ -1054,7 +1057,7 @@ class PostgresI2b2HelperService {
 	def  List<String> getSubjectsAsList(String resultInstanceId){
 		List<String> subjectIds=new ArrayList<String>();
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-		String sqlt = "select distinct patient_num from qt_patient_set_collection where result_instance_id = CAST(? AS numeric)";
+		String sqlt = "select distinct patient_num from I2B2DEMODATA.qt_patient_set_collection where result_instance_id = (SELECT CAST(? AS numeric))";
 		log.trace("before sql call")
 		sql.eachRow(sqlt, [resultInstanceId], {row ->
 			subjectIds.add(row.PATIENT_NUM);
@@ -1074,7 +1077,7 @@ class PostgresI2b2HelperService {
 	   groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
 	   
 	   //This is the SQL statement we run.
-	   String sqlt = "select distinct PATIENT_ID from DE_SUBJECT_SAMPLE_MAPPING where SAMPLE_ID in (" + listToIN(SampleIDList) + ")";
+	   String sqlt = "select distinct PATIENT_ID from DEAPP.DE_SUBJECT_SAMPLE_MAPPING where SAMPLE_ID in (" + listToIN(SampleIDList) + ")";
 
 	   sql.eachRow(sqlt, [ ], {row -> subjectIds.add(row.PATIENT_ID);})
 	   
@@ -1093,7 +1096,7 @@ class PostgresI2b2HelperService {
 	  groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
 	  
 	  //This is the SQL statement we run.
-	  String sqlt = "select distinct PATIENT_ID from DE_SUBJECT_SAMPLE_MAPPING where SAMPLE_ID in (" + listToIN(SampleIDList) + ")";
+	  String sqlt = "select distinct PATIENT_ID from DEAPP.DE_SUBJECT_SAMPLE_MAPPING where SAMPLE_ID in (" + listToIN(SampleIDList) + ")";
 
 	  sql.eachRow(sqlt, [ ], {row -> subjectIds.add(row.PATIENT_ID);})
 	  
@@ -1112,7 +1115,7 @@ class PostgresI2b2HelperService {
 	  groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
 	  
 	  //This is the SQL statement we run.
-	  String sqlt = "select distinct CONCEPT_CODE from DE_SUBJECT_SAMPLE_MAPPING where SAMPLE_ID in (" + listToIN(SampleIDList) + ")";
+	  String sqlt = "select distinct CONCEPT_CODE from DEAPP.DE_SUBJECT_SAMPLE_MAPPING where SAMPLE_ID in (" + listToIN(SampleIDList) + ")";
 
 	  sql.eachRow(sqlt, [ ], {row -> conceptIds.add(row.CONCEPT_CODE);})
 	  
@@ -1248,7 +1251,7 @@ class PostgresI2b2HelperService {
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
 		//println(ids);
 		StringBuilder fids = new StringBuilder();
-		StringBuilder sampleQ = new StringBuilder("SELECT distinct s.patient_id FROM de_subject_sample_mapping s WHERE s.patient_id IN (").append(ids).append(")");
+		StringBuilder sampleQ = new StringBuilder("SELECT distinct s.patient_id FROM DEAPP.de_subject_sample_mapping s WHERE s.patient_id IN (").append(ids).append(")");
 		
 		//	println(sampleQ);
 		sql.eachRow(sampleQ.toString(),
@@ -1334,7 +1337,7 @@ class PostgresI2b2HelperService {
 			if(trialNames == "") throw new Exception("Could not find trial names for the given subjects!")
 			
 			//Build the SQL statement to get the microarray data.
-			String sqlStr = "select a.assay_id, round(avg(a.zscore), 3) as zvalue, b.gene_symbol  from de_subject_microarray_data a, de_mrna_annotation b ";
+			String sqlStr = "select a.assay_id, round(avg(a.zscore), 3) as zvalue, b.gene_symbol  from DEAPP.de_subject_microarray_data a, de_mrna_annotation b ";
 			sqlStr += "where a.probeset_id = b.probeset_id and a.assay_id in (" + assayIdAllListStr + ") ";
 			sqlStr += " and a.trial_name IN (" + trialNames + ") ";
 			if (pathwayName != null && pathwayName.length() != 0) {
@@ -2087,7 +2090,7 @@ class PostgresI2b2HelperService {
 		}
 		
 		// Get the snp association and chrom mapping
-		sqlStr = "select a.entrez_gene_id, b.* from de_snp_gene_map a, de_snp_info b where a.snp_id = b.snp_info_id and a.entrez_gene_id in (" + geneEntrezIdListStr + ") ";
+		sqlStr = "select a.entrez_gene_id, b.* from DEAPP.de_snp_gene_map a, DEAPP.de_snp_info b where a.snp_id = b.snp_info_id and a.entrez_gene_id in (" + geneEntrezIdListStr + ") ";
 		sql.eachRow(sqlStr) {row ->
 			Long snpId = row.snp_info_id;
 			String snpName = row.name;
@@ -2142,7 +2145,7 @@ class PostgresI2b2HelperService {
 		Map<Long, GeneWithSnp> geneEntrezIdMap = new HashMap<Long, GeneWithSnp>();
 		// Get the snp association and chrom mapping
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
-		String sqlStr = "select a.entrez_gene_id, b.* from de_snp_gene_map a, de_snp_info b where a.snp_id = b.snp_info_id and b.name in (" + snpNameListStr + ") ";
+		String sqlStr = "select a.entrez_gene_id, b.* from DEAPP.de_snp_gene_map a, DEAPP.de_snp_info b where a.snp_id = b.snp_info_id and b.name in (" + snpNameListStr + ") ";
 		sql.eachRow(sqlStr) {row ->
 			Long snpId = row.snp_info_id;
 			String snpName = row.name;
@@ -2185,7 +2188,7 @@ class PostgresI2b2HelperService {
 		}
 		
 		// Get the gene name from search_keyword table
-		sqlStr = "select unique_id, keyword from search_keyword where unique_id in (" + geneSearchStr + ") ";
+		sqlStr = "select unique_id, keyword from SEARCHAPP.search_keyword where unique_id in (" + geneSearchStr + ") ";
 		sqlStr += " and data_category = 'GENE'";
 		sql.eachRow(sqlStr) {row ->
 			String unique_id = row.unique_id;
@@ -2273,7 +2276,7 @@ class PostgresI2b2HelperService {
 		String commonTrialName = null;	// For now only one trial is allowed.
 		
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
-		String sqlStr = "select * from de_subject_snp_dataset where patient_num in (" + subjectListStr + ")";
+		String sqlStr = "select * from DEAPP.de_subject_snp_dataset where patient_num in (" + subjectListStr + ")";
 		sql.eachRow(sqlStr) { row ->
 			SnpDataset snpDataset = new SnpDataset();
 			snpDataset.id = row.subject_snp_dataset_id;
@@ -2316,7 +2319,7 @@ class PostgresI2b2HelperService {
 		if (subjectListStr == null || subjectListStr.length() == 0) return;
 		
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
-		sql.eachRow("select patient_num, sex_cd from patient_dimension where patient_num in (" + subjectListStr + ")") { row ->
+		sql.eachRow("select patient_num, sex_cd from i2b2demodata.patient_dimension where patient_num in (" + subjectListStr + ")") { row ->
 			Long patientNum = row.patient_num;
 			String gender = row.sex_cd;
 			if (gender != null) {
@@ -2936,7 +2939,7 @@ class PostgresI2b2HelperService {
 			snpNamesBuf.append("'" + snpName + "'");
 		}
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
-		String sqlStr = "select * from de_snp_gene_map where snp_name in (" + snpNamesBuf.toString() + ")";
+		String sqlStr = "select * from DEAPP.de_snp_gene_map where snp_name in (" + snpNamesBuf.toString() + ")";
 		sql.eachRow(sqlStr) {row ->
 			String snpName = row.snp_name;
 			String entrezId = row.entrez_gene_id;
@@ -2964,7 +2967,7 @@ class PostgresI2b2HelperService {
 				entrezListBuf.append(",");
 			entrezListBuf.append("'GENE:" + entrezId + "'");
 		}
-		sqlStr = "select keyword, unique_id from search_keyword where unique_id in (" + entrezListBuf.toString() + ")";
+		sqlStr = "select keyword, unique_id from SEARCHAPP.search_keyword where unique_id in (" + entrezListBuf.toString() + ")";
 		sql.eachRow(sqlStr) {row ->
 			String geneName = row.keyword;
 			String entrezStr = row.unique_id;
@@ -3006,7 +3009,7 @@ class PostgresI2b2HelperService {
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
 		
 		// Get the list of dataset first, SNP data will be fetched later
-		String sqlt = "SELECT a.*, b.chrom as chrom, b.data_by_patient_chr as data FROM de_subject_snp_dataset a, de_snp_data_by_patient b ";
+		String sqlt = "SELECT a.*, b.chrom as chrom, b.data_by_patient_chr as data FROM DEAPP.de_subject_snp_dataset a, DEAPP.de_snp_data_by_patient b ";
 		sqlt += "WHERE a.subject_snp_dataset_id = b.snp_dataset_id and a.patient_num in (" + subjectIds + ") ";
 		sqlt += " and b.chrom in (" + getSqlStrFromChroms(chroms) + ") ";
 		
@@ -3221,7 +3224,7 @@ class PostgresI2b2HelperService {
 		if (subjectIds == null || subjectIds.trim().length() == 0) return null;
 		List<Long> idList = null;
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
-		String sqlt = "SELECT subject_snp_dataset_id as id FROM de_subject_snp_dataset WHERE patient_num in (" + subjectIds + ") ";
+		String sqlt = "SELECT subject_snp_dataset_id as id FROM DEAPP.de_subject_snp_dataset WHERE patient_num in (" + subjectIds + ") ";
 		sql.eachRow(sqlt) {row ->
 			Long id = row.id;
 			if (idList == null) {
@@ -3243,7 +3246,7 @@ class PostgresI2b2HelperService {
 		if (platformName == null || platformName.trim().length() == 0) return null;
 		Map<String, SnpProbeSortedDef> snpProbeDefMap = new HashMap<String, SnpProbeSortedDef>();
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
-		String sqlt = "SELECT snp_probe_sorted_def_id, platform_name, num_probe, chrom, snp_id_def FROM de_snp_probe_sorted_def WHERE platform_name = '";
+		String sqlt = "SELECT snp_probe_sorted_def_id, platform_name, num_probe, chrom, snp_id_def FROM DEAPP.de_snp_probe_sorted_def WHERE platform_name = '";
 		sqlt += platformName + "' and chrom in (" + getSqlStrFromChroms(chroms) + ") order by chrom";
 		sql.eachRow(sqlt) {row ->
 			SnpProbeSortedDef probeDef = new SnpProbeSortedDef();
@@ -3263,7 +3266,7 @@ class PostgresI2b2HelperService {
 		if (subjectIds == null || subjectIds.trim().length() == 0) return null;
 		List<String> list = null;
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
-		String sqlt = "SELECT distinct(platform_name) as platform FROM de_subject_snp_dataset WHERE patient_num in (" + subjectIds + ") ";
+		String sqlt = "SELECT distinct(platform_name) as platform FROM DEAPP.de_subject_snp_dataset WHERE patient_num in (" + subjectIds + ") ";
 		sql.eachRow(sqlt) {row ->
 			if (list == null) {
 				list = new ArrayList<String>();
@@ -3298,7 +3301,7 @@ class PostgresI2b2HelperService {
 			return;
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
 		String subjectIdListInStr = DBHelper.listToInString(subjectStrList);
-		String sqlt = "SELECT * FROM observation_fact WHERE CONCEPT_CD = ?";
+		String sqlt = "SELECT * FROM i2b2demodata.observation_fact WHERE CONCEPT_CD = ?";
 		if (subjectIdListInStr != null)
 			sqlt += " and PATIENT_NUM in (" + subjectIdListInStr + ")";
 		sql.eachRow(sqlt, [
@@ -3320,7 +3323,7 @@ class PostgresI2b2HelperService {
 			return;
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
 		String subjectIdListInStr = DBHelper.listToInString(subjectStrList);
-		String sqlt = "SELECT * FROM observation_fact WHERE CONCEPT_CD = ?";
+		String sqlt = "SELECT * FROM i2b2demodata.observation_fact WHERE CONCEPT_CD = ?";
 		if (subjectIdListInStr != null)
 			sqlt += " and PATIENT_NUM in (" + subjectIdListInStr + ")";
 		sql.eachRow(sqlt, [conceptEvent.getBaseCode()], {row ->
@@ -3339,7 +3342,7 @@ class PostgresI2b2HelperService {
 		
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
 		
-		StringBuilder trialQ = new StringBuilder("select distinct s.trial_name from de_subject_sample_mapping s ");
+		StringBuilder trialQ = new StringBuilder("select distinct s.trial_name from DEAPP.de_subject_sample_mapping s ");
 		trialQ.append(" where s.patient_id in (").append(ids).append(") and s.platform = 'MRNA_AFFYMETRIX'");
 		
 		log.debug("getTrialName used this query: " + trialQ.toString());
@@ -3411,7 +3414,7 @@ class PostgresI2b2HelperService {
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
 		
 		def sampleTypesArray = [];
-		StringBuilder sampleQ = new StringBuilder("SELECT distinct s.SAMPLE_TYPE_CD FROM de_subject_sample_mapping s WHERE s.CONCEPT_CODE IN ").append(convertStringToken(concepts));
+		StringBuilder sampleQ = new StringBuilder("SELECT distinct s.SAMPLE_TYPE_CD FROM DEAPP.de_subject_sample_mapping s WHERE s.CONCEPT_CODE IN ").append(convertStringToken(concepts));
 		
 		log.debug("getSampleTypes used this query: " + sampleQ.toString());
 		
@@ -3429,7 +3432,7 @@ class PostgresI2b2HelperService {
 		
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
 		
-		StringBuilder assayS = new StringBuilder("select distinct s.assay_id  from de_subject_sample_mapping s where s.patient_id in (").append(ids).append(")");
+		StringBuilder assayS = new StringBuilder("select distinct s.assay_id  from DEAPP.de_subject_sample_mapping s where s.patient_id in (").append(ids).append(")");
 		// check sample type
 		if(sampleTypes!=null && sampleTypes.length()>0){
 			assayS.append(" AND s.sample_type_cd IN ").append(convertStringToken(sampleTypes));
@@ -3464,18 +3467,18 @@ class PostgresI2b2HelperService {
 		StringBuilder pathwayS = new StringBuilder();
 		if(pathwayName.startsWith("GENESIG")||pathwayName.startsWith("GENELIST")){
 			pathwayS.append(" select  distinct bm.primary_external_id as gene_id from ")
-					.append("search_keyword sk, ")
-					.append(" search_bio_mkr_correl_fast_mv sbm,")
-					.append(" bio_marker bm")
+					.append("SEARCHAPP.search_keyword sk, ")
+					.append(" SEARCHAPP.search_bio_mkr_correl_fast_mv sbm,")
+					.append(" BIOMART.bio_marker bm")
 					.append(" where sk.bio_data_id = sbm.domain_object_id")
 					.append(" and sbm.asso_bio_marker_id = bm.bio_marker_id")
 					.append(" and sk.unique_id ='");
 		}
 		else {
 			pathwayS.append(" select  distinct bm.primary_external_id as gene_id from ")
-					.append("search_keyword sk, ")
+					.append("SEARCHAPP.search_keyword sk, ")
 					.append(" bio_marker_correl_mv sbm,")
-					.append(" bio_marker bm")
+					.append(" BIOMART.bio_marker bm")
 					.append(" where sk.bio_data_id = sbm.bio_marker_id")
 					.append(" and sbm.asso_bio_marker_id = bm.bio_marker_id")
 					.append(" and sk.unique_id ='");
@@ -3507,7 +3510,7 @@ class PostgresI2b2HelperService {
 		s.append("SELECT a.PROBESET || a.GENE_SYMBOL as PROBESET,a.GENE_SYMBOL, ");
 		s.append(" a.zscore as LOG2_INTENSITY, ");
 		s.append(" a.patient_ID,a.ASSAY_ID,a.raw_intensity");
-		s.append(" FROM de_subject_microarray_data a ");
+		s.append(" FROM DEAPP.de_subject_microarray_data a ");
 		s.append(" WHERE a.trial_name IN (").append(trialNames).append(") ");
 		s.append(" AND a.assay_id IN (").append(assayIds).append(")");
 		// s.append(" order by a.patient_id, a.GENE_SYMBOL, a.PROBESET");
@@ -3666,7 +3669,7 @@ class PostgresI2b2HelperService {
 		
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
 		
-		String sqlStr = "SELECT sourcesystem_cd, patient_num FROM patient_dimension WHERE patient_num IN (" +
+		String sqlStr = "SELECT sourcesystem_cd, patient_num FROM i2b2demodata.patient_dimension WHERE patient_num IN (" +
 				ids + ") order by patient_num";
 		
 		sql.eachRow(sqlStr) { row ->
@@ -3697,12 +3700,12 @@ class PostgresI2b2HelperService {
 		if (timepoint == null || timepoint.length() == 0 ) {
 			s.append("SELECT distinct t1.ANTIGEN_NAME, t1.GENE_SYMBOL, t1.zscore as value, '");
 			s.append(prefix + "'|| t1.patient_id as subject_id ");
-			s.append("FROM DE_SUBJECT_RBM_DATA t1, de_subject_sample_mapping t2 ");
+			s.append("FROM DEAPP.DE_SUBJECT_RBM_DATA t1, DEAPP.de_subject_sample_mapping t2 ");
 			s.append("WHERE t1.patient_id = t2.patient_id and t1.patient_id IN (" + ids + ")");
 		} else {
 			s.append("SELECT distinct t1.ANTIGEN_NAME, t1.GENE_SYMBOL, t1.zscore as value, '");
 			s.append(prefix + "'|| t1.patient_id as subject_id ");
-			s.append("FROM DE_SUBJECT_RBM_DATA t1, de_subject_sample_mapping t2 ");
+			s.append("FROM DEAPP.DE_SUBJECT_RBM_DATA t1, DEAPP.de_subject_sample_mapping t2 ");
 			s.append("WHERE ")
 			s.append("t2.patient_id IN ("+ ids + ") and ");
 			s.append("t2.timepoint_cd IN (" + quoteCSV(timepoint) + ") and ");
@@ -3731,7 +3734,7 @@ class PostgresI2b2HelperService {
 		
 		log.debug("createProteinHeatmapQuery created sql object");
 		
-		String cntQuery = "SELECT COUNT(*) as N FROM DE_SUBJECT_SAMPLE_MAPPING WHERE concept_code IN (" +
+		String cntQuery = "SELECT COUNT(*) as N FROM DEAPP.DE_SUBJECT_SAMPLE_MAPPING WHERE concept_code IN (" +
 				quoteCSV(concepts) + ")";
 		
 		log.debug("createProteinHeatmapQuery created cntQuery = " + cntQuery);
@@ -3755,8 +3758,8 @@ class PostgresI2b2HelperService {
 			if (timepoint != null && timepoint.length() > 0 ) {
 				s.append("SELECT distinct a.component, a.GENE_SYMBOL, a.zscore, '");
 				s.append(prefix + "' || a.patient_ID as subject_id ");
-				s.append("FROM DE_SUBJECT_PROTEIN_DATA a, DE_pathway_gene c, de_pathway p, ");
-				s.append("DE_subject_sample_mapping b ");
+				s.append("FROM DEAPP.DE_SUBJECT_PROTEIN_DATA a, DEAPP.DE_pathway_gene c, DEAPP.de_pathway p, ");
+				s.append("DEAPP.DE_subject_sample_mapping b ");
 				s.append("WHERE c.pathway_id= p.id and ");
 				if (pathwayName != null) {
 					s.append(" p.pathway_uid='" + pathwayName + "' and ");
@@ -3769,7 +3772,7 @@ class PostgresI2b2HelperService {
 			} else {
 				s.append("SELECT distinct a.component, a.GENE_SYMBOL, a.zscore, '");
 				s.append(prefix + "' || a.patient_ID as subject_id ");
-				s.append("FROM DE_SUBJECT_PROTEIN_DATA a, DE_pathway_gene c, de_pathway p ");
+				s.append("FROM DEAPP.DE_SUBJECT_PROTEIN_DATA a, DEAPP.DE_pathway_gene c, DEAPP.de_pathway p ");
 				s.append("WHERE c.pathway_id= p.id and ");
 				if (pathwayName != null) {
 					s.append(" p.pathway_uid='" + pathwayName + "' and ");
@@ -3781,7 +3784,7 @@ class PostgresI2b2HelperService {
 			if (timepoint != null && timepoint.length() > 0 ) {
 				s.append("select distinct a.component, a.GENE_SYMBOL, a.zscore, '");
 				s.append(prefix + "' || a.patient_ID as subject_id ");
-				s.append("FROM DE_SUBJECT_PROTEIN_DATA a, DE_pathway_gene c, de_pathway p, ");
+				s.append("FROM DEAPP.DE_SUBJECT_PROTEIN_DATA a, DEAPP.DE_pathway_gene c, DEAPP.de_pathway p, ");
 				s.append("DE_subject_sample_mapping b ");
 				s.append("WHERE c.pathway_id= p.id and ");
 				if (pathwayName != null) {
@@ -3796,8 +3799,8 @@ class PostgresI2b2HelperService {
 			}  else {
 				s.append("select distinct a.component, a.GENE_SYMBOL, a.zscore, '");
 				s.append(prefix + "' || a.patient_ID as subject_id ");
-				s.append("FROM DE_SUBJECT_PROTEIN_DATA a, DE_pathway_gene c, de_pathway p, ");
-				s.append("DE_subject_sample_mapping b ");
+				s.append("FROM DEAPP.DE_SUBJECT_PROTEIN_DATA a, DEAPP.DE_pathway_gene c, DEAPP.de_pathway p, ");
+				s.append("DEAPP.DE_subject_sample_mapping b ");
 				s.append("WHERE c.pathway_id= p.id and ");
 				if (pathwayName != null) {
 					s.append(" p.pathway_uid='" + pathwayName + "' and ");
@@ -4122,7 +4125,7 @@ class PostgresI2b2HelperService {
 			//check if we have sufficient raw data to run gp query
 			def goodPct
 			String rawCountQuery="select DISTINCT /*+ parallel(de_subject_microarray_data,4) */ /*+ parallel(de_mrna_annotation,4) */ count(distinct a.raw_intensity)/count(*) as pct_good " +
-					"FROM de_subject_microarray_data a, de_mrna_annotation b " +
+					"FROM DEAPP.de_subject_microarray_data a, DEAPP.de_mrna_annotation b " +
 					"WHERE a.probeset_id = b.probeset_id AND a.trial_name IN ("+trialNames+") " +
 					"AND a.assay_id IN ("+assayIds+")";
 					
@@ -4138,7 +4141,7 @@ class PostgresI2b2HelperService {
 		StringBuilder s = new StringBuilder();
 		s.append("select DISTINCT /*+ parallel(de_subject_microarray_data,4) */ /*+ parallel(de_mrna_annotation,4) */  b.PROBE_ID || ':' || b.GENE_SYMBOL as PROBESET, b.GENE_SYMBOL, "+"a."+intensityCol+" as LOG2_INTENSITY ");
 		s.append(" , '").append(prefix).append("' || a.patient_ID as subject_id ");
-		s.append(" FROM de_subject_microarray_data a, de_mrna_annotation b ");
+		s.append(" FROM DEAPP.de_subject_microarray_data a, DEAPP.de_mrna_annotation b ");
 		s.append(" WHERE a.probeset_id = b.probeset_id AND a.trial_name IN (").append(trialNames).append(") ");
 		s.append(" AND a.assay_id IN (").append(assayIds).append(")");
 		
@@ -4389,7 +4392,7 @@ class PostgresI2b2HelperService {
 		log.debug("getting genes for happloview");
 		def genes=[];
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
-		String sqlt = "select distinct gene from haploview_data a inner join qt_patient_set_collection b on a.I2B2_ID=b.patient_num where result_instance_id = CAST(? AS numeric) order by gene asc"
+		String sqlt = "select distinct gene from DEAPP.haploview_data a inner join i2b2demodata.qt_patient_set_collection b on a.I2B2_ID=b.patient_num where result_instance_id = CAST(? AS numeric) order by gene asc"
 		//String sqlt = "select distinct patient_num from qt_patient_set_collection where result_instance_id="+resultInstanceId
 		sql.eachRow(sqlt, [resultInstanceId], {row ->
 			log.trace("IN ROW ITERATOR");
@@ -4478,10 +4481,10 @@ class PostgresI2b2HelperService {
 			groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
 			String concept_cd=getConceptCodeFromKey(concept_key);
 			//ArrayList<Double> values=new ArrayList<Double>();
-			String sqlt="""SELECT TRIAL, NVAL_NUM FROM OBSERVATION_FACT f  INNER JOIN PATIENT_TRIAL t
+			String sqlt="""SELECT TRIAL, NVAL_NUM FROM i2b2demodata.OBSERVATION_FACT f  INNER JOIN i2b2demodata.PATIENT_TRIAL t
 			    ON f.PATIENT_NUM=t.PATIENT_NUM WHERE CONCEPT_CD = ? AND
-			    f.PATIENT_NUM IN (select distinct patient_num from qt_patient_set_collection
-				where result_instance_id = CAST(? AS numeric))""";
+			    f.PATIENT_NUM IN (select distinct patient_num from i2b2demodata.qt_patient_set_collection
+				where result_instance_id = (SELECT CAST(? AS numeric)))""";
 			sql.eachRow(sqlt, [
 				concept_cd,
 				result_instance_id
@@ -4511,11 +4514,11 @@ class PostgresI2b2HelperService {
 			
 			// IN clause here
 			
-			String sqlt="""SELECT TRIAL, NVAL_NUM FROM OBSERVATION_FACT f  INNER JOIN PATIENT_TRIAL t
+			String sqlt="""SELECT TRIAL, NVAL_NUM FROM i2b2demodata.OBSERVATION_FACT f  INNER JOIN i2b2demodata.PATIENT_TRIAL t
 			ON f.PATIENT_NUM=t.PATIENT_NUM
 			WHERE CONCEPT_CD IN ("""+listToIN(childConcepts.asList())+""") AND
 			f.PATIENT_NUM IN (select distinct patient_num
-					from qt_patient_set_collection
+					from i2b2demodata.qt_patient_set_collection
 					where result_instance_id="""+result_instance_id+""") """;
 			
 			log.debug("about to execute query: "+sqlt);
@@ -4658,7 +4661,7 @@ class PostgresI2b2HelperService {
 	 * 
 	 * @return an XML String
 	 */	
-    def renderQueryDefinition(String resultInstanceId, String title, Writer pw) {
+    def renderQueryDefinition(String resultInstanceId, String title, Writer pw, regionParams) {
 		if (log.isDebugEnabled())	{
 			log.debug("renderQueryDefinition called with ${resultInstanceId} and ${title}")
 		}
@@ -4820,7 +4823,7 @@ class PostgresI2b2HelperService {
 		log.trace(subids)
 		
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-		String sqlt = "SELECT TISSUE_TYPE, TISSUE_TYPE_CD, PLATFORM, TIMEPOINT, TIMEPOINT_CD, SAMPLE_TYPE_CD, SAMPLE_TYPE FROM DE_SUBJECT_SAMPLE_MAPPING WHERE "
+		String sqlt = "SELECT TISSUE_TYPE, TISSUE_TYPE_CD, PLATFORM, TIMEPOINT, TIMEPOINT_CD, SAMPLE_TYPE_CD, SAMPLE_TYPE FROM DEAPP.DE_SUBJECT_SAMPLE_MAPPING WHERE "
 		if (subids != null)
 			sqlt += "PATIENT_ID IN (" + listToIN(subids) + ") AND ";
 		sqlt += "SAMPLE_TYPE_CD IN (" + listToIN(conids) + ") GROUP BY PLATFORM, TIMEPOINT, TIMEPOINT_CD, SAMPLE_TYPE_CD, SAMPLE_TYPE, TISSUE_TYPE, TISSUE_TYPE_CD";
@@ -4845,7 +4848,7 @@ class PostgresI2b2HelperService {
 		if(hv.validate()){return;
 		}
 		
-		sqlt = "SELECT TISSUE_TYPE, TISSUE_TYPE_CD, PLATFORM, TIMEPOINT, TIMEPOINT_CD, SAMPLE_TYPE_CD, SAMPLE_TYPE FROM DE_SUBJECT_SAMPLE_MAPPING WHERE "
+		sqlt = "SELECT TISSUE_TYPE, TISSUE_TYPE_CD, PLATFORM, TIMEPOINT, TIMEPOINT_CD, SAMPLE_TYPE_CD, SAMPLE_TYPE FROM DEAPP.DE_SUBJECT_SAMPLE_MAPPING WHERE "
 		if (subids != null)
 			sqlt += "PATIENT_ID IN (" + listToIN(subids) + ") AND ";
 		sqlt += "TIMEPOINT_CD IN (" + listToIN(conids) + ") GROUP BY PLATFORM, TIMEPOINT, TIMEPOINT_CD, SAMPLE_TYPE_CD, SAMPLE_TYPE, TISSUE_TYPE, TISSUE_TYPE_CD";
@@ -4870,7 +4873,7 @@ class PostgresI2b2HelperService {
 		if(hv.validate()){return;
 		}
 		
-		sqlt = "SELECT TISSUE_TYPE, TISSUE_TYPE_CD, PLATFORM, TIMEPOINT, TIMEPOINT_CD, SAMPLE_TYPE_CD, SAMPLE_TYPE FROM DE_SUBJECT_SAMPLE_MAPPING WHERE ";
+		sqlt = "SELECT TISSUE_TYPE, TISSUE_TYPE_CD, PLATFORM, TIMEPOINT, TIMEPOINT_CD, SAMPLE_TYPE_CD, SAMPLE_TYPE FROM DEAPP.DE_SUBJECT_SAMPLE_MAPPING WHERE ";
 		if (subids != null)
 			sqlt += "PATIENT_ID IN (" + listToIN(subids) + ") AND ";
 		sqlt += "CONCEPT_CODE IN (" + listToIN(conids) + ") GROUP BY PLATFORM, TIMEPOINT, TIMEPOINT_CD, SAMPLE_TYPE_CD, SAMPLE_TYPE, TISSUE_TYPE, TISSUE_TYPE_CD";
@@ -4905,7 +4908,7 @@ class PostgresI2b2HelperService {
 		
 		def timepoints=[];
 		sql = new groovy.sql.Sql(dataSource)
-		sqlt = "SELECT TISSUE_TYPE, TISSUE_TYPE_CD, PLATFORM, TIMEPOINT, TIMEPOINT_CD, SAMPLE_TYPE_CD, SAMPLE_TYPE FROM DE_SUBJECT_SAMPLE_MAPPING WHERE ";
+		sqlt = "SELECT TISSUE_TYPE, TISSUE_TYPE_CD, PLATFORM, TIMEPOINT, TIMEPOINT_CD, SAMPLE_TYPE_CD, SAMPLE_TYPE FROM DEAPP.DE_SUBJECT_SAMPLE_MAPPING WHERE ";
 		if (subids != null)
 			sqlt += "PATIENT_ID IN ("+listToIN(subids)+") AND ";
 		sqlt += "PLATFORM_CD IN (" + listToIN(conids) + ") GROUP BY PLATFORM, TIMEPOINT, TIMEPOINT_CD, SAMPLE_TYPE_CD, SAMPLE_TYPE, TISSUE_TYPE, TISSUE_TYPE_CD";
@@ -4930,7 +4933,7 @@ class PostgresI2b2HelperService {
 		if(hv.validate()){return;
 		}
 		
-		sqlt = "SELECT TISSUE_TYPE, TISSUE_TYPE_CD, PLATFORM, TIMEPOINT, TIMEPOINT_CD, SAMPLE_TYPE_CD, SAMPLE_TYPE FROM DE_SUBJECT_SAMPLE_MAPPING WHERE ";
+		sqlt = "SELECT TISSUE_TYPE, TISSUE_TYPE_CD, PLATFORM, TIMEPOINT, TIMEPOINT_CD, SAMPLE_TYPE_CD, SAMPLE_TYPE FROM DEAPP.DE_SUBJECT_SAMPLE_MAPPING WHERE ";
 		if (subids != null)
 			sqlt += "PATIENT_ID IN ("+listToIN(subids)+") AND ";
 		sqlt += "TISSUE_TYPE_CD IN (" + listToIN(conids) + ") GROUP BY PLATFORM, TIMEPOINT, TIMEPOINT_CD, SAMPLE_TYPE_CD, SAMPLE_TYPE, TISSUE_TYPE, TISSUE_TYPE_CD";
@@ -4986,14 +4989,14 @@ class PostgresI2b2HelperService {
 				break;
 			case CohortInformation.PLATFORMS_TYPE:
 				ci.platforms=new ArrayList();
-				sqlt="select distinct platform from de_subject_sample_mapping where trial_name in ("+listToIN(ci.trials)+") order by platform";
+				sqlt="select distinct platform from DEAPP.de_subject_sample_mapping where trial_name in ("+listToIN(ci.trials)+") order by platform";
 				sql.eachRow(sqlt, {row->
 					ci.platforms.add([platform:row.platform, platformLabel:("MRNA_AFFYMETRIX".equals(row.platform)?"MRNA":row.platform)])
 				})
 				break;
 			case CohortInformation.TIMEPOINTS_TYPE:
 				ci.timepoints=new ArrayList();
-				sqlt="select distinct timepoint, timepoint_cd from de_subject_sample_mapping where trial_name in ("+listToIN(ci.trials)+") " +
+				sqlt="select distinct timepoint, timepoint_cd from DEAPP.de_subject_sample_mapping where trial_name in ("+listToIN(ci.trials)+") " +
 						"and platform in ("+listToIN(ci.platforms)+")"
 				if (ci.platforms.get(0)=='RBM'){
 					sqlt+=" and instr(timepoint_cd, ':Z:')>0"
@@ -5014,7 +5017,7 @@ class PostgresI2b2HelperService {
 				break;
 			case CohortInformation.SAMPLES_TYPE:
 				ci.samples=new ArrayList();
-				sqlt="select distinct sample_type, sample_type_cd from de_subject_sample_mapping where trial_name in ("+listToIN(ci.trials)+") " +
+				sqlt="select distinct sample_type, sample_type_cd from DEAPP.de_subject_sample_mapping where trial_name in ("+listToIN(ci.trials)+") " +
 						"and platform in ("+listToIN(ci.platforms)+")";
 				if(ci.gpls.size>0)
 					sqlt+=" and gpl_id in("+listToIN(ci.gpls)+")";
@@ -5025,7 +5028,7 @@ class PostgresI2b2HelperService {
 				break;
 			case CohortInformation.TISSUE_TYPE:
 				ci.tissues=new ArrayList();
-				sqlt="select distinct tissue_type, tissue_type_cd from de_subject_sample_mapping where trial_name in ("+listToIN(ci.trials)+") " +
+				sqlt="select distinct tissue_type, tissue_type_cd from DEAPP.de_subject_sample_mapping where trial_name in ("+listToIN(ci.trials)+") " +
 						"and platform in ("+listToIN(ci.platforms)+")";
 				if(ci.gpls.size>0)
 					sqlt+=" and gpl_id in("+listToIN(ci.gpls)+")";
@@ -5038,7 +5041,7 @@ class PostgresI2b2HelperService {
 				break;
 			case CohortInformation.GPL_TYPE:
 				ci.gpls=new ArrayList();
-				sqlt="select distinct rgi.platform, rgi.title from de_subject_sample_mapping dssm, de_gpl_info rgi where dssm.trial_name in ("+listToIN(ci.trials)+") " +
+				sqlt="select distinct rgi.platform, rgi.title from DEAPP.de_subject_sample_mapping dssm, de_gpl_info rgi where dssm.trial_name in ("+listToIN(ci.trials)+") " +
 						"and dssm.platform in ("+listToIN(ci.platforms)+")" +
 						"and dssm.gpl_id=rgi.platform"
 				sqlt+=" order by rgi.title";
@@ -5048,7 +5051,7 @@ class PostgresI2b2HelperService {
 				break;
 			case CohortInformation.RBM_PANEL_TYPE:
 				ci.rbmpanels=new ArrayList();
-				sqlt="select distinct dssm.rbm_panel from de_subject_sample_mapping dssm where dssm.trial_name in ("+listToIN(ci.trials)+") " +
+				sqlt="select distinct dssm.rbm_panel from DEAPP.de_subject_sample_mapping dssm where dssm.trial_name in ("+listToIN(ci.trials)+") " +
 						"and dssm.platform in ("+listToIN(ci.platforms)+")"
 				sql.eachRow(sqlt, {row->
 					ci.rbmpanels.add([rbmpanel:row.rbm_panel, rbmpanelLabel:row.rbm_panel])
@@ -5077,7 +5080,7 @@ class PostgresI2b2HelperService {
 		}else if (ci.gpls.size()>1){
 			groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
 			String sqlt="";
-			sqlt="select distinct rgi.platform, rgi.title from de_subject_sample_mapping dssm, de_gpl_info rgi where dssm.trial_name in ("+listToIN(ci.trials)+") " +
+			sqlt="select distinct rgi.platform, rgi.title from DEAPP.de_subject_sample_mapping dssm, de_gpl_info rgi where dssm.trial_name in ("+listToIN(ci.trials)+") " +
 					"and dssm.platform in ("+listToIN(ci.platforms)+")" +
 					"and dssm.concept_code in ("+listToIN(concepts)+")" +
 					"and dssm.gpl_id=rgi.platform"
@@ -5107,7 +5110,7 @@ class PostgresI2b2HelperService {
 		}else if (ci.rbmpanels.size()>1){
 			groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
 			String sqlt="";
-			sqlt="select distinct dssm.rbm_panel from de_subject_sample_mapping dssm where dssm.trial_name in ("+listToIN(ci.trials)+") " +
+			sqlt="select distinct dssm.rbm_panel from DEAPP.de_subject_sample_mapping dssm where dssm.trial_name in ("+listToIN(ci.trials)+") " +
 					"and dssm.platform in ("+listToIN(ci.platforms)+") and dssm.CONCEPT_CODE IN (" + listToIN(concepts)+")"
 			sql.eachRow(sqlt, {row->
 				hv.rbmpanels.add(row.rbm_panel)
@@ -5126,10 +5129,10 @@ class PostgresI2b2HelperService {
 		}
 		if(rid1!=null & rid2!=null) {
 			groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
-			String sqlt="""SELECT DISTINCT SECURE_OBJ_TOKEN FROM PATIENT_TRIAL t
+			String sqlt="""SELECT DISTINCT SECURE_OBJ_TOKEN FROM i2b2demodata.PATIENT_TRIAL t
 			    WHERE t.PATIENT_NUM IN (select distinct patient_num
-				from qt_patient_set_collection
-				where result_instance_id IN (CAST(? AS numeric), CAST(? AS numeric)))""";
+				from i2b2demodata.qt_patient_set_collection
+				where result_instance_id IN ( (SELECT CAST(? AS numeric)), (SELECT CAST(? AS numeric))))""";
 			log.debug(sqlt);
 			sql.eachRow(sqlt, [rid1, rid2], {row ->
 				if(row.SECURE_OBJ_TOKEN!=null) {
@@ -5150,10 +5153,10 @@ class PostgresI2b2HelperService {
 				rid=rid2;
 			}
 			groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-			String sqlt="""SELECT DISTINCT SECURE_OBJ_TOKEN FROM PATIENT_TRIAL t
+			String sqlt="""SELECT DISTINCT SECURE_OBJ_TOKEN FROM i2b2demodata.PATIENT_TRIAL t
 			    WHERE t.PATIENT_NUM IN (select distinct patient_num
-				from qt_patient_set_collection
-				where result_instance_id = CAST(? AS numeric))""";
+				from i2b2demodata.qt_patient_set_collection
+				where result_instance_id = (SELECT CAST(? AS numeric)))""";
 			log.debug(sqlt);
 			sql.eachRow(sqlt, [rid], {row ->
 				if(row.SECURE_OBJ_TOKEN!=null) {
@@ -5163,4 +5166,145 @@ class PostgresI2b2HelperService {
 			return trials;
 		}
 	}
+
+    def renderQueryDefinitionTable(String resultInstanceId, String title, Writer pw, regionParams)
+    {
+        String qid=getQIDFromRID(resultInstanceId);
+        pw.write("<table class='analysis'>")
+        pw.write("<tr><th>${title}</th></tr>")
+        pw.write("<tr>")
+        pw.write("<td>")
+        renderQueryDefinition(qid, title, pw, regionParams);
+        pw.write("</td></tr></table>")
+    }
+
+    TransmartQueryDefinition getQueryDefinition(String resultInstanceId) {
+
+        TransmartQueryDefinition tQD = null;
+
+        if (resultInstanceId != null) {
+            try {
+
+                String xmlRequest = getQueryDefinitionXML(resultInstanceId)
+
+                DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance()
+                domFactory.setNamespaceAware(true)
+                DocumentBuilder builder = domFactory.newDocumentBuilder()
+                Document doc = builder.parse(new InputSource(new StringReader(xmlRequest)))
+
+                XPathFactory factory = XPathFactory.newInstance()
+                XPath xpath = factory.newXPath()
+
+                Object queryTimingNodes=xpath.evaluate("//query_timing", doc, XPathConstants.NODESET)
+                NodeList qts =  (NodeList) queryTimingNodes
+                tQD = new TransmartQueryDefinition(resultInstanceId)
+                Node qtsNode = qts.item(0)
+                tQD.queryTiming = qtsNode.getTextContent()
+
+                Object result = xpath.evaluate("//panel", doc, XPathConstants.NODESET)
+                NodeList panels = (NodeList) result
+
+                for (int p = 0; p < panels.getLength(); p++) {
+
+                    TransmartQueryPanel tQP = new TransmartQueryPanel()
+
+                    Node panel=panels.item(p)
+                    Node panelNumber=(Node)xpath.evaluate("panel_number", panel, XPathConstants.NODE)
+                    tQP.panelNum = panelNumber.getTextContent();
+
+                    Node invert=(Node)xpath.evaluate("invert", panel, XPathConstants.NODE)
+                    tQP.invert = invert.getTextContent() != "0"
+
+                    Node panelTiming=(Node)xpath.evaluate("panel_timing", panel, XPathConstants.NODE)
+                    tQP.panelTiming = panelTiming.getTextContent()
+
+                    NodeList items=(NodeList)xpath.evaluate("item", panel, XPathConstants.NODESET)
+
+                    for(int i=0; i<items.getLength(); i++) {
+
+                        TransmartQueryItem tQI = new TransmartQueryItem()
+
+                        Node item=items.item(i);
+
+                        Node key=(Node)xpath.evaluate("item_key", item, XPathConstants.NODE)
+
+                        tQI.itemKey = key.getTextContent()
+
+                        tQI.concept_cd = getConceptCodeFromPath(tQI.fullName);
+                        tQI.linkType = getLinkTypeFromConceptCode(tQI.concept_cd)
+
+                        tQP.items.add(tQI)
+
+                    }
+
+                    tQD.panels.add(tQP);
+
+                }
+
+            } catch (Exception e) {
+                log.error(e)
+            }
+        }
+
+        return tQD
+
+    }
+
+    def String getConceptCodeFromPath(String path)  {
+        StringBuilder concepts = new StringBuilder();
+        log.trace("Getting concept codes for path:" +path);
+        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
+        String sqlt =
+            sql.eachRow("SELECT CONCEPT_CD FROM i2b2demodata.CONCEPT_DIMENSION c WHERE CONCEPT_PATH = ?", [path], {row ->
+                log.trace("Found code:"+row.CONCEPT_CD);
+                concepts.append(row.CONCEPT_CD);
+            });
+        log.trace("Done getting concept codes for path:" +path);
+        return concepts.toString();
+    }
+
+    def String getConceptCodeFromLongPath(String path)  {
+        log.trace("Getting concept codes for long path:" +path);
+        print "test-------------------------------->"+path;
+        String shortPath = "";
+        try{
+            shortPath=path.substring(path.indexOf("\\",2), path.length());
+        }
+        catch(Exception e){
+            print e.getMessage();
+        }
+
+
+        if(!path.endsWith("\\")){
+            path +="\\";
+        }
+        return getConceptCodeFromPath(shortPath);
+    }
+
+    def List<String> getChildKeysFromParentKey(String concept_key) {
+        String prefix=concept_key.substring(0, concept_key.indexOf("\\",2)); //get the prefix to put on to the fullname to make a key
+        String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length());
+
+        String xml;
+        ArrayList ls=new ArrayList();
+        int i=getLevelFromKey(concept_key)+1;
+        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
+        String sqlt = "SELECT C_FULLNAME FROM i2b2metadata.i2b2 WHERE C_FULLNAME LIKE ? AND c_hlevel = ? ORDER BY C_FULLNAME";
+        sql.eachRow(sqlt, [fullname+"%", i], {row ->
+            String conceptkey=prefix+row.c_fullname;
+            ls.add(conceptkey);
+        })
+        return ls;
+    }
+
+
+    def renderQueryDefinitionToString(String qid, String title, regionParams)
+    {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        renderQueryDefinition(qid, title, pw, regionParams);
+        StringBuffer sb = sw.getBuffer();
+        return sb.toString();
+    }
+
 }
