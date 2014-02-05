@@ -813,7 +813,7 @@ class PostgresI2b2HelperService {
 	/**
 	 * Gets all the concept keys in both subsets into a hashmap that distincts them
 	 */
-	def List<String> (String result_instance_id1, String result_instance_id2) {
+	def List<String> getConceptKeysInSubsets(String result_instance_id1, String result_instance_id2) {
 		/*get all distinct  concepts for analysis from both subsets into hashmap*/
 		HashMap<String, String> h=new HashMap<String,String>();
 		ArrayList<String> results=new ArrayList<String>();
