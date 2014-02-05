@@ -117,8 +117,8 @@ class PostgresGeneExpressionDataService {
 			ssm.trial_name,
 			ssm.GPL_ID
 		FROM
-		de_subject_sample_mapping ssm
-		INNER JOIN qt_patient_set_collection sc ON sc.result_instance_id = CAST(? AS numeric) AND ssm.patient_id = sc.patient_num
+		DEAPP.de_subject_sample_mapping ssm
+		INNER JOIN i2b2demodata.qt_patient_set_collection sc ON sc.result_instance_id = CAST(? AS numeric) AND ssm.patient_id = sc.patient_num
 
 		""");
 		sQuery.append(" WHERE ssm.trial_name = '").append(study).append("' ")
@@ -181,11 +181,11 @@ class PostgresGeneExpressionDataService {
 		   """);
 	   
 	   sTables.append("""
-	   FROM de_subject_microarray_data a
-			   INNER JOIN de_mrna_annotation b ON a.probeset_id = b.probeset_id
-			   INNER JOIN de_subject_sample_mapping ssm ON ssm.assay_id = A.assay_id
-			   INNER JOIN qt_patient_set_collection sc ON sc.result_instance_id = CAST(? AS numeric) AND ssm.PATIENT_ID = sc.patient_num
-	   		   INNER JOIN PATIENT_DIMENSION pd on ssm.patient_id = pd.patient_num
+	   FROM DEAPP.de_subject_microarray_data a
+			   INNER JOIN DEAPP.de_mrna_annotation b ON a.probeset_id = b.probeset_id
+			   INNER JOIN DEAPP.de_subject_sample_mapping ssm ON ssm.assay_id = A.assay_id
+			   INNER JOIN i2b2demodata.qt_patient_set_collection sc ON sc.result_instance_id = CAST(? AS numeric) AND ssm.PATIENT_ID = sc.patient_num
+	   		   INNER JOIN i2b2demodata.PATIENT_DIMENSION pd on ssm.patient_id = pd.patient_num
 	   """)
 	   
 	   //If a list of genes was entered, look up the gene ids and add them to the query. If a gene signature or list was supplied then we modify the query to join on the tables that link the list to the gene ids.
@@ -201,9 +201,9 @@ class PostgresGeneExpressionDataService {
 		   
 		   //Include the tables we join on to get the unique_id.
 		   sTables.append("""
-			   INNER JOIN bio_marker bm ON bm.PRIMARY_EXTERNAL_ID = b.GENE_ID::varchar
-			   INNER JOIN bio_marker_correl_mv sbm ON sbm.asso_bio_marker_id = bm.bio_marker_id
-			   INNER JOIN search_keyword sk ON sk.bio_data_id = sbm.bio_marker_id
+			   INNER JOIN BIOMART.bio_marker bm ON bm.PRIMARY_EXTERNAL_ID = b.GENE_ID::varchar
+			   INNER JOIN BIOMART.bio_marker_correl_mv sbm ON sbm.asso_bio_marker_id = bm.bio_marker_id
+			   INNER JOIN SEARCHAPP.search_keyword sk ON sk.bio_data_id = sbm.bio_marker_id
 		   """)
 		   
 		   sTables.append(" WHERE SSM.trial_name = '").append(study).append("' ")
@@ -217,9 +217,9 @@ class PostgresGeneExpressionDataService {
 		   
 		   //Include the tables we join on to filter by the pathway.
 		   sTables.append("""
-		   INNER JOIN bio_marker bm ON bm.PRIMARY_EXTERNAL_ID = b.GENE_ID::varchar
+		   INNER JOIN BIOMART.bio_marker bm ON bm.PRIMARY_EXTERNAL_ID = b.GENE_ID::varchar
 		   INNER JOIN SEARCHAPP.SEARCH_BIO_MKR_CORREL_VIEW sbm ON sbm.asso_bio_marker_id = bm.bio_marker_id
-		   INNER JOIN search_keyword sk ON sk.bio_data_id = sbm.domain_object_id
+		   INNER JOIN SEARCHAPP.search_keyword sk ON sk.bio_data_id = sbm.domain_object_id
 		   """)
 
 		   //Include the normal filter.
@@ -271,8 +271,8 @@ class PostgresGeneExpressionDataService {
 			//Build the string to get the sample data.
 			s.append("""
 						SELECT DISTINCT a.PATIENT_ID, a.sample_type, a.timepoint, a.tissue_type, a.sample_cd, a.trial_name, pd.sourcesystem_cd
-						FROM de_subject_sample_mapping a 
-						INNER JOIN PATIENT_DIMENSION pd on a.patient_id = pd.patient_num
+						FROM DEAPP.de_subject_sample_mapping a
+						INNER i2b2demodata.JOIN PATIENT_DIMENSION pd on a.patient_id = pd.patient_num
 					""");
 			
 			s.append(" WHERE a.trial_name in (").append(studies).append(") ")
@@ -300,8 +300,8 @@ class PostgresGeneExpressionDataService {
 		StringBuilder assayS = new StringBuilder()
 		
 		assayS.append("""	SELECT DISTINCT s.assay_id 
-							FROM 	de_subject_sample_mapping s,
-									qt_patient_set_collection qt 
+							FROM 	DEAPP.de_subject_sample_mapping s,
+									i2b2demodata.qt_patient_set_collection qt
 							WHERE qt.patient_num = s.patient_id AND qt.result_instance_id = CAST(? AS numeric) """);
 
 
@@ -360,7 +360,7 @@ class PostgresGeneExpressionDataService {
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
 
 		//Query used to get trials.
-		StringBuilder trialQ = new StringBuilder("select distinct s.trial_name from de_subject_sample_mapping s ");
+		StringBuilder trialQ = new StringBuilder("select distinct s.trial_name from DEAPP.de_subject_sample_mapping s ");
 
 		//Append the patient ids.
 		trialQ.append(" where s.patient_id in (").append(ids).append(") and s.platform = 'MRNA_AFFYMETRIX'");
@@ -876,13 +876,13 @@ class PostgresGeneExpressionDataService {
 	def validateCommonSubjectsIn2Subsets(Map resultInstanceIdMap) {
 		if (resultInstanceIdMap && !resultInstanceIdMap.isEmpty() && resultInstanceIdMap.size() == 2) {
 			def sqlQuery = """
-							SELECT DISTINCT ssm.patient_id FROM de_subject_sample_mapping ssm 
+							SELECT DISTINCT ssm.patient_id FROM DEAPP.de_subject_sample_mapping ssm
 							INNER JOIN (SELECT DISTINCT patient_num 
-							            FROM qt_patient_set_collection
+							            FROM i2b2demodata.qt_patient_set_collection
 							            WHERE result_instance_id = CAST(? AS numeric)
 							            INTERSECT
 							            SELECT DISTINCT patient_num 
-							            FROM qt_patient_set_collection
+							            FROM i2b2demodata.qt_patient_set_collection
 							            WHERE result_instance_id = CAST(? AS numeric)) sc ON ssm.patient_id = sc.patient_num
 							"""
 			groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
@@ -999,9 +999,9 @@ class PostgresGeneExpressionDataService {
 							ssm.timepoint,
 							ssm.tissue_type,
 	   						sc.result_instance_id
-		   FROM de_subject_sample_mapping ssm 
+		   FROM DEAPP.de_subject_sample_mapping ssm
 		   INNER JOIN (SELECT DISTINCT patient_num, result_instance_id 
-	                  FROM qt_patient_set_collection 
+	                  FROM i2b2demodata.qt_patient_set_collection
 	                  WHERE result_instance_id IN (""")
    		.append(resultInstanceIds).append(")) sc ON ssm.patient_id = sc.patient_num")
 		.append(" WHERE ssm.trial_name IN (").append(convertList(studyList, true, 100)).append(")")
@@ -1015,18 +1015,18 @@ class PostgresGeneExpressionDataService {
 	   def sSelect = new StringBuilder()	   
 	   sSelect.append("""
 	   	SELECT a.PATIENT_ID, a.LOG_INTENSITY, a.RAW_INTENSITY, a.assay_id, b.probe_id, b.probeset_id, pd.sourcesystem_cd, ssm.gpl_id
-	   	FROM de_subject_microarray_data a
+	   	FROM DEAPP.de_subject_microarray_data a
 		   INNER JOIN (SELECT probe_id, probeset_id, min(gene_id) gene_id
-                       FROM de_mrna_annotation
+                       FROM DEAPP.de_mrna_annotation
                        group by probe_id, probeset_id) b ON a.probeset_id = b.probeset_id
-		   INNER JOIN de_subject_sample_mapping ssm ON (
+		   INNER JOIN DEAPP.de_subject_sample_mapping ssm ON (
 	   						ssm.trial_name = A.trial_name 
 	   					AND ssm.assay_id = A.assay_id)
-	   	   INNER JOIN patient_dimension pd ON a.patient_id = pd.patient_num 
+	   	   INNER JOIN i2b2demodata.patient_dimension pd ON a.patient_id = pd.patient_num
 	   """)
 	   sSelect.append("""
 	   		INNER JOIN (SELECT DISTINCT patient_num 
-					                  FROM qt_patient_set_collection 
+					                  FROM i2b2demodata.qt_patient_set_collection
 					                  WHERE result_instance_id IN (""")
 	   		.append(resultInstanceIds).append(")) sc ON ssm.patient_id = sc.patient_num") 
 			.append(" WHERE ssm.trial_name IN (").append(utilService.toListString(studyList)).append(")")
@@ -1040,10 +1040,10 @@ class PostgresGeneExpressionDataService {
 	   def sQuery = new StringBuilder();
 	   sQuery.append("""
 	   	SELECT DISTINCT ssm.assay_id, ssm.sample_type, ssm.timepoint, ssm.tissue_type, ssm.sample_cd, ssm.trial_name, ssm.GPL_ID
-	   	FROM de_subject_sample_mapping ssm
+	   	FROM DEAPP.de_subject_sample_mapping ssm
 	   """);
 	   sQuery.append("""INNER JOIN (SELECT DISTINCT patient_num 
-					                  FROM qt_patient_set_collection 
+					                  FROM i2b2demodata.qt_patient_set_collection
 					                  WHERE result_instance_id IN (""")
 	   		.append(resultInstanceIds).append(")) sc ON ssm.patient_id = sc.patient_num") 
 	   sQuery.append(" WHERE ssm.trial_name IN ( ").append(utilService.toListString(studyList)).append(") ")

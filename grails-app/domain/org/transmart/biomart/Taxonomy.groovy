@@ -35,7 +35,7 @@ class Taxonomy {
 		name column:'TAXON_NAME'
 		label column:'TAXON_LABEL'
 		ncbiTaxId column:'NCBI_TAX_ID'
-		experiments joinTable:[name:'BIO_DATA_TAXONOMY', key:'BIO_TAXONOMY_ID', schema:'BIOMART']
+		experiments joinTable:[name:'BIOMART.BIO_DATA_TAXONOMY', key:'BIO_TAXONOMY_ID']
 		}
 	}
 
