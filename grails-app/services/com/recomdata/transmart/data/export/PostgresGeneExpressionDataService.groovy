@@ -1355,7 +1355,7 @@ class PostgresGeneExpressionDataService {
    
    def getGplTitle(gplId){
 	   String gplTitle=""
-	   String commandString = "SELECT TITLE FROM de_gpl_info where PLATFORM=?"
+	   String commandString = "SELECT TITLE FROM DEAPP.de_gpl_info where PLATFORM=?"
 	   groovy.sql.Sql sql = new groovy.sql.Sql(dataSource);
 	   sql.eachRow(commandString, [gplId], {row->
 		   gplTitle=row[0]
