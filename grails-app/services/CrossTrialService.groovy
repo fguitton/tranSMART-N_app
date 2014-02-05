@@ -329,7 +329,7 @@ class CrossTrialService {
 		//Both of these represent concept paths.
 		metaDataJson["qtip"] = modifierNode.modifierPath
 		metaDataJson["dimcode"] = modifierNode.modifierPath
-		metaDataJson["tablename"] = "MODIFIER_DIMENSION"
+		metaDataJson["tablename"] = "I2B2DEMODATA.MODIFIER_DIMENSION"
 		metaDataJson["level"] = nodeLevel
 		
 		if(!leafnode)
@@ -392,7 +392,7 @@ class CrossTrialService {
 		metaDataJson["qtip"] = modifierNode.modifierPath
 		metaDataJson["dimcode"] = modifierNode.modifierPath
 		metaDataJson["iconCls"] = modifierNode.valtypeCd
-		metaDataJson["tablename"] = "MODIFIER_DIMENSION"
+		metaDataJson["tablename"] = "i2b2demodata.MODIFIER_DIMENSION"
 		metaDataJson["level"] = modifierNode.modifierLevel
 		metaDataJson["visitInd"] = modifierNode.visitInd ? modifierNode.visitInd : ""
 		metaDataJson["inOutCode"] = modifierNode.inOutCode ? modifierNode.inOutCode : ""

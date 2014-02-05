@@ -813,7 +813,7 @@ class PostgresI2b2HelperService {
 	/**
 	 * Gets all the concept keys in both subsets into a hashmap that distincts them
 	 */
-	def List<String> getConceptKeysInSubsets(String result_instance_id1, String result_instance_id2) {
+	def List<String> (String result_instance_id1, String result_instance_id2) {
 		/*get all distinct  concepts for analysis from both subsets into hashmap*/
 		HashMap<String, String> h=new HashMap<String,String>();
 		ArrayList<String> results=new ArrayList<String>();
@@ -952,9 +952,9 @@ class PostgresI2b2HelperService {
 		
 		log.debug("getDistinctConceptSet called with arguments: "+result_instance_id1+" and "+result_instance_id2)
 		
-		if(result_instance_id1!=null && !result_instance_id1.isEmpty())
+		if(result_instance_id1!=null && !result_instance_id1!="")
         workingSet.addAll(getConceptKeysInSubset(result_instance_id1));
-        if(result_instance_id1!=null && !result_instance_id1.isEmpty())
+        if(result_instance_id2!=null && !result_instance_id2!="")
 		workingSet.addAll(getConceptKeysInSubset(result_instance_id2));
 		
 		for (String k : workingSet) {

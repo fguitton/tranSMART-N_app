@@ -15,7 +15,7 @@ class i2b2DemoDataService {
 		//def newInstanceId = sqlObject.firstRow('SELECT QT_SQ_QRI_QRIID.nextval NEXTVAL from dual')
 
         //Netezza
-		def newInstanceId = sqlObject.firstRow('SELECT next value for QT_SQ_QRI_QRIID NEXTVAL')
+		def newInstanceId = sqlObject.firstRow("SELECT nextval('I2B2DEMODATA.QT_SQ_QRI_QRIID')")
 
 		return newInstanceId.NEXTVAL;
 	}
@@ -32,7 +32,7 @@ class i2b2DemoDataService {
 
         //Netezza
 		//Generate the query master id.
-		def queryMasterId = sqlObject.firstRow('SELECT next value for QT_SQ_QM_QMID NEXTVAL')
+		def queryMasterId = sqlObject.firstRow("SELECT nextval('I2B2DEMODATA.QT_SQ_QM_QMID')")
 
         //Oracle
         //Insert a record in the QT_QUERY_MASTER table.
@@ -40,7 +40,7 @@ class i2b2DemoDataService {
 
         //Netezza
 		//Insert a record in the QT_QUERY_MASTER table.
-        sqlObject.execute("INSERT INTO QT_QUERY_MASTER (QUERY_MASTER_ID, NAME, USER_ID, GROUP_ID, CREATE_DATE, REQUEST_XML, DELETE_FLAG) VALUES (?, ?, 'DEMO','DEMO', now(), ?, 'N')", [queryMasterId.NEXTVAL,'Across Trial Query',requestXML])
+        sqlObject.execute("INSERT INTO I2B2DEMODATA.QT_QUERY_MASTER (QUERY_MASTER_ID, NAME, USER_ID, GROUP_ID, CREATE_DATE, REQUEST_XML, DELETE_FLAG) VALUES (?, ?, 'DEMO','DEMO', now(), ?, 'N')", [queryMasterId.NEXTVAL,'Across Trial Query',requestXML])
 
         //Oracle
         //Generate the query instance id.
@@ -48,10 +48,10 @@ class i2b2DemoDataService {
 
         //Netezza
 		//Generate the query instance id.
-		def queryInstanceId = sqlObject.firstRow('SELECT next value for  QT_SQ_QI_QIID NEXTVAL')
-		
+		def queryInstanceId = sqlObject.firstRow("SELECT nextval('I2B2DEMODATA.QT_SQ_QI_QIID')")
+
 		//Insert a record in the QT_QUERY_INSTANCE table.
-		sqlObject.execute("INSERT INTO QT_QUERY_INSTANCE (QUERY_INSTANCE_ID, QUERY_MASTER_ID, USER_ID, GROUP_ID, START_DATE) VALUES (?,?,'DEMO','DEMO', now())", [queryInstanceId.NEXTVAL, queryMasterId.NEXTVAL])
+		sqlObject.execute("INSERT INTO I2B2DEMODATA.QT_QUERY_INSTANCE (QUERY_INSTANCE_ID, QUERY_MASTER_ID, USER_ID, GROUP_ID, START_DATE) VALUES (?,?,'DEMO','DEMO', now())", [queryInstanceId.NEXTVAL, queryMasterId.NEXTVAL])
 
         //Oracle
         //Insert a record in the QT_QUERY_RESULT_INSTANCE table.
@@ -59,7 +59,7 @@ class i2b2DemoDataService {
 
 		//Netezza
 		//Insert a record in the QT_QUERY_RESULT_INSTANCE table.
-		sqlObject.execute("INSERT INTO QT_QUERY_RESULT_INSTANCE (RESULT_INSTANCE_ID, QUERY_INSTANCE_ID, RESULT_TYPE_ID, START_DATE, STATUS_TYPE_ID) VALUES (?,?,1,now(),3)", [resultInstanceId, queryInstanceId.NEXTVAL])
+		sqlObject.execute("INSERT INTO I2B2DEMODATA.QT_QUERY_RESULT_INSTANCE (RESULT_INSTANCE_ID, QUERY_INSTANCE_ID, RESULT_TYPE_ID, START_DATE, STATUS_TYPE_ID) VALUES (?,?,1,now(),3)", [resultInstanceId, queryInstanceId.NEXTVAL])
 		
 	}
 	
@@ -70,8 +70,8 @@ class i2b2DemoDataService {
 		
 		xml.queryDefinition()
 		{
-			queryDimensionTable("MODIFIER_DIMENSION")
-			
+			queryDimensionTable("I2B2DEMODATA.MODIFIER_DIMENSION")
+
 			criteriaJSON.each()
 			{
 				currentAndGroup ->
@@ -130,7 +130,7 @@ class i2b2DemoDataService {
 	{
 		//Netezza
 		//This is the final SQL string which does the inserts.
-		def finalSQLString = "INSERT INTO qt_patient_set_collection (patient_set_coll_id, result_instance_id, patient_num) select next value for qt_sq_qs_qsid, ?,t.patient_num from ( SELECT DISTINCT OBSFACT.PATIENT_NUM FROM OBSERVATION_FACT OBSFACT "
+		def finalSQLString = "INSERT INTO I2B2DEMODATA.qt_patient_set_collection (patient_set_coll_id, result_instance_id, patient_num) select nextval('I2B2DEMODATA.qt_sq_qs_qsid'), ?,t.patient_num from ( SELECT DISTINCT OBSFACT.PATIENT_NUM FROM I2B2DEMODATA.OBSERVATION_FACT OBSFACT "
 
         //Oracle
         //This is the final SQL string which does the inserts.
@@ -290,10 +290,11 @@ class i2b2DemoDataService {
 			}
 			
 			//Build the sub select statement.
-			sqlANDList += " ${joinText} (SELECT OBSFACT_INNER.PATIENT_NUM, OBSFACT_INNER.ENCOUNTER_NUM FROM OBSERVATION_FACT OBSFACT_INNER INNER JOIN MODIFIER_DIMENSION MD ON MD.MODIFIER_CD = OBSFACT_INNER.MODIFIER_CD LEFT JOIN VISIT_DIMENSION VD ON VD.ENCOUNTER_NUM = OBSFACT_INNER.ENCOUNTER_NUM WHERE " + sqlORList + ") ${subselectName} ON ${subselectName}.PATIENT_NUM = OBSFACT.PATIENT_NUM ${levelJoin}"
+			sqlANDList += " ${joinText} (SELECT OBSFACT_INNER.PATIENT_NUM, OBSFACT_INNER.ENCOUNTER_NUM FROM I2B2DEMODATA.OBSERVATION_FACT OBSFACT_INNER INNER JOIN I2B2DEMODATA.MODIFIER_DIMENSION MD ON MD.MODIFIER_CD = OBSFACT_INNER.MODIFIER_CD LEFT JOIN I2B2DEMODATA.VISIT_DIMENSION VD ON VD.ENCOUNTER_NUM = OBSFACT_INNER.ENCOUNTER_NUM WHERE " + sqlORList + ") ${subselectName} ON ${subselectName}.PATIENT_NUM = OBSFACT.PATIENT_NUM ${levelJoin}"
 			
 			//Increment the counter for the number of sub selects.
 			joinCount += 1
+            //COMPILE
 			
 		}
 		
@@ -404,7 +405,7 @@ class i2b2DemoDataService {
 		//Build a SQL statement to retrieve the level records.
 		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
 		
-		String sqlt = "SELECT DE_ENCOUNTER_LEVEL.LINK_TYPE,i2b2.C_FULLNAME FROM DE_ENCOUNTER_LEVEL INNER JOIN i2b2 ON i2b2.C_BASECODE = DE_ENCOUNTER_LEVEL.CONCEPT_CD WHERE i2b2.C_FULLNAME LIKE ? AND i2b2.C_HLEVEL = ?";
+		String sqlt = "SELECT DE_ENCOUNTER_LEVEL.LINK_TYPE,i2b2.C_FULLNAME FROM DEAPP.DE_ENCOUNTER_LEVEL INNER JOIN I2B2METADATA.i2b2 ON i2b2.C_BASECODE = DE_ENCOUNTER_LEVEL.CONCEPT_CD WHERE i2b2.C_FULLNAME LIKE ? AND i2b2.C_HLEVEL = ?";
 		
 		//Build the list of concept paths and link types.
 		sql.eachRow(sqlt, [fullname+"%", i], {row ->
