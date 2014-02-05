@@ -45,8 +45,8 @@ class SubsetController {
     }
 
     def save = {
-        def qid1 = i2b2HelperService.getQIDFromRID(request.getParameter("result_instance_id1"))
-        def qid2 = i2b2HelperService.getQIDFromRID(request.getParameter("result_instance_id2"))
+        def qid1 = request.getParameter("result_instance_id1");//i2b2HelperService.getQIDFromRID(request.getParameter("result_instance_id1"))
+        def qid2 = request.getParameter("result_instance_id2");//i2b2HelperService.getQIDFromRID(request.getParameter("result_instance_id2"))
         def subset = new Subset()
 
         try	{

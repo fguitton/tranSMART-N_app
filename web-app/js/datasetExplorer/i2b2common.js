@@ -138,7 +138,8 @@ function createPanelItemNew(panel, concept, shortNameDepth)
     li.setAttribute('setvalueunits',concept.value.units);
     li.setAttribute('oktousevalues',concept.oktousevalues);
     li.setAttribute('setnodetype',concept.nodeType);
-    li.setAttribute('ismodifier', concept.ismodifier);
+    var ismodifier=typeof concept.inOutCode !== 'undefined' ? concept.ismodifier : false;
+    li.setAttribute('ismodifier', ismodifier);
     li.setAttribute('modifiername', concept.modifiername);
     li.setAttribute('modifierappliedpath', concept.modifierappliedpath);
     li.setAttribute('modifierkey', concept.modifierkey);
@@ -162,7 +163,7 @@ function createPanelItemNew(panel, concept, shortNameDepth)
         }
     }
     else shortname=splits[splits.length-1];
-    if(concept.ismodifier){shortname=shortname+" ["+concept.modifiername+"] ";}
+    if(ismodifier){shortname=shortname+" ["+concept.modifiername+"] ";}
     li.setAttribute('conceptshortname',shortname);
 
     //Create a setvalue description
