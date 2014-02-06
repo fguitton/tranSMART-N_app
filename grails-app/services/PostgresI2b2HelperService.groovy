@@ -86,16 +86,21 @@ class PostgresI2b2HelperService {
 	/**
 	 * Converts a concept key to a path
 	 */
-	def keyToPath(String concept_key) {
-		log.trace("keytoPath from key: "+concept_key);
-		String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length());
-		String path=fullname;
-		if(!fullname.endsWith("\\")) {
-			path=path+"\\";
-		}
-		return path;
-	}
-	
+    def keyToPath(String concept_key) {
+        String path = concept_key
+        try{
+            log.trace("keytoPath from key: "+concept_key);
+            String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length());
+            path=fullname;
+            if(!fullname.endsWith("\\")) {
+                path=path+"\\";
+            }
+        }
+        catch (Exception e){
+            path = concept_key;
+        }
+        return path;
+    }
 	/**
 	 *  Gets the parent concept key of a concept key
 	 */
@@ -233,15 +238,20 @@ class PostgresI2b2HelperService {
 	/**
 	 * Determines if a concept key is a leaf or not
 	 */
-	def Boolean isLeafConceptKey(String concept_key) {
-		String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length());
-		Boolean res=false;
-		groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-		sql.eachRow("SELECT C_VISUALATTRIBUTES FROM I2B2METADATA.I2B2 WHERE C_FULLNAME = ?", [fullname], {row ->
-			res=row.c_visualattributes.indexOf('L')>-1
-		})
-		return res;
-	}
+    def Boolean isLeafConceptKey(String concept_key) {
+        Boolean res=false;
+        try{
+            String fullname=concept_key.substring(concept_key.indexOf("\\",2), concept_key.length());
+            groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
+            sql.eachRow("SELECT C_VISUALATTRIBUTES FROM I2B2METADATA.I2B2 WHERE C_FULLNAME = ?", [fullname], {row ->
+                res=row.c_visualattributes.indexOf('L')>-1
+            })
+        }
+        catch (Exception e){
+
+        }
+        return res;
+    }
 	
 	/**
 	 * Gets the distinct patient counts for the children of a parent concept key
