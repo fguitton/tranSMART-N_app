@@ -311,6 +311,8 @@ class I2b2ModifierHelperService {
     {
 
         ArrayList<Map> modifierObjects = new ArrayList<Map>();
+        if(!resultInstanceId1.equals("")&&!resultInstanceId2.equals(""))
+        {
         def modifierObject = [:]
 
         //Oracle
@@ -365,7 +367,7 @@ class I2b2ModifierHelperService {
         });
 
         //if(dimensions.unique().size() > 1) throw new Exception("Multiple Dimension types found in Query.")
-
+        }
         return modifierObjects;
     }
 
